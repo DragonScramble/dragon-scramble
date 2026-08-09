@@ -30,5 +30,18 @@ render();
     SUPABASE_KEY
   );
 
-  console.log("Dragon Scramble connected to Supabase");
+  console.log("Dragon Scramble connected to Supabase");async function testDatabaseConnection() {
+  const { data, error } = await supabaseClient
+    .from("players")
+    .select("*")
+    .limit(1);
+
+  if (error) {
+    console.error("Dragon Scramble database test failed:", error);
+  } else {
+    console.log("Dragon Scramble database test successful:", data);
+  }
+}
+
+testDatabaseConnection();
 </script></body></html>
