@@ -84,6 +84,7 @@ h1{
 
 h2{margin:8px 0}
 h3{margin:8px 0}
+h4{margin:5px 0}
 
 .eyebrow{
   text-transform:uppercase;
@@ -258,6 +259,24 @@ label{
   padding:18px 0;
 }
 
+.game-result{
+  padding:15px;
+  margin:10px 0;
+  background:#f3eee3;
+  border-radius:10px;
+}
+
+.game-result strong{
+  font-size:16px;
+}
+
+.match-total{
+  padding:15px;
+  background:#e5eee7;
+  border-radius:10px;
+  margin-top:15px;
+}
+
 .checkrow{
   display:flex;
   gap:20px;
@@ -270,6 +289,12 @@ label{
   letter-spacing:0;
   font-size:14px;
   color:var(--ink);
+}
+
+.section-divider{
+  margin:40px 0 20px;
+  border-top:1px solid var(--line);
+  padding-top:28px;
 }
 
 .hof-scramble{
@@ -322,9 +347,9 @@ label{
 <button onclick="show('account')">Account</button>
 
 <button
-  id="admin-nav"
-  class="admin-nav hidden"
-  onclick="show('admin')">
+id="admin-nav"
+class="admin-nav hidden"
+onclick="show('admin')">
 Admin
 </button>
 </nav>
@@ -351,20 +376,13 @@ Admin
 
 <div class="eyebrow">Your Standing</div>
 
-<div
-  id="my-rank"
-  style="font-size:34px">
-—
-</div>
+<div id="my-rank" style="font-size:34px">—</div>
 
 <b id="my-nickname">
 Sign in to view
 </b>
 
-<div
-  id="my-stats"
-  class="muted">
-</div>
+<div id="my-stats" class="muted"></div>
 
 </div>
 
@@ -418,9 +436,7 @@ Open Table
 
 <!-- MATCHES -->
 
-<section
-  id="matches"
-  class="hidden">
+<section id="matches" class="hidden">
 
 <div class="hero">
 
@@ -443,8 +459,8 @@ Only active, payment-confirmed players can propose or join.
 </div>
 
 <button
-  class="btn alt"
-  onclick="toggleProposal()">
+class="btn alt"
+onclick="toggleProposal()">
 + Propose a Match
 </button>
 
@@ -452,14 +468,12 @@ Only active, payment-confirmed players can propose or join.
 
 
 <div
-  id="match-eligibility-message"
-  class="notice hidden">
+id="match-eligibility-message"
+class="notice hidden">
 </div>
 
 
-<div
-  id="proposal"
-  class="card hidden">
+<div id="proposal" class="card hidden">
 
 <div class="eyebrow">
 New Match
@@ -469,62 +483,33 @@ New Match
 Propose a Match
 </h2>
 
-
 <div class="formgrid">
 
 <div>
-
-<label>
-Date
-</label>
-
-<input
-  id="match-date"
-  type="date">
-
+<label>Date</label>
+<input id="match-date" type="date">
 </div>
 
 <div>
-
-<label>
-Time
-</label>
-
-<input
-  id="match-time"
-  type="time">
-
+<label>Time</label>
+<input id="match-time" type="time">
 </div>
 
 </div>
 
-
-<label>
-Location
-</label>
+<label>Location</label>
 
 <input
-  id="match-location"
-  type="text"
-  placeholder="Match location">
+id="match-location"
+type="text"
+placeholder="Match location">
 
-
-<label>
-Match Type
-</label>
+<label>Match Type</label>
 
 <select id="match-type">
-
-<option value="social">
-Social
-</option>
-
-<option value="focused">
-Focused
-</option>
-
+<option value="social">Social</option>
+<option value="focused">Focused</option>
 </select>
-
 
 <div class="notice">
 
@@ -538,36 +523,66 @@ same rules with players expected to maintain a faster pace.
 
 </div>
 
-
 <div class="notice">
-
 The proposer provides the
 <b>Mahjong tiles, mat, racks and dice</b>.
-
 </div>
 
-
 <button
-  class="btn"
-  onclick="createMatch()">
+class="btn"
+onclick="createMatch()">
 Post Match
 </button>
 
-<p
-  id="proposal-message"
-  class="muted">
-</p>
+<p id="proposal-message" class="muted"></p>
 
 </div>
 
 
-<div id="match-list">
+<div>
 
-<div class="card">
+<div class="eyebrow">
+Upcoming
+</div>
+
+<h2>
+Upcoming Matches
+</h2>
 
 <p class="muted">
-Loading matches...
+Next upcoming match appears first.
 </p>
+
+<div id="upcoming-match-list">
+
+<div class="card">
+<p class="muted">Loading upcoming matches...</p>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="section-divider">
+
+<div class="eyebrow">
+History
+</div>
+
+<h2>
+Played Matches
+</h2>
+
+<p class="muted">
+Most recently played match appears first.
+</p>
+
+<div id="played-match-list">
+
+<div class="card">
+<p class="muted">Loading played matches...</p>
+</div>
 
 </div>
 
@@ -578,9 +593,7 @@ Loading matches...
 
 <!-- ROSTER -->
 
-<section
-  id="roster"
-  class="hidden">
+<section id="roster" class="hidden">
 
 <div class="eyebrow">
 Active Players
@@ -596,14 +609,8 @@ Player Roster
 Only active players for the current Scramble appear here.
 </p>
 
-<div
-  class="card"
-  id="rosterlist">
-
-<p class="muted">
-Loading players...
-</p>
-
+<div class="card" id="rosterlist">
+<p class="muted">Loading players...</p>
 </div>
 
 </section>
@@ -611,9 +618,7 @@ Loading players...
 
 <!-- HALL OF FAME -->
 
-<section
-  id="hall"
-  class="hidden">
+<section id="hall" class="hidden">
 
 <div class="eyebrow">
 Dragon Scramble History
@@ -624,17 +629,11 @@ Hall of Fame
 </h1>
 
 <p class="muted">
-Closed Scrambles are preserved here by name.
+Closed Scrambles are preserved here with their final standings.
 </p>
 
-<div
-  class="card"
-  id="hall-of-fame-list">
-
-<p class="muted">
-Loading Hall of Fame...
-</p>
-
+<div class="card" id="hall-of-fame-list">
+<p class="muted">Loading Hall of Fame...</p>
 </div>
 
 </section>
@@ -642,9 +641,7 @@ Loading Hall of Fame...
 
 <!-- RULES -->
 
-<section
-  id="rules"
-  class="hidden">
+<section id="rules" class="hidden">
 
 <div class="eyebrow">
 Play fair · Have fun
@@ -653,7 +650,6 @@ Play fair · Have fun
 <h1>
 Dragon Scramble Rules
 </h1>
-
 
 <div class="card">
 
@@ -666,8 +662,8 @@ Current Scramble
 </h2>
 
 <div
-  id="rules-payment-instructions"
-  class="payment-box">
+id="rules-payment-instructions"
+class="payment-box">
 Loading payment instructions...
 </div>
 
@@ -748,9 +744,7 @@ If an emergency occurs after play begins, every unfinished game becomes a Wall G
 
 <!-- ACCOUNT -->
 
-<section
-  id="account"
-  class="hidden">
+<section id="account" class="hidden">
 
 <div class="eyebrow">
 Player Account
@@ -762,8 +756,8 @@ Dragon Scramble Account
 
 
 <div
-  id="logged-in-player"
-  class="card hidden">
+id="logged-in-player"
+class="card hidden">
 
 <div class="eyebrow">
 Your Account
@@ -774,15 +768,12 @@ Welcome,
 <span id="player-nickname"></span>
 </h2>
 
-<p
-  id="player-name"
-  class="muted">
-</p>
+<p id="player-name" class="muted"></p>
 
 
 <div
-  id="account-payment-section"
-  class="hidden">
+id="account-payment-section"
+class="hidden">
 
 <div class="eyebrow">
 Current Scramble
@@ -791,8 +782,8 @@ Current Scramble
 <h2 id="account-scramble-name"></h2>
 
 <div
-  id="account-payment-instructions"
-  class="payment-box">
+id="account-payment-instructions"
+class="payment-box">
 Loading payment instructions...
 </div>
 
@@ -802,17 +793,15 @@ Loading payment instructions...
 
 
 <button
-  class="btn alt"
-  onclick="signOutPlayer()">
+class="btn alt"
+onclick="signOutPlayer()">
 Sign Out
 </button>
 
 </div>
 
 
-<div
-  id="signup-card"
-  class="card">
+<div id="signup-card" class="card">
 
 <div class="eyebrow">
 New Player
@@ -822,63 +811,33 @@ New Player
 Create Account
 </h2>
 
-<label>
-Full Name
-</label>
+<label>Full Name</label>
+<input id="signup-name" type="text">
 
-<input
-  id="signup-name"
-  type="text">
+<label>Mahjong Nickname</label>
+<input id="signup-nickname" type="text">
 
-<label>
-Mahjong Nickname
-</label>
+<label>Phone</label>
+<input id="signup-phone" type="tel">
 
-<input
-  id="signup-nickname"
-  type="text">
+<label>Email</label>
+<input id="signup-email" type="email">
 
-<label>
-Phone
-</label>
-
-<input
-  id="signup-phone"
-  type="tel">
-
-<label>
-Email
-</label>
-
-<input
-  id="signup-email"
-  type="email">
-
-<label>
-Password
-</label>
-
-<input
-  id="signup-password"
-  type="password">
+<label>Password</label>
+<input id="signup-password" type="password">
 
 <button
-  class="btn"
-  onclick="signUpPlayer()">
+class="btn"
+onclick="signUpPlayer()">
 Create Account
 </button>
 
-<p
-  id="signup-message"
-  class="muted">
-</p>
+<p id="signup-message" class="muted"></p>
 
 </div>
 
 
-<div
-  id="login-card"
-  class="card">
+<div id="login-card" class="card">
 
 <div class="eyebrow">
 Returning Player
@@ -888,43 +847,28 @@ Returning Player
 Sign In
 </h2>
 
-<label>
-Email
-</label>
+<label>Email</label>
+<input id="login-email" type="email">
 
-<input
-  id="login-email"
-  type="email">
-
-<label>
-Password
-</label>
-
-<input
-  id="login-password"
-  type="password">
+<label>Password</label>
+<input id="login-password" type="password">
 
 <button
-  class="btn alt"
-  onclick="signInPlayer()">
+class="btn alt"
+onclick="signInPlayer()">
 Sign In
 </button>
 
-<p
-  id="login-message"
-  class="muted">
-</p>
+<p id="login-message" class="muted"></p>
 
 </div>
 
 </section>
 
 
-<!-- SCORE ENTRY FOR PLAYERS -->
+<!-- RESULTS -->
 
-<section
-  id="results"
-  class="hidden">
+<section id="results" class="hidden">
 
 <div class="eyebrow">
 Match Results
@@ -935,16 +879,14 @@ Enter Results
 </h1>
 
 <p class="muted">
-Any player in a confirmed match may submit its results.
-Admin can submit results for any confirmed match.
+Any player in a confirmed match may submit the results.
+Admin may submit results for any confirmed match.
 </p>
 
 <div id="player-score-list">
 
 <div class="card">
-<p class="muted">
-Loading confirmed matches...
-</p>
+<p class="muted">Loading confirmed matches...</p>
 </div>
 
 </div>
@@ -954,9 +896,7 @@ Loading confirmed matches...
 
 <!-- ADMIN -->
 
-<section
-  id="admin"
-  class="hidden">
+<section id="admin" class="hidden">
 
 <div class="eyebrow">
 Administration
@@ -978,7 +918,7 @@ Scrambles
 </h2>
 
 <p class="muted">
-Edit names and dates of active or closed Scrambles.
+Names and dates may be edited. Closed Scrambles remain locked for scoring.
 </p>
 
 <div id="admin-scramble-history">
@@ -987,8 +927,8 @@ Edit names and dates of active or closed Scrambles.
 
 
 <div
-  id="admin-create-scramble"
-  class="hidden">
+id="admin-create-scramble"
+class="hidden">
 
 <div class="edit-box">
 
@@ -996,13 +936,11 @@ Edit names and dates of active or closed Scrambles.
 Create New Scramble
 </h3>
 
-<label>
-Scramble Name
-</label>
+<label>Scramble Name</label>
 
 <input
-  id="new-scramble-name"
-  placeholder="e.g. Fall 2026 Dragon Scramble">
+id="new-scramble-name"
+placeholder="e.g. Fall 2026 Dragon Scramble">
 
 <div class="formgrid">
 
@@ -1019,15 +957,12 @@ Scramble Name
 </div>
 
 <button
-  class="btn"
-  onclick="adminCreateScramble()">
+class="btn"
+onclick="adminCreateScramble()">
 Create Active Scramble
 </button>
 
-<p
-  id="new-scramble-message"
-  class="muted">
-</p>
+<p id="new-scramble-message" class="muted"></p>
 
 </div>
 
@@ -1036,9 +971,7 @@ Create Active Scramble
 </div>
 
 
-<div
-  id="admin-payment-card"
-  class="card">
+<div id="admin-payment-card" class="card">
 
 <div class="eyebrow">
 Current Scramble Settings
@@ -1052,27 +985,20 @@ Payment Instructions
 Payment Message
 </label>
 
-<textarea
-  id="admin-payment-instructions">
-</textarea>
+<textarea id="admin-payment-instructions"></textarea>
 
 <button
-  class="btn"
-  onclick="adminSavePaymentInstructions()">
+class="btn"
+onclick="adminSavePaymentInstructions()">
 Save Payment Instructions
 </button>
 
-<p
-  id="admin-payment-message"
-  class="muted">
-</p>
+<p id="admin-payment-message" class="muted"></p>
 
 </div>
 
 
-<div
-  id="admin-player-card"
-  class="card">
+<div id="admin-player-card" class="card">
 
 <div class="eyebrow">
 Player Management
@@ -1100,7 +1026,7 @@ All Matches
 </h2>
 
 <p class="muted">
-Admin may remove test or invalid matches. Completed match points will also be removed.
+Admin may permanently remove test or invalid matches.
 </p>
 
 <div id="admin-match-management">
@@ -1110,9 +1036,7 @@ Admin may remove test or invalid matches. Completed match points will also be re
 </div>
 
 
-<div
-  id="admin-score-card"
-  class="card">
+<div id="admin-score-card" class="card">
 
 <div class="eyebrow">
 Score Entry
@@ -1121,10 +1045,6 @@ Score Entry
 <h2>
 Confirmed Matches
 </h2>
-
-<p class="muted">
-Admin can submit results for any confirmed match.
-</p>
 
 <div id="admin-score-list">
 <p class="muted">Loading confirmed matches...</p>
@@ -1178,6 +1098,38 @@ function escapeHtml(value){
 }
 
 
+function dateText(value){
+
+  const date =
+    new Date(value);
+
+  return date.toLocaleDateString(
+    undefined,
+    {
+      weekday:"short",
+      month:"short",
+      day:"numeric",
+      year:"numeric"
+    }
+  );
+
+}
+
+
+function timeText(value){
+
+  return new Date(value)
+    .toLocaleTimeString(
+      undefined,
+      {
+        hour:"numeric",
+        minute:"2-digit"
+      }
+    );
+
+}
+
+
 function show(id){
 
   document
@@ -1219,7 +1171,10 @@ function show(id){
   }
 
   if(id === "results"){
-    loadScoreEntry("player-score-list",false);
+    loadScoreEntry(
+      "player-score-list",
+      false
+    );
   }
 
   if(id === "admin"){
@@ -1239,7 +1194,10 @@ async function getActiveScramble(){
       .select(
         "id,name,start_date,end_date,status,closed_at,payment_instructions"
       )
-      .eq("status","active")
+      .eq(
+        "status",
+        "active"
+      )
       .order(
         "start_date",
         {ascending:false}
@@ -1250,7 +1208,7 @@ async function getActiveScramble(){
   if(error){
 
     console.error(
-      "Could not load Scramble:",
+      "Could not load active Scramble:",
       error
     );
 
@@ -1367,7 +1325,7 @@ async function checkEligibility(){
 }
 
 
-/* PAYMENT / ACCOUNT */
+/* ACCOUNT */
 
 async function loadAccountPaymentStatus(){
 
@@ -1382,7 +1340,9 @@ async function loadAccountPaymentStatus(){
       "account-payment-section"
     );
 
-  const name =
+  section.classList.remove("hidden");
+
+  const scrambleName =
     document.getElementById(
       "account-scramble-name"
     );
@@ -1397,11 +1357,9 @@ async function loadAccountPaymentStatus(){
       "account-payment-status"
     );
 
-  section.classList.remove("hidden");
-
   if(!currentScramble){
 
-    name.textContent =
+    scrambleName.textContent =
       "No active Scramble";
 
     instructions.textContent =
@@ -1413,7 +1371,7 @@ async function loadAccountPaymentStatus(){
     return;
   }
 
-  name.textContent =
+  scrambleName.textContent =
     currentScramble.name;
 
   instructions.textContent =
@@ -1470,9 +1428,7 @@ async function loadAccountPaymentStatus(){
 
       <div class="notice">
 
-        <b>
-          Payment confirmed ✓
-        </b>
+        <b>Payment confirmed ✓</b>
 
         <br>
 
@@ -1494,9 +1450,7 @@ async function loadAccountPaymentStatus(){
 
       <div class="notice">
 
-        <b>
-          Payment confirmed ✓
-        </b>
+        <b>Payment confirmed ✓</b>
 
         <br>
 
@@ -1518,9 +1472,7 @@ async function loadAccountPaymentStatus(){
 
       <div class="notice notice-pending">
 
-        <b>
-          Payment notice sent
-        </b>
+        <b>Payment notice sent</b>
 
         <br>
 
@@ -1587,7 +1539,7 @@ async function playerNotifyPayment(){
 }
 
 
-/* MATCHES */
+/* MATCH PAGE */
 
 function toggleProposal(){
 
@@ -1621,14 +1573,19 @@ function toggleProposal(){
 
 async function loadMatchesPage(){
 
-  const list =
+  const upcoming =
     document.getElementById(
-      "match-list"
+      "upcoming-match-list"
+    );
+
+  const played =
+    document.getElementById(
+      "played-match-list"
     );
 
   if(!currentUser){
 
-    list.innerHTML = `
+    upcoming.innerHTML = `
 
       <div class="card">
 
@@ -1646,6 +1603,8 @@ async function loadMatchesPage(){
 
     `;
 
+    played.innerHTML = "";
+
     return;
   }
 
@@ -1661,8 +1620,11 @@ async function loadMatchesPage(){
 
   if(!currentScramble){
 
-    list.innerHTML =
-      '<div class="card"><p class="muted">There is no active Scramble.</p></div>';
+    upcoming.innerHTML =
+      '<div class="card"><p class="muted">There is currently no active Scramble.</p></div>';
+
+    played.innerHTML =
+      '<div class="card"><p class="muted">Played-match details are not shown after a Scramble closes. See Hall of Fame for final standings.</p></div>';
 
     return;
   }
@@ -1697,10 +1659,15 @@ async function loadMatchesPage(){
 
   }
 
-  await loadMatches();
+  await Promise.all([
+    loadUpcomingMatches(),
+    loadPlayedMatches()
+  ]);
 
 }
 
+
+/* CREATE MATCH */
 
 async function createMatch(){
 
@@ -1808,11 +1775,13 @@ async function createMatch(){
     .getElementById("proposal")
     .classList.add("hidden");
 
-  await loadMatches();
+  await loadMatchesPage();
   await loadHomeMatches();
 
 }
 
+
+/* JOIN */
 
 async function joinMatch(id){
 
@@ -1847,251 +1816,19 @@ async function joinMatch(id){
     return;
   }
 
-  await loadMatches();
+  await loadMatchesPage();
   await loadHomeMatches();
 
 }
 
 
-function toggleEdit(id){
+/* UPCOMING MATCHES */
 
-  document
-    .getElementById(
-      `edit-${id}`
-    )
-    .classList.toggle("hidden");
-
-}
-
-
-function toggleCancel(id){
-
-  document
-    .getElementById(
-      `cancel-${id}`
-    )
-    .classList.toggle("hidden");
-
-}
-
-
-async function updateMatch(
-  id,
-  status,
-  originalScheduledAt
-){
-
-  const location =
-    document.getElementById(
-      `edit-location-${id}`
-    ).value.trim();
-
-  const message =
-    document.getElementById(
-      `edit-message-${id}`
-    );
-
-  if(!location){
-
-    message.textContent =
-      "Location is required.";
-
-    return;
-  }
-
-  if(status === "confirmed"){
-
-    const scheduled =
-      new Date(
-        originalScheduledAt
-      );
-
-    if(
-      new Date() >=
-      new Date(
-        scheduled.getTime() -
-        21600000
-      )
-    ){
-
-      message.textContent =
-        "Location cannot be changed within 6 hours of the match.";
-
-      return;
-    }
-
-    const {error} =
-      await supabaseClient
-        .from("matches")
-        .update({
-          location:location
-        })
-        .eq("id",id)
-        .eq(
-          "proposer_id",
-          currentUser.id
-        );
-
-    if(error){
-
-      message.textContent =
-        error.message;
-
-      return;
-    }
-
-    await loadMatches();
-    return;
-  }
-
-  const date =
-    document.getElementById(
-      `edit-date-${id}`
-    ).value;
-
-  const time =
-    document.getElementById(
-      `edit-time-${id}`
-    ).value;
-
-  const type =
-    document.getElementById(
-      `edit-type-${id}`
-    ).value;
-
-  const scheduled =
-    new Date(
-      `${date}T${time}:00`
-    );
-
-  const {error} =
-    await supabaseClient
-      .from("matches")
-      .update({
-
-        scheduled_at:
-          scheduled.toISOString(),
-
-        location:
-          location,
-
-        match_type:
-          type
-
-      })
-      .eq("id",id)
-      .eq(
-        "proposer_id",
-        currentUser.id
-      );
-
-  if(error){
-
-    message.textContent =
-      error.message;
-
-    return;
-  }
-
-  await loadMatches();
-
-}
-
-
-async function leaveMatch(id){
-
-  if(
-    !confirm(
-      "Leave this match?"
-    )
-  ){
-    return;
-  }
-
-  const {error} =
-    await supabaseClient
-      .from("match_players")
-      .delete()
-      .eq(
-        "match_id",
-        id
-      )
-      .eq(
-        "player_id",
-        currentUser.id
-      );
-
-  if(error){
-
-    alert(error.message);
-    return;
-  }
-
-  await loadMatches();
-
-}
-
-
-async function cancelMatch(id){
-
-  const reason =
-    document.getElementById(
-      `cancel-reason-${id}`
-    ).value.trim();
-
-  if(!reason){
-
-    alert(
-      "Please enter a cancellation reason."
-    );
-
-    return;
-  }
-
-  if(
-    !confirm(
-      "Cancel this match?"
-    )
-  ){
-    return;
-  }
-
-  const {error} =
-    await supabaseClient
-      .from("matches")
-      .update({
-
-        status:"cancelled",
-
-        cancelled_at:
-          new Date().toISOString(),
-
-        cancellation_reason:
-          reason
-
-      })
-      .eq("id",id)
-      .eq(
-        "proposer_id",
-        currentUser.id
-      );
-
-  if(error){
-
-    alert(error.message);
-    return;
-  }
-
-  await loadMatches();
-
-}
-
-
-async function loadMatches(){
+async function loadUpcomingMatches(){
 
   const list =
     document.getElementById(
-      "match-list"
+      "upcoming-match-list"
     );
 
   const {
@@ -2132,7 +1869,7 @@ async function loadMatches(){
   ){
 
     list.innerHTML =
-      '<div class="card"><h2>No upcoming matches yet</h2></div>';
+      '<div class="card"><p class="muted">No upcoming matches yet.</p></div>';
 
     return;
   }
@@ -2193,9 +1930,6 @@ async function loadMatches(){
               new Date(b.joined_at)
           );
 
-        const count =
-          matchSeats.length;
-
         const joined =
           matchSeats.some(
             seat =>
@@ -2211,10 +1945,8 @@ async function loadMatches(){
           currentPlayerProfile?.role ===
           "admin";
 
-        const scheduled =
-          new Date(
-            match.scheduled_at
-          );
+        const count =
+          matchSeats.length;
 
         const names =
           matchSeats.map(
@@ -2336,6 +2068,11 @@ async function loadMatches(){
 
         }
 
+        const scheduled =
+          new Date(
+            match.scheduled_at
+          );
+
         const localDate =
           `${scheduled.getFullYear()}-${String(
             scheduled.getMonth()+1
@@ -2363,27 +2100,21 @@ async function loadMatches(){
             <span class="pill">
               ${
                 match.match_type === "focused"
-                ? "Focused"
-                : "Social"
+                  ? "Focused"
+                  : "Social"
               }
             </span>
 
             <h2>
 
               ${escapeHtml(
-                scheduled.toLocaleDateString()
+                dateText(match.scheduled_at)
               )}
 
               ·
 
               ${escapeHtml(
-                scheduled.toLocaleTimeString(
-                  undefined,
-                  {
-                    hour:"numeric",
-                    minute:"2-digit"
-                  }
-                )
+                timeText(match.scheduled_at)
               )}
 
             </h2>
@@ -2398,8 +2129,8 @@ async function loadMatches(){
 
               ${
                 count < 4
-                ? `<br><span class="muted">${4-count} seat${4-count === 1 ? "" : "s"} open</span>`
-                : ""
+                  ? `<br><span class="muted">${4-count} seat${4-count === 1 ? "" : "s"} open</span>`
+                  : ""
               }
 
             </div>
@@ -2480,7 +2211,9 @@ async function loadMatches(){
                   '${match.status}',
                   '${match.scheduled_at}'
                 )">
+
                 Save Changes
+
               </button>
 
               <p
@@ -2505,7 +2238,9 @@ async function loadMatches(){
               <button
                 class="btn danger"
                 onclick="cancelMatch('${match.id}')">
+
                 Confirm Cancellation
+
               </button>
 
             </div>
@@ -2520,7 +2255,1116 @@ async function loadMatches(){
 }
 
 
-/* SCORE ENTRY */
+/* PLAYED MATCHES */
+
+async function loadPlayedMatches(){
+
+  const list =
+    document.getElementById(
+      "played-match-list"
+    );
+
+  if(!currentScramble){
+
+    list.innerHTML =
+      '<div class="card"><p class="muted">Played-match details are available only while the Scramble is active.</p></div>';
+
+    return;
+  }
+
+  const [
+    matchesResult,
+    seatsResult,
+    playersResult,
+    gamesResult,
+    scoresResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("matches")
+      .select(
+        "id,proposer_id,scheduled_at,location,match_type,status,completed_at"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "status",
+        "completed"
+      )
+      .order(
+        "scheduled_at",
+        {ascending:false}
+      ),
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      ),
+
+    supabaseClient
+      .from("games")
+      .select(
+        "id,match_id,game_number,east_player_id,winner_player_id,is_wall_game,base_hand_value,self_picked,jokerless"
+      ),
+
+    supabaseClient
+      .from("scores")
+      .select(
+        "game_id,player_id,points"
+      )
+
+  ]);
+
+  if(
+    matchesResult.error ||
+    seatsResult.error ||
+    playersResult.error ||
+    gamesResult.error ||
+    scoresResult.error
+  ){
+
+    list.innerHTML =
+      '<div class="card"><p class="error">Unable to load played matches.</p></div>';
+
+    return;
+  }
+
+  const matches =
+    matchesResult.data || [];
+
+  if(!matches.length){
+
+    list.innerHTML =
+      '<div class="card"><p class="muted">No played matches yet.</p></div>';
+
+    return;
+  }
+
+  const seats =
+    seatsResult.data || [];
+
+  const games =
+    gamesResult.data || [];
+
+  const scores =
+    scoresResult.data || [];
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+      .map(
+        player => [
+          player.id,
+          player.nickname ||
+          "Player"
+        ]
+      )
+    );
+
+  const isAdmin =
+    currentPlayerProfile?.role ===
+    "admin";
+
+  list.innerHTML =
+    matches.map(
+      match => {
+
+        const matchSeats =
+          seats
+          .filter(
+            seat =>
+              seat.match_id ===
+              match.id
+          )
+          .sort(
+            (a,b) =>
+              new Date(a.joined_at) -
+              new Date(b.joined_at)
+          );
+
+        const names =
+          matchSeats.map(
+            seat =>
+              escapeHtml(
+                playerMap.get(
+                  seat.player_id
+                ) ||
+                "Player"
+              )
+          );
+
+        const matchGames =
+          games
+          .filter(
+            game =>
+              game.match_id ===
+              match.id
+          )
+          .sort(
+            (a,b) =>
+              a.game_number -
+              b.game_number
+          );
+
+        const proposerName =
+          playerMap.get(
+            match.proposer_id
+          ) ||
+          "Player";
+
+        const detailsHtml =
+          renderCompletedMatchDetails(
+            match,
+            matchGames,
+            scores,
+            playerMap
+          );
+
+        const editHtml =
+          isAdmin
+            ? renderAdminCompletedEdit(
+                match,
+                matchSeats,
+                matchGames,
+                playerMap
+              )
+            : "";
+
+        return `
+
+          <div class="card">
+
+            <span class="pill">
+              Completed
+            </span>
+
+            &nbsp;
+
+            <span class="pill">
+              ${
+                match.match_type === "focused"
+                  ? "Focused"
+                  : "Social"
+              }
+            </span>
+
+            <h2>
+
+              ${escapeHtml(
+                dateText(match.scheduled_at)
+              )}
+
+              ·
+
+              ${escapeHtml(
+                timeText(match.scheduled_at)
+              )}
+
+            </h2>
+
+            <p>
+              📍 ${escapeHtml(match.location)}
+            </p>
+
+            <div class="players">
+              ${names.join(" · ")}
+            </div>
+
+            <p class="muted">
+
+              Proposed by
+              <b>${escapeHtml(proposerName)}</b>
+
+            </p>
+
+            <button
+              class="btn"
+              onclick="togglePlayedDetails('${match.id}')">
+
+              View Details
+
+            </button>
+
+            ${
+              isAdmin
+                ? `
+
+                  <button
+                    class="btn alt"
+                    onclick="toggleCompletedEdit('${match.id}')">
+
+                    Edit Results
+
+                  </button>
+
+                `
+                : ""
+            }
+
+            <div
+              id="played-details-${match.id}"
+              class="edit-box hidden">
+
+              ${detailsHtml}
+
+            </div>
+
+            ${
+              isAdmin
+                ? `
+
+                  <div
+                    id="completed-edit-${match.id}"
+                    class="edit-box hidden">
+
+                    ${editHtml}
+
+                  </div>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+function togglePlayedDetails(id){
+
+  document
+    .getElementById(
+      `played-details-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+function toggleCompletedEdit(id){
+
+  document
+    .getElementById(
+      `completed-edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+function renderCompletedMatchDetails(
+  match,
+  games,
+  scores,
+  playerMap
+){
+
+  if(games.length !== 4){
+
+    return `
+      <p class="error">
+        Complete game details are not available for this match.
+      </p>
+    `;
+  }
+
+  let html = `
+    <div class="eyebrow">
+      Four-Game Breakdown
+    </div>
+  `;
+
+  for(
+    const game of
+    games
+  ){
+
+    const east =
+      playerMap.get(
+        game.east_player_id
+      ) ||
+      "Player";
+
+    if(game.is_wall_game){
+
+      html += `
+
+        <div class="game-result">
+
+          <strong>
+            Game ${game.game_number}
+          </strong>
+
+          <br>
+
+          East:
+          ${escapeHtml(east)}
+
+          <br><br>
+
+          <b>
+            Wall Game
+          </b>
+
+          <br>
+
+          +10 points to each player
+
+        </div>
+
+      `;
+
+      continue;
+    }
+
+    const winner =
+      playerMap.get(
+        game.winner_player_id
+      ) ||
+      "Player";
+
+    const winnerScore =
+      scores.find(
+        score =>
+          score.game_id ===
+            game.id
+        &&
+          score.player_id ===
+            game.winner_player_id
+      );
+
+    let extras = [];
+
+    if(game.self_picked){
+      extras.push("Self-picked +10");
+    }
+
+    if(game.jokerless){
+      extras.push("Jokerless +20");
+    }
+
+    html += `
+
+      <div class="game-result">
+
+        <strong>
+          Game ${game.game_number}
+        </strong>
+
+        <br>
+
+        East:
+        ${escapeHtml(east)}
+
+        <br>
+
+        Winner:
+        <b>${escapeHtml(winner)}</b>
+
+        <br>
+
+        NMJL Hand Value:
+        ${Number(game.base_hand_value || 0)} points
+
+        ${
+          extras.length
+            ? `<br>${extras.join("<br>")}`
+            : "<br>No extras"
+        }
+
+        <br><br>
+
+        <b>
+          Total awarded:
+          ${Number(winnerScore?.points || 0)} points
+        </b>
+
+      </div>
+
+    `;
+
+  }
+
+  const proposer =
+    playerMap.get(
+      match.proposer_id
+    ) ||
+    "Player";
+
+  html += `
+
+    <div class="match-total">
+
+      <b>
+        Match Bonus
+      </b>
+
+      <br>
+
+      Proposer
+      ${escapeHtml(proposer)}
+      receives
+      <b>+5 points</b>
+      for the completed match.
+
+    </div>
+
+  `;
+
+  return html;
+
+}
+
+
+/* ADMIN EDIT COMPLETED RESULTS */
+
+function renderAdminCompletedEdit(
+  match,
+  matchSeats,
+  games,
+  playerMap
+){
+
+  const players =
+    matchSeats.map(
+      seat => ({
+        id:
+          seat.player_id,
+
+        nickname:
+          playerMap.get(
+            seat.player_id
+          ) ||
+          "Player"
+      })
+    );
+
+  if(players.length !== 4){
+
+    return `
+      <p class="error">
+        This match cannot be edited because it does not contain exactly four players.
+      </p>
+    `;
+  }
+
+  const gameMap =
+    new Map(
+      games.map(
+        game => [
+          game.game_number,
+          game
+        ]
+      )
+    );
+
+  let html = `
+
+    <div class="eyebrow">
+      Admin Correction
+    </div>
+
+    <h3>
+      Edit Completed Results
+    </h3>
+
+    <div class="notice">
+
+      Saving will replace all four original game results
+      and recalculate the leaderboard.
+
+    </div>
+
+  `;
+
+  for(
+    let n = 1;
+    n <= 4;
+    n++
+  ){
+
+    const game =
+      gameMap.get(n);
+
+    const east =
+      players[n-1];
+
+    const result =
+      game?.is_wall_game
+        ? "wall"
+        : (
+          game?.winner_player_id ||
+          ""
+        );
+
+    html += `
+
+      <div class="game-entry">
+
+        <h3>
+
+          Game ${n}
+          ·
+          East:
+          ${escapeHtml(east.nickname)}
+
+        </h3>
+
+        <label>
+          Winner / Result
+        </label>
+
+        <select
+          id="edit-result-${match.id}-${n}"
+          onchange="completedEditResultChanged(
+            '${match.id}',
+            ${n}
+          )">
+
+          <option value="">
+            Select Winner
+          </option>
+
+          ${
+            players.map(
+              player => `
+
+                <option
+                  value="${player.id}"
+                  ${result === player.id ? "selected" : ""}>
+
+                  ${escapeHtml(player.nickname)}
+
+                </option>
+
+              `
+            ).join("")
+          }
+
+          <option
+            value="wall"
+            ${result === "wall" ? "selected" : ""}>
+            Wall Game
+          </option>
+
+        </select>
+
+        <div
+          id="edit-winner-options-${match.id}-${n}"
+          class="${result === "wall" ? "hidden" : ""}">
+
+          <label>
+            NMJL Hand Value
+          </label>
+
+          <input
+            id="edit-base-${match.id}-${n}"
+            type="number"
+            min="1"
+            value="${game && !game.is_wall_game ? Number(game.base_hand_value || 0) : ""}">
+
+          <div class="checkrow">
+
+            <label>
+
+              <input
+                id="edit-self-${match.id}-${n}"
+                type="checkbox"
+                ${game?.self_picked ? "checked" : ""}>
+
+              Self-picked +10
+
+            </label>
+
+            <label>
+
+              <input
+                id="edit-jokerless-${match.id}-${n}"
+                type="checkbox"
+                ${game?.jokerless ? "checked" : ""}>
+
+              Jokerless +20
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+  html += `
+
+    <button
+      class="btn alt"
+      onclick='adminSaveCompletedResults(
+        "${match.id}",
+        ${JSON.stringify(players)}
+      )'>
+
+      Save Corrected Results
+
+    </button>
+
+    <p
+      id="completed-edit-message-${match.id}"
+      class="muted">
+    </p>
+
+  `;
+
+  return html;
+
+}
+
+
+function completedEditResultChanged(
+  matchId,
+  gameNumber
+){
+
+  const result =
+    document.getElementById(
+      `edit-result-${matchId}-${gameNumber}`
+    ).value;
+
+  document
+    .getElementById(
+      `edit-winner-options-${matchId}-${gameNumber}`
+    )
+    .classList.toggle(
+      "hidden",
+      result === "wall"
+    );
+
+}
+
+
+async function adminSaveCompletedResults(
+  matchId,
+  players
+){
+
+  const message =
+    document.getElementById(
+      `completed-edit-message-${matchId}`
+    );
+
+  const games = [];
+
+  for(
+    let n = 1;
+    n <= 4;
+    n++
+  ){
+
+    const result =
+      document.getElementById(
+        `edit-result-${matchId}-${n}`
+      ).value;
+
+    if(!result){
+
+      message.textContent =
+        `Select a result for Game ${n}.`;
+
+      message.className =
+        "error";
+
+      return;
+    }
+
+    if(result === "wall"){
+
+      games.push({
+
+        game_number:n,
+
+        east_player_id:
+          players[n-1].id,
+
+        winner_player_id:null,
+
+        is_wall_game:true,
+
+        base_hand_value:0,
+
+        self_picked:false,
+
+        jokerless:false
+
+      });
+
+      continue;
+    }
+
+    const base =
+      Number(
+        document.getElementById(
+          `edit-base-${matchId}-${n}`
+        ).value
+      );
+
+    if(
+      !base ||
+      base <= 0
+    ){
+
+      message.textContent =
+        `Enter the NMJL hand value for Game ${n}.`;
+
+      message.className =
+        "error";
+
+      return;
+    }
+
+    games.push({
+
+      game_number:n,
+
+      east_player_id:
+        players[n-1].id,
+
+      winner_player_id:
+        result,
+
+      is_wall_game:false,
+
+      base_hand_value:
+        base,
+
+      self_picked:
+        document.getElementById(
+          `edit-self-${matchId}-${n}`
+        ).checked,
+
+      jokerless:
+        document.getElementById(
+          `edit-jokerless-${matchId}-${n}`
+        ).checked
+
+    });
+
+  }
+
+  if(
+    !confirm(
+      "Replace the existing results for this completed match?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_edit_completed_match",
+        {
+
+          p_match_id:
+            matchId,
+
+          p_games:
+            games
+
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      "Could not update results: " +
+      error.message;
+
+    message.className =
+      "error";
+
+    return;
+  }
+
+  message.textContent =
+    "Results corrected successfully.";
+
+  message.className =
+    "success";
+
+  await loadPlayedMatches();
+  await loadLeaderboard();
+  await loadHallOfFame();
+
+}
+
+
+/* UPCOMING MATCH EDIT/CANCEL */
+
+function toggleEdit(id){
+
+  document
+    .getElementById(
+      `edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+function toggleCancel(id){
+
+  document
+    .getElementById(
+      `cancel-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function updateMatch(
+  id,
+  status,
+  originalScheduledAt
+){
+
+  const location =
+    document.getElementById(
+      `edit-location-${id}`
+    ).value.trim();
+
+  const message =
+    document.getElementById(
+      `edit-message-${id}`
+    );
+
+  if(!location){
+
+    message.textContent =
+      "Location is required.";
+
+    return;
+  }
+
+  if(status === "confirmed"){
+
+    const scheduled =
+      new Date(
+        originalScheduledAt
+      );
+
+    if(
+      new Date() >=
+      new Date(
+        scheduled.getTime() -
+        21600000
+      )
+    ){
+
+      message.textContent =
+        "Location cannot be changed within 6 hours of the match.";
+
+      return;
+    }
+
+    const {error} =
+      await supabaseClient
+        .from("matches")
+        .update({
+          location:location
+        })
+        .eq("id",id)
+        .eq(
+          "proposer_id",
+          currentUser.id
+        );
+
+    if(error){
+
+      message.textContent =
+        error.message;
+
+      return;
+    }
+
+    await loadUpcomingMatches();
+
+    return;
+  }
+
+  const date =
+    document.getElementById(
+      `edit-date-${id}`
+    ).value;
+
+  const time =
+    document.getElementById(
+      `edit-time-${id}`
+    ).value;
+
+  const type =
+    document.getElementById(
+      `edit-type-${id}`
+    ).value;
+
+  const scheduled =
+    new Date(
+      `${date}T${time}:00`
+    );
+
+  if(
+    scheduled <=
+    new Date()
+  ){
+
+    message.textContent =
+      "The match must be in the future.";
+
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .from("matches")
+      .update({
+
+        scheduled_at:
+          scheduled.toISOString(),
+
+        location:
+          location,
+
+        match_type:
+          type
+
+      })
+      .eq("id",id)
+      .eq(
+        "proposer_id",
+        currentUser.id
+      );
+
+  if(error){
+
+    message.textContent =
+      error.message;
+
+    return;
+  }
+
+  await loadUpcomingMatches();
+  await loadHomeMatches();
+
+}
+
+
+async function leaveMatch(id){
+
+  if(
+    !confirm(
+      "Leave this match?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .from("match_players")
+      .delete()
+      .eq(
+        "match_id",
+        id
+      )
+      .eq(
+        "player_id",
+        currentUser.id
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadUpcomingMatches();
+
+}
+
+
+async function cancelMatch(id){
+
+  const reason =
+    document.getElementById(
+      `cancel-reason-${id}`
+    ).value.trim();
+
+  if(!reason){
+
+    alert(
+      "Please enter a cancellation reason."
+    );
+
+    return;
+  }
+
+  if(
+    !confirm(
+      "Cancel this match?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .from("matches")
+      .update({
+
+        status:"cancelled",
+
+        cancelled_at:
+          new Date().toISOString(),
+
+        cancellation_reason:
+          reason
+
+      })
+      .eq("id",id)
+      .eq(
+        "proposer_id",
+        currentUser.id
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadMatchesPage();
+  await loadHomeMatches();
+
+}
+
+
+/* SCORE ENTRY FOR CONFIRMED MATCHES */
 
 async function loadScoreEntry(
   targetId,
@@ -2644,7 +3488,7 @@ async function loadScoreEntry(
           seat =>
             seat.match_id ===
               match.id
-            &&
+          &&
             seat.player_id ===
               currentUser.id
         );
@@ -2709,189 +3553,11 @@ async function loadScoreEntry(
             })
           );
 
-        const scheduled =
-          new Date(
-            match.scheduled_at
-          );
-
-        return `
-
-          <div class="card">
-
-            <div class="eyebrow">
-              Confirmed Match
-            </div>
-
-            <h2>
-
-              ${escapeHtml(
-                scheduled.toLocaleDateString()
-              )}
-
-              ·
-
-              ${escapeHtml(
-                scheduled.toLocaleTimeString(
-                  undefined,
-                  {
-                    hour:"numeric",
-                    minute:"2-digit"
-                  }
-                )
-              )}
-
-            </h2>
-
-            <p>
-              📍 ${escapeHtml(match.location)}
-            </p>
-
-            <div class="players">
-
-              ${players
-                .map(
-                  player =>
-                    escapeHtml(
-                      player.nickname
-                    )
-                )
-                .join(" · ")}
-
-            </div>
-
-            <div class="notice">
-
-              Enter all four games.
-
-              Each player is East once.
-
-            </div>
-
-            ${
-              players.map(
-                (east,index) => {
-
-                  const n =
-                    index + 1;
-
-                  return `
-
-                    <div class="game-entry">
-
-                      <h3>
-
-                        Game ${n}
-                        ·
-                        East:
-                        ${escapeHtml(east.nickname)}
-
-                      </h3>
-
-                      <label>
-                        Winner / Result
-                      </label>
-
-                      <select
-                        id="result-${match.id}-${n}"
-                        onchange="scoreResultChanged(
-                          '${match.id}',
-                          ${n}
-                        )">
-
-                        <option value="">
-                          Select Winner
-                        </option>
-
-                        ${
-                          players.map(
-                            player => `
-
-                              <option
-                                value="${player.id}">
-
-                                ${escapeHtml(
-                                  player.nickname
-                                )}
-
-                              </option>
-
-                            `
-                          ).join("")
-                        }
-
-                        <option value="wall">
-                          Wall Game
-                        </option>
-
-                      </select>
-
-                      <div
-                        id="winner-options-${match.id}-${n}">
-
-                        <label>
-                          NMJL Hand Value
-                        </label>
-
-                        <input
-                          id="base-${match.id}-${n}"
-                          type="number"
-                          min="1"
-                          placeholder="e.g. 25">
-
-                        <div class="checkrow">
-
-                          <label>
-
-                            <input
-                              id="self-${match.id}-${n}"
-                              type="checkbox">
-
-                            Self-picked +10
-
-                          </label>
-
-                          <label>
-
-                            <input
-                              id="jokerless-${match.id}-${n}"
-                              type="checkbox">
-
-                            Jokerless +20
-
-                          </label>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  `;
-
-                }
-              ).join("")
-            }
-
-            <button
-              id="submit-results-${match.id}"
-              class="btn alt"
-              onclick='submitMatchResults(
-                "${match.id}",
-                ${JSON.stringify(players)}
-              )'>
-
-              Submit Match Results
-
-            </button>
-
-            <p
-              id="score-message-${match.id}"
-              class="muted">
-            </p>
-
-          </div>
-
-        `;
+        return renderNewScoreForm(
+          match,
+          players,
+          targetId
+        );
 
       }
     ).join("");
@@ -2899,19 +3565,200 @@ async function loadScoreEntry(
 }
 
 
-function scoreResultChanged(
+function renderNewScoreForm(
+  match,
+  players,
+  prefix
+){
+
+  const safePrefix =
+    prefix.replaceAll("-","_");
+
+  return `
+
+    <div class="card">
+
+      <div class="eyebrow">
+        Confirmed Match
+      </div>
+
+      <h2>
+
+        ${escapeHtml(
+          dateText(match.scheduled_at)
+        )}
+
+        ·
+
+        ${escapeHtml(
+          timeText(match.scheduled_at)
+        )}
+
+      </h2>
+
+      <p>
+        📍 ${escapeHtml(match.location)}
+      </p>
+
+      <div class="players">
+
+        ${players
+          .map(
+            player =>
+              escapeHtml(
+                player.nickname
+              )
+          )
+          .join(" · ")}
+
+      </div>
+
+      <div class="notice">
+
+        Enter all four games.
+        Each player is East once.
+
+      </div>
+
+      ${
+        players.map(
+          (east,index) => {
+
+            const n =
+              index + 1;
+
+            return `
+
+              <div class="game-entry">
+
+                <h3>
+
+                  Game ${n}
+                  ·
+                  East:
+                  ${escapeHtml(east.nickname)}
+
+                </h3>
+
+                <label>
+                  Winner / Result
+                </label>
+
+                <select
+                  id="${safePrefix}-result-${match.id}-${n}"
+                  onchange="newScoreResultChanged(
+                    '${safePrefix}',
+                    '${match.id}',
+                    ${n}
+                  )">
+
+                  <option value="">
+                    Select Winner
+                  </option>
+
+                  ${
+                    players.map(
+                      player => `
+
+                        <option value="${player.id}">
+                          ${escapeHtml(player.nickname)}
+                        </option>
+
+                      `
+                    ).join("")
+                  }
+
+                  <option value="wall">
+                    Wall Game
+                  </option>
+
+                </select>
+
+                <div
+                  id="${safePrefix}-winner-options-${match.id}-${n}">
+
+                  <label>
+                    NMJL Hand Value
+                  </label>
+
+                  <input
+                    id="${safePrefix}-base-${match.id}-${n}"
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 25">
+
+                  <div class="checkrow">
+
+                    <label>
+
+                      <input
+                        id="${safePrefix}-self-${match.id}-${n}"
+                        type="checkbox">
+
+                      Self-picked +10
+
+                    </label>
+
+                    <label>
+
+                      <input
+                        id="${safePrefix}-jokerless-${match.id}-${n}"
+                        type="checkbox">
+
+                      Jokerless +20
+
+                    </label>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        ).join("")
+      }
+
+      <button
+        class="btn alt"
+        onclick='submitMatchResults(
+          "${match.id}",
+          ${JSON.stringify(players)},
+          "${safePrefix}"
+        )'>
+
+        Submit Match Results
+
+      </button>
+
+      <p
+        id="${safePrefix}-score-message-${match.id}"
+        class="muted">
+      </p>
+
+    </div>
+
+  `;
+
+}
+
+
+function newScoreResultChanged(
+  prefix,
   matchId,
   gameNumber
 ){
 
   const result =
     document.getElementById(
-      `result-${matchId}-${gameNumber}`
+      `${prefix}-result-${matchId}-${gameNumber}`
     ).value;
 
   document
     .getElementById(
-      `winner-options-${matchId}-${gameNumber}`
+      `${prefix}-winner-options-${matchId}-${gameNumber}`
     )
     .classList.toggle(
       "hidden",
@@ -2923,12 +3770,13 @@ function scoreResultChanged(
 
 async function submitMatchResults(
   matchId,
-  players
+  players,
+  prefix
 ){
 
   const message =
     document.getElementById(
-      `score-message-${matchId}`
+      `${prefix}-score-message-${matchId}`
     );
 
   const games = [];
@@ -2941,7 +3789,7 @@ async function submitMatchResults(
 
     const result =
       document.getElementById(
-        `result-${matchId}-${n}`
+        `${prefix}-result-${matchId}-${n}`
       ).value;
 
     if(!result){
@@ -2982,7 +3830,7 @@ async function submitMatchResults(
     const base =
       Number(
         document.getElementById(
-          `base-${matchId}-${n}`
+          `${prefix}-base-${matchId}-${n}`
         ).value
       );
 
@@ -3017,12 +3865,12 @@ async function submitMatchResults(
 
       self_picked:
         document.getElementById(
-          `self-${matchId}-${n}`
+          `${prefix}-self-${matchId}-${n}`
         ).checked,
 
       jokerless:
         document.getElementById(
-          `jokerless-${matchId}-${n}`
+          `${prefix}-jokerless-${matchId}-${n}`
         ).checked
 
     });
@@ -3080,8 +3928,8 @@ async function submitMatchResults(
   await loadHomeMatches();
 
   setTimeout(
-    () => show("home"),
-    800
+    () => show("matches"),
+    700
   );
 
 }
@@ -3148,14 +3996,7 @@ async function loadHomeMatches(){
       );
 
   const upcoming =
-    (data || [])
-    .filter(
-      match =>
-        new Date(
-          match.scheduled_at
-        ) >=
-        new Date()
-    );
+    data || [];
 
   const confirmed =
     upcoming.find(
@@ -3195,29 +4036,18 @@ function homeMatchHtml(
   button
 ){
 
-  const date =
-    new Date(
-      match.scheduled_at
-    );
-
   return `
 
     <h2>
 
       ${escapeHtml(
-        date.toLocaleDateString()
+        dateText(match.scheduled_at)
       )}
 
       ·
 
       ${escapeHtml(
-        date.toLocaleTimeString(
-          undefined,
-          {
-            hour:"numeric",
-            minute:"2-digit"
-          }
-        )
+        timeText(match.scheduled_at)
       )}
 
     </h2>
@@ -3289,8 +4119,7 @@ async function calculateScrambleStandings(
     (matchesResult.data || [])
     .filter(
       match =>
-        match.status ===
-          "completed"
+        match.status === "completed"
         ||
         !!match.completed_at
     );
@@ -3462,6 +4291,11 @@ async function loadLeaderboard(){
 
     board.innerHTML =
       '<p class="muted">No active Scramble.</p>';
+
+    updateMyStanding(
+      [],
+      currentUser
+    );
 
     return;
   }
@@ -3795,6 +4629,9 @@ async function loadHallOfFame(){
         (a,b) =>
           b.points -
           a.points
+          ||
+          b.average -
+          a.average
       )
       .slice(0,3);
 
@@ -3804,6 +4641,9 @@ async function loadHallOfFame(){
         (a,b) =>
           b.average -
           a.average
+          ||
+          b.points -
+          a.points
       )
       .slice(0,3);
 
@@ -3811,14 +4651,22 @@ async function loadHallOfFame(){
 
       <div class="hof-scramble">
 
+        <div class="eyebrow">
+          Closed Scramble
+        </div>
+
         <h2>
           ${escapeHtml(scramble.name)}
         </h2>
 
         <p class="muted">
+
           ${escapeHtml(scramble.start_date || "")}
+
           –
+
           ${escapeHtml(scramble.end_date || "")}
+
         </p>
 
         <div class="grid">
@@ -3830,23 +4678,25 @@ async function loadHallOfFame(){
             </h3>
 
             ${
-              totals.map(
-                (player,index) => `
+              totals.length
+                ? totals.map(
+                    (player,index) => `
 
-                  <p>
+                      <p>
 
-                    <b>
-                      ${index+1}.
-                      ${escapeHtml(player.nickname)}
-                    </b>
+                        <b>
+                          ${index+1}.
+                          ${escapeHtml(player.nickname)}
+                        </b>
 
-                    —
-                    ${player.points} pts
+                        —
+                        ${player.points} pts
 
-                  </p>
+                      </p>
 
-                `
-              ).join("")
+                    `
+                  ).join("")
+                : '<p class="muted">No results.</p>'
             }
 
           </div>
@@ -3858,23 +4708,25 @@ async function loadHallOfFame(){
             </h3>
 
             ${
-              averages.map(
-                (player,index) => `
+              averages.length
+                ? averages.map(
+                    (player,index) => `
 
-                  <p>
+                      <p>
 
-                    <b>
-                      ${index+1}.
-                      ${escapeHtml(player.nickname)}
-                    </b>
+                        <b>
+                          ${index+1}.
+                          ${escapeHtml(player.nickname)}
+                        </b>
 
-                    —
-                    ${player.average.toFixed(1)}
+                        —
+                        ${player.average.toFixed(1)}
 
-                  </p>
+                      </p>
 
-                `
-              ).join("")
+                    `
+                  ).join("")
+                : '<p class="muted">No results.</p>'
             }
 
           </div>
@@ -3887,7 +4739,8 @@ async function loadHallOfFame(){
 
   }
 
-  box.innerHTML = html;
+  box.innerHTML =
+    html;
 
 }
 
@@ -3978,6 +4831,8 @@ async function loadAdminDashboard(){
 }
 
 
+/* ADMIN SCRAMBLES */
+
 async function loadAdminScrambleHistory(){
 
   const box =
@@ -4045,7 +4900,9 @@ async function loadAdminScrambleHistory(){
           <button
             class="btn secondary"
             onclick="toggleScrambleEdit('${scramble.id}')">
+
             Edit Name & Dates
+
           </button>
 
           ${
@@ -4058,7 +4915,9 @@ async function loadAdminScrambleHistory(){
                     '${scramble.id}',
                     '${escapeHtml(scramble.name)}'
                   )">
+
                   Close Scramble
+
                 </button>
 
               `
@@ -4110,7 +4969,9 @@ async function loadAdminScrambleHistory(){
             <button
               class="btn"
               onclick="adminSaveScrambleEdit('${scramble.id}')">
+
               Save
+
             </button>
 
           </div>
@@ -4183,7 +5044,6 @@ async function adminSaveScrambleEdit(id){
   await getActiveScramble();
 
   await loadAdminScrambleHistory();
-
   await loadCurrentScrambleDisplay();
 
 }
@@ -4249,7 +5109,6 @@ async function adminCreateScramble(){
   currentScramble = null;
 
   await getActiveScramble();
-
   await loadAdminDashboard();
 
 }
@@ -4263,6 +5122,14 @@ async function adminCloseScramble(
   if(
     !confirm(
       `Close "${name}"?`
+    )
+  ){
+    return;
+  }
+
+  if(
+    !confirm(
+      "Scores will become final and individual match details will no longer be shown after the Scramble closes. Continue?"
     )
   ){
     return;
@@ -4286,8 +5153,9 @@ async function adminCloseScramble(
   currentScramble = null;
 
   await getActiveScramble();
-
   await loadAdminDashboard();
+  await loadHallOfFame();
+  await loadLeaderboard();
 
 }
 
@@ -4401,23 +5269,31 @@ async function loadAdminPlayers(){
       player => {
 
         const payment =
-          payments.get(player.id);
+          payments.get(
+            player.id
+          );
 
         const membership =
-          memberships.get(player.id);
+          memberships.get(
+            player.id
+          );
 
         const paid =
-          payment?.status === "paid";
+          payment?.status ===
+          "paid";
 
         const pending =
-          payment?.status === "pending" &&
+          payment?.status ===
+          "pending"
+          &&
           payment?.notified_at;
 
         const active =
           membership?.active === true;
 
         const self =
-          player.id === currentUser.id;
+          player.id ===
+          currentUser.id;
 
         let paymentLabel =
           '<span class="pill pending">Not Submitted</span>';
@@ -4461,9 +5337,7 @@ async function loadAdminPlayers(){
                 <div>
 
                   <span class="pill ${
-                    active
-                      ? ""
-                      : "inactive"
+                    active ? "" : "inactive"
                   }">
 
                     ${
@@ -4487,7 +5361,9 @@ async function loadAdminPlayers(){
                 <button
                   class="btn secondary"
                   onclick="togglePlayerEdit('${player.id}')">
+
                   Edit Profile
+
                 </button>
 
                 ${
@@ -4497,7 +5373,9 @@ async function loadAdminPlayers(){
                       <button
                         class="btn"
                         onclick="adminConfirmPayment('${player.id}')">
+
                         Confirm Payment
+
                       </button>
 
                     `
@@ -4514,7 +5392,9 @@ async function loadAdminPlayers(){
                           '${player.id}',
                           false
                         )">
+
                         Hide from Roster
+
                       </button>
 
                     `
@@ -4522,7 +5402,9 @@ async function loadAdminPlayers(){
                 }
 
                 ${
-                  !self && !active && paid
+                  !self &&
+                  !active &&
+                  paid
                     ? `
 
                       <button
@@ -4531,7 +5413,9 @@ async function loadAdminPlayers(){
                           '${player.id}',
                           true
                         )">
+
                         Reactivate
+
                       </button>
 
                     `
@@ -4548,7 +5432,9 @@ async function loadAdminPlayers(){
                           '${player.id}',
                           '${escapeHtml(player.nickname)}'
                         )">
+
                         Delete Player
+
                       </button>
 
                     `
@@ -4590,7 +5476,9 @@ async function loadAdminPlayers(){
               <button
                 class="btn"
                 onclick="adminSavePlayerProfile('${player.id}')">
+
                 Save Profile
+
               </button>
 
             </div>
@@ -4776,7 +5664,9 @@ async function loadAdminMatchManagement(){
 
     supabaseClient
       .from("scrambles")
-      .select("id,name"),
+      .select(
+        "id,name,status"
+      ),
 
     supabaseClient
       .from("players")
@@ -4798,7 +5688,7 @@ async function loadAdminMatchManagement(){
       .map(
         item => [
           item.id,
-          item.name
+          item
         ]
       )
     );
@@ -4817,14 +5707,25 @@ async function loadAdminMatchManagement(){
   const seats =
     seatsResult.data || [];
 
+  if(
+    !matchesResult.data ||
+    !matchesResult.data.length
+  ){
+
+    box.innerHTML =
+      '<p class="muted">No matches yet.</p>';
+
+    return;
+  }
+
   box.innerHTML =
-    (matchesResult.data || [])
+    matchesResult.data
     .map(
       match => {
 
-        const date =
-          new Date(
-            match.scheduled_at
+        const scramble =
+          scrambleMap.get(
+            match.scramble_id
           );
 
         const names =
@@ -4852,9 +5753,7 @@ async function loadAdminMatchManagement(){
 
             <h3>
               ${escapeHtml(
-                scrambleMap.get(
-                  match.scramble_id
-                ) ||
+                scramble?.name ||
                 "Scramble"
               )}
             </h3>
@@ -4863,20 +5762,14 @@ async function loadAdminMatchManagement(){
 
               <b>
                 ${escapeHtml(
-                  date.toLocaleDateString()
+                  dateText(match.scheduled_at)
                 )}
               </b>
 
               ·
 
               ${escapeHtml(
-                date.toLocaleTimeString(
-                  undefined,
-                  {
-                    hour:"numeric",
-                    minute:"2-digit"
-                  }
-                )
+                timeText(match.scheduled_at)
               )}
 
               <br>
@@ -4890,13 +5783,16 @@ async function loadAdminMatchManagement(){
             </div>
 
             ${
-              match.status === "confirmed"
+              match.status === "confirmed" &&
+              scramble?.status === "active"
                 ? `
 
                   <button
                     class="btn alt"
                     onclick="show('results')">
+
                     Enter Results
+
                   </button>
 
                 `
@@ -4906,7 +5802,9 @@ async function loadAdminMatchManagement(){
             <button
               class="btn danger"
               onclick="toggleAdminMatchDelete('${match.id}')">
+
               Delete Match
+
             </button>
 
             <div
@@ -4927,7 +5825,9 @@ async function loadAdminMatchManagement(){
                   '${match.id}',
                   '${match.status}'
                 )">
+
                 Permanently Delete
+
               </button>
 
             </div>
@@ -5012,6 +5912,13 @@ async function adminDeleteMatch(
 
   await loadAdminMatchManagement();
   await loadLeaderboard();
+
+  if(currentScramble){
+
+    await loadPlayedMatches();
+    await loadUpcomingMatches();
+
+  }
 
 }
 
@@ -5113,12 +6020,16 @@ async function signInPlayer(){
       "login-password"
     ).value;
 
-  const {data,error} =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .auth
       .signInWithPassword({
 
         email:email,
+
         password:password
 
       });
@@ -5157,16 +6068,17 @@ async function showLoggedInPlayer(user){
   const {
     data:player,
     error
-  } = await supabaseClient
-    .from("players")
-    .select(
-      "full_name,nickname,role"
-    )
-    .eq(
-      "id",
-      user.id
-    )
-    .single();
+  } =
+    await supabaseClient
+      .from("players")
+      .select(
+        "full_name,nickname,role"
+      )
+      .eq(
+        "id",
+        user.id
+      )
+      .single();
 
   if(
     error ||
@@ -5196,25 +6108,19 @@ async function showLoggedInPlayer(user){
     .getElementById(
       "logged-in-player"
     )
-    .classList.remove(
-      "hidden"
-    );
+    .classList.remove("hidden");
 
   document
     .getElementById(
       "signup-card"
     )
-    .classList.add(
-      "hidden"
-    );
+    .classList.add("hidden");
 
   document
     .getElementById(
       "login-card"
     )
-    .classList.add(
-      "hidden"
-    );
+    .classList.add("hidden");
 
   document
     .getElementById(
@@ -5222,8 +6128,7 @@ async function showLoggedInPlayer(user){
     )
     .classList.toggle(
       "hidden",
-      player.role !==
-      "admin"
+      player.role !== "admin"
     );
 
 }
@@ -5249,40 +6154,32 @@ async function signOutPlayer(){
     .getElementById(
       "admin-nav"
     )
-    .classList.add(
-      "hidden"
-    );
+    .classList.add("hidden");
 
   document
     .getElementById(
       "logged-in-player"
     )
-    .classList.add(
-      "hidden"
-    );
+    .classList.add("hidden");
 
   document
     .getElementById(
       "signup-card"
     )
-    .classList.remove(
-      "hidden"
-    );
+    .classList.remove("hidden");
 
   document
     .getElementById(
       "login-card"
     )
-    .classList.remove(
-      "hidden"
-    );
+    .classList.remove("hidden");
 
   show("home");
 
 }
 
 
-/* SESSION */
+/* SESSION RESTORE */
 
 supabaseClient
 .auth
