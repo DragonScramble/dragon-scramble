@@ -1,0 +1,1 @@
+Dragon Scramble V2 prototype: leaderboard, matches, roster, rules, external-payment confirmation and score-entry UI. Production authentication/database/hosting are not yet connected.
