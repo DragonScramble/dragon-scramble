@@ -6,49 +6,252 @@
 <title>Dragon Scramble</title>
 
 <style>
-:root{--ink:#24312b;--forest:#26352e;--paper:#f7f2e8;--card:#fffdf8;--gold:#b28a42;--muted:#68736c;--line:#ddd5c6}
+:root{
+  --ink:#24312b;
+  --forest:#26352e;
+  --paper:#f7f2e8;
+  --card:#fffdf8;
+  --gold:#b28a42;
+  --muted:#68736c;
+  --line:#ddd5c6;
+}
+
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 Georgia,serif}
-header{background:var(--forest);color:#f8f1df;padding:20px 6%;display:flex;justify-content:space-between;align-items:center;gap:20px;position:sticky;top:0;z-index:10}
-.brand{font-size:24px;letter-spacing:2px}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font:15px/1.5 Georgia,serif;
+}
+
+header{
+  background:var(--forest);
+  color:#f8f1df;
+  padding:20px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.brand{
+  font-size:24px;
+  letter-spacing:2px;
+}
+
 .brand span{color:#d3b36b}
-nav button{background:none;border:0;color:#fff;margin:5px;cursor:pointer;font:inherit}
-.admin{border:1px solid #d3b36b!important;border-radius:8px;padding:7px 10px}
-main{max-width:1120px;margin:auto;padding:35px 20px}
+
+nav button{
+  background:none;
+  border:0;
+  color:#fff;
+  margin:5px;
+  cursor:pointer;
+  font:inherit;
+}
+
+.admin{
+  border:1px solid #d3b36b!important;
+  border-radius:8px;
+  padding:7px 10px;
+}
+
+main{
+  max-width:1120px;
+  margin:auto;
+  padding:35px 20px;
+}
+
 .hidden{display:none!important}
-.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;margin-bottom:25px}
-h1{font-size:48px;line-height:1;margin:0 0 10px}
+
+.hero{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:24px;
+  margin-bottom:25px;
+}
+
+h1{
+  font-size:48px;
+  line-height:1;
+  margin:0 0 10px;
+}
+
 h2{margin:8px 0}
-.eyebrow{text-transform:uppercase;letter-spacing:3px;color:var(--gold);font-size:11px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 5px 18px #2b342c10}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+
+h3{margin:8px 0}
+
+.eyebrow{
+  text-transform:uppercase;
+  letter-spacing:3px;
+  color:var(--gold);
+  font-size:11px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 5px 18px #2b342c10;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
 .muted{color:var(--muted)}
-.leader{display:grid;grid-template-columns:48px 1fr auto auto;gap:14px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}
-.rank{font-size:24px;color:var(--gold)}
-.nick{font-weight:bold;font-size:18px}
-.score{font-size:20px;font-weight:bold}
-.pill{display:inline-block;padding:4px 9px;border-radius:99px;background:#e5eee7;font-size:11px;text-transform:uppercase}
-.btn{border:0;border-radius:8px;padding:11px 16px;background:var(--ink);color:white;cursor:pointer;margin-right:6px;margin-top:5px}
-.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.leader{
+  display:grid;
+  grid-template-columns:48px 1fr auto auto;
+  gap:14px;
+  align-items:center;
+  padding:15px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.rank{
+  font-size:24px;
+  color:var(--gold);
+}
+
+.nick{
+  font-weight:bold;
+  font-size:18px;
+}
+
+.score{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.pill{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:99px;
+  background:#e5eee7;
+  font-size:11px;
+  text-transform:uppercase;
+}
+
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:11px 16px;
+  background:var(--ink);
+  color:white;
+  cursor:pointer;
+  margin-right:6px;
+  margin-top:5px;
+}
+
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
 .alt{background:var(--gold)}
 .danger{background:#8b3030}
-input,select,textarea{width:100%;padding:10px;border:1px solid #cfc7b8;border-radius:7px;background:white;margin:5px 0 12px;font:inherit}
-textarea{min-height:90px;resize:vertical}
-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.players{padding:11px;background:#f3eee3;border-radius:9px;margin:12px 0}
-.rule{padding:13px 0;border-bottom:1px solid var(--line)}
-.notice{padding:12px;background:#e5eee7;border-radius:9px;margin:12px 0}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:10px;
+  border:1px solid #cfc7b8;
+  border-radius:7px;
+  background:white;
+  margin:5px 0 12px;
+  font:inherit;
+}
+
+input[type="checkbox"]{
+  width:auto;
+  margin-right:6px;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted);
+}
+
+.formgrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.players{
+  padding:11px;
+  background:#f3eee3;
+  border-radius:9px;
+  margin:12px 0;
+}
+
+.rule{
+  padding:13px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.notice{
+  padding:12px;
+  background:#e5eee7;
+  border-radius:9px;
+  margin:12px 0;
+}
+
 .error{color:#8b3030}
 .success{color:#315d45}
-.edit-box{border-top:1px solid var(--line);margin-top:18px;padding-top:18px}
+
+.edit-box{
+  border-top:1px solid var(--line);
+  margin-top:18px;
+  padding-top:18px;
+}
+
+.game-entry{
+  border-top:1px solid var(--line);
+  padding:18px 0;
+}
+
+.checkrow{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  margin:8px 0 14px;
+}
+
+.checkrow label{
+  text-transform:none;
+  letter-spacing:0;
+  font-size:14px;
+  color:var(--ink);
+}
 
 @media(max-width:760px){
   .hero,.grid,.formgrid{grid-template-columns:1fr}
   h1{font-size:38px}
   .leader{grid-template-columns:35px 1fr auto}
   .avg{display:none}
-  header{flex-direction:column;align-items:flex-start}
+  header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
 }
 </style>
 </head>
@@ -56,7 +259,11 @@ label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut
 <body>
 
 <header>
-<div class="brand">🐉 DRAGON <span>SCRAMBLE</span></div>
+
+<div class="brand">
+🐉 DRAGON <span>SCRAMBLE</span>
+</div>
+
 <nav>
 <button onclick="show('home')">Leaderboard</button>
 <button onclick="show('matches')">Matches</button>
@@ -65,11 +272,13 @@ label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut
 <button onclick="show('account')">Account</button>
 <button class="admin" onclick="show('admin')">Admin</button>
 </nav>
+
 </header>
 
 <main>
 
 <section id="home">
+
 <div class="hero">
 
 <div>
@@ -89,22 +298,29 @@ label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut
 
 <div class="card">
 <div class="eyebrow">Current leaderboard</div>
-<div id="board"><p class="muted">Loading leaderboard...</p></div>
+<div id="board">
+<p class="muted">Loading leaderboard...</p>
+</div>
 </div>
 
 <div class="grid">
 
 <div class="card">
 <div class="eyebrow">Next confirmed match</div>
-<div id="next-confirmed-home"><p class="muted">Loading...</p></div>
+<div id="next-confirmed-home">
+<p class="muted">Loading...</p>
+</div>
 </div>
 
 <div class="card">
 <div class="eyebrow">Open table</div>
-<div id="next-open-home"><p class="muted">Loading...</p></div>
+<div id="next-open-home">
+<p class="muted">Loading...</p>
+</div>
 </div>
 
 </div>
+
 </section>
 
 
@@ -115,16 +331,24 @@ label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut
 <div>
 <div class="eyebrow">Tables</div>
 <h1>Matches</h1>
-<p class="muted">Only active, payment-confirmed players can propose or join.</p>
+<p class="muted">
+Only active, payment-confirmed players can propose or join.
+</p>
 </div>
 
-<button id="proposal-toggle" class="btn alt" onclick="toggleProposal()">
+<button
+id="proposal-toggle"
+class="btn alt"
+onclick="toggleProposal()">
 + Propose a match
 </button>
 
 </div>
 
-<div id="match-eligibility-message" class="notice hidden"></div>
+<div
+id="match-eligibility-message"
+class="notice hidden">
+</div>
 
 <div id="proposal" class="card hidden">
 
@@ -132,6 +356,7 @@ label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut
 <h2>Propose a Match</h2>
 
 <div class="formgrid">
+
 <div>
 <label>Date</label>
 <input id="match-date" type="date">
@@ -141,28 +366,44 @@ label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mut
 <label>Time</label>
 <input id="match-time" type="time">
 </div>
+
 </div>
 
 <label>Location</label>
-<input id="match-location" type="text" placeholder="Match location">
+
+<input
+id="match-location"
+type="text"
+placeholder="Match location">
 
 <label>Match Type</label>
+
 <select id="match-type">
 <option value="social">Social</option>
 <option value="focused">Focused</option>
 </select>
 
 <div class="notice">
-<b>Social:</b> same Dragon Scramble rules, with a more relaxed expectation for pace of play.
+
+<b>Social:</b>
+same Dragon Scramble rules with a more relaxed expectation for pace.
+
 <br><br>
-<b>Focused:</b> same rules, with players expected to maintain a faster pace.
+
+<b>Focused:</b>
+same rules with players expected to maintain a faster pace.
+
 </div>
 
 <div class="notice">
-The proposer provides the <b>Mahjong tiles, mat, racks and dice</b>.
+The proposer provides the
+<b>Mahjong tiles, mat, racks and dice</b>.
 </div>
 
-<button id="post-match-button" class="btn" onclick="createMatch()">
+<button
+id="post-match-button"
+class="btn"
+onclick="createMatch()">
 Post Match
 </button>
 
@@ -171,7 +412,9 @@ Post Match
 </div>
 
 <div id="match-list">
-<div class="card"><p class="muted">Loading matches...</p></div>
+<div class="card">
+<p class="muted">Loading matches...</p>
+</div>
 </div>
 
 </section>
@@ -196,53 +439,113 @@ Phone numbers are visible to authenticated players for coordinating games and su
 <section id="rules" class="hidden">
 
 <div class="eyebrow">Play fair · Have fun</div>
+
 <h1>Dragon Scramble Rules</h1>
 
 <div class="card">
 
-<div class="rule"><b>NMJL</b><br>All National Mah Jongg League rules apply.</div>
+<div class="rule">
+<b>NMJL</b><br>
+All National Mah Jongg League rules apply.
+</div>
 
-<div class="rule"><b>Four games</b><br>Every match has four games, with each player East once.</div>
+<div class="rule">
+<b>Four games</b><br>
+Every match has four games, with each player East once.
+</div>
 
-<div class="rule"><b>Social vs. Focused</b><br>All matches use the same rules. Social has a more relaxed pace expectation. Focused requires a faster pace.</div>
+<div class="rule">
+<b>Social vs. Focused</b><br>
+All matches use the same rules. Social has a more relaxed pace expectation. Focused requires a faster pace.
+</div>
 
-<div class="rule"><b>Proposer equipment</b><br>The match proposer provides the Mahjong tiles, mat, racks and dice.</div>
+<div class="rule">
+<b>Proposer equipment</b><br>
+The proposer provides the Mahjong tiles, mat, racks and dice.
+</div>
 
-<div class="rule"><b>Charleston passing</b><br>All four players must place their tiles on the mat before anyone picks up the incoming tiles.</div>
+<div class="rule">
+<b>Charleston passing</b><br>
+All four players must place their tiles on the mat before anyone picks up the incoming tiles.
+</div>
 
-<div class="rule"><b>Phones</b><br>No phone above table height. No photos of tiles, racks, hands or the table. No AI or electronic assistance.</div>
+<div class="rule">
+<b>Phones</b><br>
+No phone above table height. No photos of tiles, racks, hands or the table. No AI or electronic assistance.
+</div>
 
-<div class="rule"><b>Notifications</b><br>All phone notification sounds must be off.</div>
+<div class="rule">
+<b>Notifications</b><br>
+All phone notification sounds must be off.
+</div>
 
-<div class="rule"><b>Scoring</b><br>NMJL hand value. Self-pick +10. Jokerless +20. Wall Game = +10 each and no other points for that game.</div>
+<div class="rule">
+<b>Scoring</b><br>
+Winner receives NMJL hand value. Self-pick +10. Jokerless +20. Wall Game = +10 to each player and no other points for that game.
+</div>
 
-<div class="rule"><b>Proposer</b><br>+5 points for every completed four-game match proposed.</div>
+<div class="rule">
+<b>Proposer</b><br>
++5 points for every completed four-game match proposed.
+</div>
 
-<div class="rule"><b>Withdrawal</b><br>Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.</div>
+<div class="rule">
+<b>Withdrawal</b><br>
+Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.
+</div>
 
-<div class="rule"><b>Late</b><br>More than 20 minutes late: match cancelled; late player −20, other three +25 each.</div>
+<div class="rule">
+<b>Late</b><br>
+More than 20 minutes late: match cancelled; late player −20, other three +25 each.
+</div>
 
-<div class="rule"><b>Emergency</b><br>If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.</div>
+<div class="rule">
+<b>Emergency</b><br>
+If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.
+</div>
 
 </div>
+
 </section>
 
 
 <section id="account" class="hidden">
 
 <div class="eyebrow">Player Account</div>
+
 <h1>Join Dragon Scramble</h1>
 
-<div id="logged-in-player" class="card hidden">
+<div
+id="logged-in-player"
+class="card hidden">
+
 <div class="eyebrow">Your Account</div>
-<h2>Welcome, <span id="player-nickname"></span></h2>
-<p id="player-name" class="muted"></p>
-<button class="btn alt" onclick="signOutPlayer()">Sign Out</button>
+
+<h2>
+Welcome,
+<span id="player-nickname"></span>
+</h2>
+
+<p
+id="player-name"
+class="muted">
+</p>
+
+<button
+class="btn alt"
+onclick="signOutPlayer()">
+Sign Out
+</button>
+
 </div>
 
-<div id="signup-card" class="card">
+
+<div
+id="signup-card"
+class="card">
 
 <div class="eyebrow">New Player</div>
+
 <h2>Create Account</h2>
 
 <label>Full Name</label>
@@ -260,15 +563,23 @@ Phone numbers are visible to authenticated players for coordinating games and su
 <label>Password</label>
 <input id="signup-password" type="password">
 
-<button class="btn" onclick="signUpPlayer()">Create Account</button>
+<button
+class="btn"
+onclick="signUpPlayer()">
+Create Account
+</button>
 
 <p id="signup-message" class="muted"></p>
 
 </div>
 
-<div id="login-card" class="card">
+
+<div
+id="login-card"
+class="card">
 
 <div class="eyebrow">Returning Player</div>
+
 <h2>Sign In</h2>
 
 <label>Email</label>
@@ -277,7 +588,11 @@ Phone numbers are visible to authenticated players for coordinating games and su
 <label>Password</label>
 <input id="login-password" type="password">
 
-<button class="btn alt" onclick="signInPlayer()">Sign In</button>
+<button
+class="btn alt"
+onclick="signInPlayer()">
+Sign In
+</button>
 
 <p id="login-message" class="muted"></p>
 
@@ -289,16 +604,19 @@ Phone numbers are visible to authenticated players for coordinating games and su
 <section id="admin" class="hidden">
 
 <div class="eyebrow">Administration</div>
-<h1>Admin Dashboard</h1>
+
+<h1>Score Entry</h1>
+
+<p class="muted">
+Confirmed matches you proposed will appear here for result entry.
+</p>
+
+<div id="admin-score-list">
 
 <div class="card">
-<h2>Payment confirmation</h2>
-<p class="muted">Admin payment controls will be connected later.</p>
+<p class="muted">Loading confirmed matches...</p>
 </div>
 
-<div class="card">
-<h2>Completed Match</h2>
-<p class="muted">Real score entry will be connected next.</p>
 </div>
 
 </section>
@@ -371,6 +689,10 @@ if(id === "roster"){
 roster();
 }
 
+if(id === "admin"){
+loadAdminScores();
+}
+
 }
 
 
@@ -395,8 +717,7 @@ error
 return null;
 }
 
-currentScramble =
-data || null;
+currentScramble = data || null;
 
 return currentScramble;
 
@@ -457,10 +778,8 @@ return currentEligibility;
 function toggleProposal(){
 
 if(!currentUser){
-
 show("account");
 return;
-
 }
 
 if(!currentEligibility.eligible){
@@ -473,12 +792,9 @@ document.getElementById(
 message.textContent =
 "You must be an active, paid Dragon Scramble player to propose a match.";
 
-message.classList.remove(
-"hidden"
-);
+message.classList.remove("hidden");
 
 return;
-
 }
 
 document
@@ -491,9 +807,7 @@ document
 async function loadMatchesPage(){
 
 const list =
-document.getElementById(
-"match-list"
-);
+document.getElementById("match-list");
 
 list.innerHTML =
 '<div class="card"><p class="muted">Loading matches...</p></div>';
@@ -504,7 +818,6 @@ list.innerHTML =
 '<div class="card"><h2>Sign in to view matches</h2><button class="btn" onclick="show(\'account\')">Sign In</button></div>';
 
 return;
-
 }
 
 await getActiveScramble();
@@ -515,7 +828,6 @@ list.innerHTML =
 '<div class="card"><p class="muted">There is no active Scramble.</p></div>';
 
 return;
-
 }
 
 await checkEligibility();
@@ -541,57 +853,37 @@ message.textContent =
 "You must be an active, paid player.";
 
 return;
-
 }
 
 const date =
-document.getElementById(
-"match-date"
-).value;
+document.getElementById("match-date").value;
 
 const time =
-document.getElementById(
-"match-time"
-).value;
+document.getElementById("match-time").value;
 
 const location =
-document.getElementById(
-"match-location"
-).value.trim();
+document.getElementById("match-location").value.trim();
 
 const matchType =
-document.getElementById(
-"match-type"
-).value;
+document.getElementById("match-type").value;
 
-if(
-!date ||
-!time ||
-!location
-){
+if(!date || !time || !location){
 
 message.textContent =
 "Please enter date, time and location.";
 
 return;
-
 }
 
 const localDate =
-new Date(
-`${date}T${time}:00`
-);
+new Date(`${date}T${time}:00`);
 
-if(
-localDate <=
-new Date()
-){
+if(localDate <= new Date()){
 
 message.textContent =
 "The match must be in the future.";
 
 return;
-
 }
 
 const {error} =
@@ -621,14 +913,11 @@ status:
 
 if(error){
 
-console.error(error);
-
 message.textContent =
 "Match could not be created: " +
 error.message;
 
 return;
-
 }
 
 message.textContent =
@@ -650,9 +939,7 @@ document
 .getElementById(
 `edit-${id}`
 )
-.classList.toggle(
-"hidden"
-);
+.classList.toggle("hidden");
 
 }
 
@@ -663,9 +950,7 @@ document
 .getElementById(
 `cancel-${id}`
 )
-.classList.toggle(
-"hidden"
-);
+.classList.toggle("hidden");
 
 }
 
@@ -692,16 +977,12 @@ message.textContent =
 "Location is required.";
 
 return;
-
 }
-
 
 if(status === "confirmed"){
 
 const scheduled =
-new Date(
-originalScheduledAt
-);
+new Date(originalScheduledAt);
 
 const sixHoursBefore =
 new Date(
@@ -709,16 +990,12 @@ scheduled.getTime() -
 21600000
 );
 
-if(
-new Date() >=
-sixHoursBefore
-){
+if(new Date() >= sixHoursBefore){
 
 message.textContent =
 "Location can no longer be changed because the match begins within 6 hours.";
 
 return;
-
 }
 
 const {error} =
@@ -728,10 +1005,7 @@ await supabaseClient
 location:location
 })
 .eq("id",id)
-.eq(
-"proposer_id",
-currentUser.id
-);
+.eq("proposer_id",currentUser.id);
 
 if(error){
 
@@ -740,14 +1014,12 @@ message.textContent =
 error.message;
 
 return;
-
 }
 
 await loadMatches();
 await loadHomeMatches();
 
 return;
-
 }
 
 
@@ -766,33 +1038,23 @@ document.getElementById(
 `edit-type-${id}`
 ).value;
 
-if(
-!date ||
-!time
-){
+if(!date || !time){
 
 message.textContent =
 "Date and time are required.";
 
 return;
-
 }
 
 const scheduled =
-new Date(
-`${date}T${time}:00`
-);
+new Date(`${date}T${time}:00`);
 
-if(
-scheduled <=
-new Date()
-){
+if(scheduled <= new Date()){
 
 message.textContent =
-"The match must be scheduled in the future.";
+"The match must be in the future.";
 
 return;
-
 }
 
 const {error} =
@@ -811,10 +1073,7 @@ type
 
 })
 .eq("id",id)
-.eq(
-"proposer_id",
-currentUser.id
-);
+.eq("proposer_id",currentUser.id);
 
 if(error){
 
@@ -823,7 +1082,6 @@ message.textContent =
 error.message;
 
 return;
-
 }
 
 await loadMatches();
@@ -850,17 +1108,14 @@ message.textContent =
 "Please enter a cancellation reason.";
 
 return;
-
 }
 
 if(
 !confirm(
-"Cancel this match? Players will no longer be able to join it."
+"Cancel this match?"
 )
 ){
-
 return;
-
 }
 
 const {error} =
@@ -868,9 +1123,7 @@ await supabaseClient
 .from("matches")
 .update({
 
-status:
-"cancelled",
-
+status:"cancelled",
 cancelled_at:
 new Date().toISOString(),
 
@@ -879,10 +1132,7 @@ reason
 
 })
 .eq("id",id)
-.eq(
-"proposer_id",
-currentUser.id
-);
+.eq("proposer_id",currentUser.id);
 
 if(error){
 
@@ -891,7 +1141,6 @@ message.textContent =
 error.message;
 
 return;
-
 }
 
 await loadMatches();
@@ -902,32 +1151,20 @@ await loadHomeMatches();
 
 async function leaveMatch(id){
 
-if(!currentUser){
-return;
-}
-
 if(
 !confirm(
-"Leave this match? The seat will become available for another player."
+"Leave this match? Your seat will become available."
 )
 ){
-
 return;
-
 }
 
 const {error} =
 await supabaseClient
 .from("match_players")
 .delete()
-.eq(
-"match_id",
-id
-)
-.eq(
-"player_id",
-currentUser.id
-);
+.eq("match_id",id)
+.eq("player_id",currentUser.id);
 
 if(error){
 
@@ -937,7 +1174,6 @@ error.message
 );
 
 return;
-
 }
 
 await loadMatches();
@@ -951,16 +1187,13 @@ async function joinMatch(id){
 await getActiveScramble();
 await checkEligibility();
 
-if(
-!currentEligibility.eligible
-){
+if(!currentEligibility.eligible){
 
 alert(
 "Only active, paid players can join."
 );
 
 return;
-
 }
 
 const {error} =
@@ -968,12 +1201,8 @@ await supabaseClient
 .from("match_players")
 .insert({
 
-match_id:
-id,
-
-player_id:
-currentUser.id,
-
+match_id:id,
+player_id:currentUser.id,
 joined_at:
 new Date().toISOString()
 
@@ -987,7 +1216,6 @@ error.message
 );
 
 return;
-
 }
 
 await loadMatches();
@@ -1009,23 +1237,9 @@ await supabaseClient
 .select(
 "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at"
 )
-.eq(
-"scramble_id",
-currentScramble.id
-)
-.in(
-"status",
-[
-"open",
-"confirmed"
-]
-)
-.order(
-"scheduled_at",
-{
-ascending:true
-}
-);
+.eq("scramble_id",currentScramble.id)
+.in("status",["open","confirmed"])
+.order("scheduled_at",{ascending:true});
 
 if(error){
 
@@ -1033,26 +1247,18 @@ list.innerHTML =
 '<div class="card"><p class="error">Unable to load matches.</p></div>';
 
 return;
-
 }
 
-if(
-!matches ||
-matches.length === 0
-){
+if(!matches || !matches.length){
 
 list.innerHTML =
 '<div class="card"><h2>No upcoming matches yet</h2></div>';
 
 return;
-
 }
 
 const ids =
-matches.map(
-match =>
-match.id
-);
+matches.map(match => match.id);
 
 const [
 seatsResult,
@@ -1061,19 +1267,12 @@ playersResult
 
 supabaseClient
 .from("match_players")
-.select(
-"match_id,player_id,joined_at"
-)
-.in(
-"match_id",
-ids
-),
+.select("match_id,player_id,joined_at")
+.in("match_id",ids),
 
 supabaseClient
 .from("players")
-.select(
-"id,nickname,full_name"
-)
+.select("id,nickname,full_name")
 
 ]);
 
@@ -1095,8 +1294,7 @@ matches.map(match => {
 const matchSeats =
 seats
 .filter(seat =>
-seat.match_id ===
-match.id
+seat.match_id === match.id
 )
 .sort((a,b) =>
 new Date(a.joined_at) -
@@ -1108,23 +1306,17 @@ matchSeats.length;
 
 const joined =
 matchSeats.some(seat =>
-seat.player_id ===
-currentUser.id
+seat.player_id === currentUser.id
 );
 
 const isProposer =
-currentUser.id ===
-match.proposer_id;
+currentUser.id === match.proposer_id;
 
 const proposer =
-playerMap.get(
-match.proposer_id
-);
+playerMap.get(match.proposer_id);
 
 const scheduled =
-new Date(
-match.scheduled_at
-);
+new Date(match.scheduled_at);
 
 const dateText =
 scheduled.toLocaleDateString(
@@ -1147,8 +1339,7 @@ minute:"2-digit"
 );
 
 const typeLabel =
-match.match_type ===
-"focused"
+match.match_type === "focused"
 ? "Focused"
 : "Social";
 
@@ -1163,10 +1354,7 @@ seat.player_id
 );
 
 const empty =
-Math.max(
-0,
-4-count
-);
+Math.max(0,4-count);
 
 const sixHoursBefore =
 new Date(
@@ -1174,22 +1362,13 @@ scheduled.getTime() -
 21600000
 );
 
-const confirmedLocationEditable =
-match.status ===
-"confirmed"
-&&
-new Date() <
-sixHoursBefore;
+const locationEditable =
+match.status === "confirmed" &&
+new Date() < sixHoursBefore;
 
+let actions = "";
 
-let actions =
-"";
-
-
-if(
-match.status ===
-"confirmed"
-){
+if(match.status === "confirmed"){
 
 actions +=
 '<span class="pill">Confirmed</span>';
@@ -1201,34 +1380,25 @@ actions +=
 '<span class="pill">You’re in</span>';
 
 }
-else if(
-currentEligibility.eligible
-){
+else if(currentEligibility.eligible){
 
 actions +=
 `<button class="btn" onclick="joinMatch('${match.id}')">Join Match</button>`;
 
 }
 
-
-if(
-joined &&
-!isProposer
-){
+if(joined && !isProposer){
 
 actions +=
 `<button class="btn alt" onclick="leaveMatch('${match.id}')">Leave Match</button>`;
 
 }
 
-
 if(
 isProposer &&
 (
-match.status ===
-"open"
-||
-confirmedLocationEditable
+match.status === "open" ||
+locationEditable
 )
 ){
 
@@ -1237,14 +1407,12 @@ actions +=
 
 }
 
-
 if(isProposer){
 
 actions +=
 `<button class="btn danger" onclick="toggleCancel('${match.id}')">Cancel Match</button>`;
 
 }
-
 
 const localDate =
 `${scheduled.getFullYear()}-${String(
@@ -1260,22 +1428,13 @@ scheduled.getHours()
 scheduled.getMinutes()
 ).padStart(2,"0")}`;
 
+let edit = "";
 
-let edit =
-"";
-
-
-if(
-isProposer &&
-match.status ===
-"open"
-){
+if(isProposer && match.status === "open"){
 
 edit = `
 
-<div
-id="edit-${match.id}"
-class="edit-box hidden">
+<div id="edit-${match.id}" class="edit-box hidden">
 
 <h3>Edit Match</h3>
 
@@ -1309,14 +1468,12 @@ value="${escapeHtml(match.location)}">
 
 <select id="edit-type-${match.id}">
 
-<option
-value="social"
+<option value="social"
 ${match.match_type === "social" ? "selected" : ""}>
 Social
 </option>
 
-<option
-value="focused"
+<option value="focused"
 ${match.match_type === "focused" ? "selected" : ""}>
 Focused
 </option>
@@ -1333,26 +1490,18 @@ onclick="updateMatch(
 Save Changes
 </button>
 
-<p
-id="edit-message-${match.id}"
-class="muted">
-</p>
+<p id="edit-message-${match.id}" class="muted"></p>
 
 </div>
 
 `;
 
 }
-else if(
-isProposer &&
-confirmedLocationEditable
-){
+else if(isProposer && locationEditable){
 
 edit = `
 
-<div
-id="edit-${match.id}"
-class="edit-box hidden">
+<div id="edit-${match.id}" class="edit-box hidden">
 
 <h3>Update Location</h3>
 
@@ -1376,10 +1525,7 @@ onclick="updateMatch(
 Save Location
 </button>
 
-<p
-id="edit-message-${match.id}"
-class="muted">
-</p>
+<p id="edit-message-${match.id}" class="muted"></p>
 
 </div>
 
@@ -1387,14 +1533,11 @@ class="muted">
 
 }
 
-
 const cancel =
 isProposer
 ? `
 
-<div
-id="cancel-${match.id}"
-class="edit-box hidden">
+<div id="cancel-${match.id}" class="edit-box hidden">
 
 <h3>Cancel Match</h3>
 
@@ -1402,7 +1545,7 @@ class="edit-box hidden">
 
 <textarea
 id="cancel-reason-${match.id}"
-placeholder="Why is the match being cancelled?"></textarea>
+placeholder="Cancellation reason"></textarea>
 
 <button
 class="btn danger"
@@ -1410,50 +1553,33 @@ onclick="cancelMatch('${match.id}')">
 Confirm Cancellation
 </button>
 
-<p
-id="cancel-message-${match.id}"
-class="muted">
-</p>
+<p id="cancel-message-${match.id}" class="muted"></p>
 
 </div>
 
 `
 : "";
 
-
 return `
 
 <div class="card">
 
 <div>
-
-<span class="pill">
-${count} / 4
-</span>
-
+<span class="pill">${count} / 4</span>
 &nbsp;
-
-<span class="pill">
-${typeLabel}
-</span>
-
+<span class="pill">${typeLabel}</span>
 </div>
 
-
 <h2>
-${escapeHtml(dateText)}
-·
+${escapeHtml(dateText)} ·
 ${escapeHtml(timeText)}
 </h2>
-
 
 <p>
 📍 ${escapeHtml(match.location)}
 </p>
 
-
 <p class="muted">
-
 Proposed by
 <b>
 ${escapeHtml(
@@ -1461,9 +1587,7 @@ proposer?.nickname ||
 "Player"
 )}
 </b>
-
 </p>
-
 
 <div class="players">
 
@@ -1476,7 +1600,6 @@ empty > 0
 }
 
 </div>
-
 
 ${actions}
 
@@ -1491,6 +1614,528 @@ ${cancel}
 }).join("");
 
 }
+
+
+/* ---------- SCORE ENTRY ---------- */
+
+
+async function loadAdminScores(){
+
+const list =
+document.getElementById(
+"admin-score-list"
+);
+
+if(!currentUser){
+
+list.innerHTML =
+'<div class="card"><p class="muted">Sign in first.</p></div>';
+
+return;
+}
+
+list.innerHTML =
+'<div class="card"><p class="muted">Loading confirmed matches...</p></div>';
+
+const {data:matches,error} =
+await supabaseClient
+.from("matches")
+.select(
+"id,scheduled_at,location,match_type,status"
+)
+.eq("proposer_id",currentUser.id)
+.eq("status","confirmed")
+.order("scheduled_at",{ascending:true});
+
+if(error){
+
+list.innerHTML =
+'<div class="card"><p class="error">Could not load confirmed matches.</p></div>';
+
+return;
+}
+
+if(!matches || !matches.length){
+
+list.innerHTML =
+'<div class="card"><p class="muted">No confirmed matches are waiting for scores.</p></div>';
+
+return;
+}
+
+const ids =
+matches.map(match =>
+match.id
+);
+
+const [
+seatsResult,
+playersResult
+] = await Promise.all([
+
+supabaseClient
+.from("match_players")
+.select("match_id,player_id,joined_at")
+.in("match_id",ids),
+
+supabaseClient
+.from("players")
+.select("id,nickname,full_name")
+
+]);
+
+if(seatsResult.error || playersResult.error){
+
+list.innerHTML =
+'<div class="card"><p class="error">Could not load match players.</p></div>';
+
+return;
+}
+
+const seats =
+seatsResult.data || [];
+
+const playerMap =
+new Map(
+(playersResult.data || [])
+.map(player => [
+player.id,
+player
+])
+);
+
+list.innerHTML =
+matches.map(match => {
+
+const matchPlayers =
+seats
+.filter(seat =>
+seat.match_id === match.id
+)
+.sort((a,b) =>
+new Date(a.joined_at) -
+new Date(b.joined_at)
+);
+
+if(matchPlayers.length !== 4){
+
+return `
+
+<div class="card">
+
+<h2>
+${escapeHtml(match.location)}
+</h2>
+
+<p class="error">
+This confirmed match does not currently have exactly four players.
+</p>
+
+</div>
+
+`;
+
+}
+
+const players =
+matchPlayers.map(seat => ({
+
+id:seat.player_id,
+
+nickname:
+playerMap.get(
+seat.player_id
+)?.nickname ||
+"Player"
+
+}));
+
+const scheduled =
+new Date(
+match.scheduled_at
+);
+
+return `
+
+<div class="card">
+
+<div class="eyebrow">
+Confirmed Match
+</div>
+
+<h2>
+${escapeHtml(
+scheduled.toLocaleDateString()
+)}
+·
+${escapeHtml(
+scheduled.toLocaleTimeString(
+undefined,
+{
+hour:"numeric",
+minute:"2-digit"
+}
+)
+)}
+</h2>
+
+<p>
+📍 ${escapeHtml(match.location)}
+</p>
+
+<div class="players">
+${players.map(player =>
+escapeHtml(player.nickname)
+).join(" · ")}
+</div>
+
+<div class="notice">
+Enter all four games before submitting. Each player is East once.
+</div>
+
+${players.map((eastPlayer,index) => {
+
+const gameNumber =
+index + 1;
+
+return `
+
+<div class="game-entry">
+
+<h3>
+Game ${gameNumber}
+·
+East:
+${escapeHtml(eastPlayer.nickname)}
+</h3>
+
+<label>Result</label>
+
+<select
+id="result-${match.id}-${gameNumber}"
+onchange="scoreResultChanged(
+'${match.id}',
+${gameNumber}
+)">
+
+<option value="">
+Select result
+</option>
+
+${players.map(player => `
+
+<option value="${player.id}">
+${escapeHtml(player.nickname)}
+</option>
+
+`).join("")}
+
+<option value="wall">
+Wall Game
+</option>
+
+</select>
+
+<div
+id="winner-options-${match.id}-${gameNumber}">
+
+<label>
+NMJL Hand Value
+</label>
+
+<input
+id="base-${match.id}-${gameNumber}"
+type="number"
+min="1"
+placeholder="e.g. 25">
+
+<div class="checkrow">
+
+<label>
+<input
+id="self-${match.id}-${gameNumber}"
+type="checkbox">
+Self-picked +10
+</label>
+
+<label>
+<input
+id="jokerless-${match.id}-${gameNumber}"
+type="checkbox">
+Jokerless +20
+</label>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+}).join("")}
+
+<button
+id="submit-results-${match.id}"
+class="btn alt"
+onclick='submitMatchResults(
+"${match.id}",
+${JSON.stringify(players)}
+)'>
+Submit Match Results
+</button>
+
+<p
+id="score-message-${match.id}"
+class="muted">
+</p>
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+function scoreResultChanged(
+matchId,
+gameNumber
+){
+
+const result =
+document.getElementById(
+`result-${matchId}-${gameNumber}`
+).value;
+
+const options =
+document.getElementById(
+`winner-options-${matchId}-${gameNumber}`
+);
+
+if(result === "wall"){
+
+options.classList.add(
+"hidden"
+);
+
+}
+else{
+
+options.classList.remove(
+"hidden"
+);
+
+}
+
+}
+
+
+async function submitMatchResults(
+matchId,
+players
+){
+
+const message =
+document.getElementById(
+`score-message-${matchId}`
+);
+
+const button =
+document.getElementById(
+`submit-results-${matchId}`
+);
+
+const games = [];
+
+for(
+let gameNumber = 1;
+gameNumber <= 4;
+gameNumber++
+){
+
+const result =
+document.getElementById(
+`result-${matchId}-${gameNumber}`
+).value;
+
+if(!result){
+
+message.textContent =
+`Please select a result for Game ${gameNumber}.`;
+
+message.className =
+"error";
+
+return;
+}
+
+const eastPlayer =
+players[
+gameNumber - 1
+];
+
+if(result === "wall"){
+
+games.push({
+
+game_number:
+gameNumber,
+
+east_player_id:
+eastPlayer.id,
+
+winner_player_id:
+null,
+
+is_wall_game:
+true,
+
+base_hand_value:
+0,
+
+self_picked:
+false,
+
+jokerless:
+false
+
+});
+
+continue;
+
+}
+
+const base =
+Number(
+document.getElementById(
+`base-${matchId}-${gameNumber}`
+).value
+);
+
+if(
+!Number.isFinite(base) ||
+base <= 0
+){
+
+message.textContent =
+`Enter the NMJL hand value for Game ${gameNumber}.`;
+
+message.className =
+"error";
+
+return;
+}
+
+games.push({
+
+game_number:
+gameNumber,
+
+east_player_id:
+eastPlayer.id,
+
+winner_player_id:
+result,
+
+is_wall_game:
+false,
+
+base_hand_value:
+base,
+
+self_picked:
+document.getElementById(
+`self-${matchId}-${gameNumber}`
+).checked,
+
+jokerless:
+document.getElementById(
+`jokerless-${matchId}-${gameNumber}`
+).checked
+
+});
+
+}
+
+
+if(
+!confirm(
+"Submit these four games? Once submitted, the match will be marked completed."
+)
+){
+
+return;
+}
+
+
+button.disabled =
+true;
+
+message.textContent =
+"Submitting match results...";
+
+message.className =
+"muted";
+
+
+const {
+error
+} = await supabaseClient
+.rpc(
+"complete_dragon_match",
+{
+
+p_match_id:
+matchId,
+
+p_games:
+games
+
+}
+);
+
+
+button.disabled =
+false;
+
+
+if(error){
+
+console.error(
+"Could not complete match:",
+error
+);
+
+message.textContent =
+"Could not submit match results: " +
+error.message;
+
+message.className =
+"error";
+
+return;
+}
+
+
+message.textContent =
+"Match completed successfully.";
+
+message.className =
+"success";
+
+
+await loadAdminScores();
+
+await loadLeaderboard();
+
+await loadHomeMatches();
+
+}
+
+
+/* ---------- HOME MATCHES ---------- */
 
 
 async function loadHomeMatches(){
@@ -1514,45 +2159,46 @@ openBox.innerHTML =
 '<p class="muted">Sign in to view open tables.</p>';
 
 return;
-
 }
 
 await getActiveScramble();
 
 if(!currentScramble){
+
+confirmedBox.innerHTML =
+'<p class="muted">No active Scramble.</p>';
+
+openBox.innerHTML =
+'<p class="muted">No active Scramble.</p>';
+
 return;
 }
 
-const {data} =
+const {data,error} =
 await supabaseClient
 .from("matches")
 .select(
 "id,scheduled_at,location,status,match_type"
 )
-.eq(
-"scramble_id",
-currentScramble.id
-)
-.in(
-"status",
-[
-"open",
-"confirmed"
-]
-)
-.order(
-"scheduled_at",
-{
-ascending:true
+.eq("scramble_id",currentScramble.id)
+.in("status",["open","confirmed"])
+.order("scheduled_at",{ascending:true});
+
+if(error){
+
+confirmedBox.innerHTML =
+'<p class="muted">Unable to load matches.</p>';
+
+openBox.innerHTML =
+'<p class="muted">Unable to load matches.</p>';
+
+return;
 }
-);
 
 const upcoming =
 (data || [])
 .filter(match =>
-new Date(
-match.scheduled_at
-) >=
+new Date(match.scheduled_at) >=
 new Date()
 );
 
@@ -1636,6 +2282,9 @@ button
 }
 
 
+/* ---------- LEADERBOARD ---------- */
+
+
 async function loadLeaderboard(){
 
 const board =
@@ -1654,14 +2303,17 @@ null
 );
 
 return;
-
 }
+
+board.innerHTML =
+'<p class="muted">Loading leaderboard...</p>';
 
 const [
 playersResult,
 scoresResult,
 gamesResult,
-matchesResult
+matchesResult,
+matchPlayersResult
 ] = await Promise.all([
 
 supabaseClient
@@ -1686,23 +2338,49 @@ supabaseClient
 .from("matches")
 .select(
 "id,proposer_id,status,completed_at"
+),
+
+supabaseClient
+.from("match_players")
+.select(
+"match_id,player_id"
 )
 
 ]);
 
-if(
+const error =
 playersResult.error ||
 scoresResult.error ||
 gamesResult.error ||
-matchesResult.error
-){
+matchesResult.error ||
+matchPlayersResult.error;
+
+if(error){
+
+console.error(
+"Could not load leaderboard:",
+error
+);
 
 board.innerHTML =
 '<p class="muted">Unable to load leaderboard.</p>';
 
 return;
-
 }
+
+const completed =
+(matchesResult.data || [])
+.filter(match =>
+match.status === "completed" ||
+!!match.completed_at
+);
+
+const completedIds =
+new Set(
+completed.map(match =>
+match.id
+)
+);
 
 const gameToMatch =
 new Map(
@@ -1711,22 +2389,6 @@ new Map(
 game.id,
 game.match_id
 ])
-);
-
-const completed =
-(matchesResult.data || [])
-.filter(match =>
-match.status ===
-"completed"
-||
-match.completed_at
-);
-
-const completedIds =
-new Set(
-completed.map(match =>
-match.id
-)
 );
 
 const leaderboard =
@@ -1750,6 +2412,40 @@ matches:new Set()
 );
 
 }
+
+
+/* Count every completed match for every participant */
+
+for(
+const membership of
+matchPlayersResult.data || []
+){
+
+if(
+!completedIds.has(
+membership.match_id
+)
+){
+continue;
+}
+
+const player =
+leaderboard.get(
+membership.player_id
+);
+
+if(player){
+
+player.matches.add(
+membership.match_id
+);
+
+}
+
+}
+
+
+/* Add actual score rows */
 
 for(
 const score of
@@ -1778,15 +2474,13 @@ continue;
 
 player.total_points +=
 Number(
-score.points ||
-0
-);
-
-player.matches.add(
-matchId
+score.points || 0
 );
 
 }
+
+
+/* Proposer +5 */
 
 for(
 const match of
@@ -1807,6 +2501,7 @@ proposer.total_points +=
 
 }
 
+
 const rows =
 Array.from(
 leaderboard.values()
@@ -1826,15 +2521,29 @@ player.matches.size
 
 }))
 .filter(player =>
-player.matches_played ||
-player.total_points
+player.matches_played > 0
 )
-.sort((a,b) =>
+.sort((a,b) => {
+
+if(
+b.total_points !==
+a.total_points
+){
+
+return (
 b.total_points -
-a.total_points ||
+a.total_points
+);
+
+}
+
+return (
 b.average -
 a.average
 );
+
+});
+
 
 if(!rows.length){
 
@@ -1847,8 +2556,8 @@ currentUser
 );
 
 return;
-
 }
+
 
 board.innerHTML =
 rows.map(
@@ -1863,9 +2572,7 @@ ${index+1}
 <div>
 
 <div class="nick">
-${escapeHtml(
-player.nickname
-)}
+${escapeHtml(player.nickname)}
 </div>
 
 <div class="muted">
@@ -1892,6 +2599,7 @@ ${player.average.toFixed(1)} avg
 
 `
 ).join("");
+
 
 updateMyStanding(
 rows,
@@ -1933,7 +2641,6 @@ stats.textContent =
 "";
 
 return;
-
 }
 
 const index =
@@ -1954,7 +2661,6 @@ stats.textContent =
 "";
 
 return;
-
 }
 
 const player =
@@ -1972,6 +2678,9 @@ stats.textContent =
 }
 
 
+/* ---------- ROSTER ---------- */
+
+
 async function roster(){
 
 const list =
@@ -1985,7 +2694,6 @@ list.innerHTML =
 '<p class="muted">Sign in to view the roster.</p>';
 
 return;
-
 }
 
 const {data,error} =
@@ -1996,9 +2704,7 @@ await supabaseClient
 )
 .order(
 "nickname",
-{
-ascending:true
-}
+{ascending:true}
 );
 
 if(error){
@@ -2007,7 +2713,6 @@ list.innerHTML =
 '<p class="muted">Unable to load roster.</p>';
 
 return;
-
 }
 
 list.innerHTML =
@@ -2021,23 +2726,17 @@ list.innerHTML =
 <div>
 
 <div class="nick">
-${escapeHtml(
-player.nickname
-)}
+${escapeHtml(player.nickname)}
 </div>
 
 <div class="muted">
-${escapeHtml(
-player.full_name
-)}
+${escapeHtml(player.full_name)}
 </div>
 
 </div>
 
 <div>
-${escapeHtml(
-player.phone
-)}
+${escapeHtml(player.phone)}
 </div>
 
 <span class="pill">
@@ -2050,6 +2749,9 @@ Player
 .join("");
 
 }
+
+
+/* ---------- AUTH ---------- */
 
 
 async function signUpPlayer(){
@@ -2089,23 +2791,15 @@ await supabaseClient
 .auth
 .signUp({
 
-email:
-email,
-
-password:
-password,
+email:email,
+password:password,
 
 options:{
 
 data:{
-full_name:
-full_name,
-
-nickname:
-nickname,
-
-phone:
-phone
+full_name:full_name,
+nickname:nickname,
+phone:phone
 },
 
 emailRedirectTo:
@@ -2146,11 +2840,8 @@ await supabaseClient
 .auth
 .signInWithPassword({
 
-email:
-email,
-
-password:
-password
+email:email,
+password:password
 
 });
 
@@ -2161,7 +2852,6 @@ message.textContent =
 error.message;
 
 return;
-
 }
 
 message.textContent =
@@ -2199,10 +2889,7 @@ await supabaseClient
 .select(
 "full_name,nickname"
 )
-.eq(
-"id",
-user.id
-)
+.eq("id",user.id)
 .single();
 
 if(error){
@@ -2288,11 +2975,8 @@ supabaseClient
 
 if(
 (
-event ===
-"INITIAL_SESSION"
-||
-event ===
-"SIGNED_IN"
+event === "INITIAL_SESSION" ||
+event === "SIGNED_IN"
 )
 &&
 session?.user
@@ -2323,8 +3007,7 @@ await loadHomeMatches();
 }
 
 if(
-event ===
-"SIGNED_OUT"
+event === "SIGNED_OUT"
 ){
 
 currentUser =
@@ -2338,6 +3021,8 @@ null;
 }
 );
 
+
+/* ---------- START ---------- */
 
 loadLeaderboard();
 loadHomeMatches();
