@@ -606,13 +606,44 @@ function render() {
 }
 
 
-function roster() {
+async function roster() {
+  const rosterList = document.getElementById("rosterlist");
 
-  document.getElementById('rosterlist').innerHTML =
-    players
-      .filter(player => player[5])
-      .map(player => `
-        <div class="leader">
+  rosterList.innerHTML = '<p class="muted">Loading players...</p>';
+
+  const { data: rosterPlayers, error } = await supabaseClient
+    .from("players")
+    .select("nickname, full_name, phone")
+    .order("nickname", { ascending: true });
+
+  if (error) {
+    console.error("Could not load roster:", error);
+    rosterList.innerHTML =
+      '<p class="muted">Unable to load the player roster.</p>';
+    return;
+  }
+
+  if (!rosterPlayers || rosterPlayers.length === 0) {
+    rosterList.innerHTML =
+      '<p class="muted">No players yet.</p>';
+    return;
+  }
+
+  rosterList.innerHTML = rosterPlayers.map(player => `
+    <div class="leader">
+      <div></div>
+
+      <div>
+        <div class="nick">${player.nickname || "Player"}</div>
+        <div class="muted">${player.full_name || ""}</div>
+      </div>
+
+      <div>${player.phone || ""}</div>
+
+      <span class="pill">Player</span>
+    </div>
+  `).join('');
+}
 
           <div></div>
 
