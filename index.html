@@ -11,7 +11,12 @@
 <section id="rules" class="hidden"><div class="eyebrow">Play fair · Have fun</div><h1>Dragon Scramble Rules</h1><div class="card"><div class="rule"><b>NMJL</b><br>All American Mah Jongg League (NMJL) rules apply.</div><div class="rule"><b>Four games</b><br>Every match has four games, with each player East once.</div><div class="rule"><b>Charleston passing</b><br>During all Charleston passes, all four players must have placed their tiles on the mat before any player picks up the tiles being passed to them. No player may pick up incoming tiles early.</div><div class="rule"><b>Phones</b><br>No phone above table height during play. No photos of tiles, racks, hands or the table. No AI or electronic assistance.</div><div class="rule"><b>Notifications</b><br>All phone notification sounds must be off for the entire match.</div><div class="rule"><b>Scoring</b><br>Winner receives NMJL hand value. Self-picked last tile +10. Jokerless Mahjong +20. Wall Game = +10 to each player and no other points for that game.</div><div class="rule"><b>Proposer</b><br>+5 points once for every completed four-game match proposed.</div><div class="rule"><b>Withdrawal</b><br>Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.</div><div class="rule"><b>Late</b><br>More than 20 minutes late: match cancelled; late player −20, other three +25 each.</div><div class="rule"><b>Emergency</b><br>If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.</div></div></section>
 <section id="account" class="hidden">
   <div class="eyebrow">Player Account</div>
-  <h1>Join Dragon Scramble</h1>
+  <h1>Join Dragon Scramble</h1><div id="logged-in-player" class="card hidden">
+  <div class="eyebrow">Your Account</div>
+  <h2>Welcome, <span id="player-nickname"></span></h2>
+  <p id="player-name" class="muted"></p>
+  <button class="btn alt" onclick="signOutPlayer()">Sign Out</button>
+</div>
 
   <div id="logged-in-player" class="card hidden">
     <div class="eyebrow">Your Account</div>
