@@ -1,18 +1,11 @@
 <!doctype html>
 <html>
-
 <head>
-
 <meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1">
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dragon Scramble</title>
 
 <style>
-
 :root{
   --ink:#24312b;
   --forest:#26352e;
@@ -23,9 +16,7 @@
   --line:#ddd5c6;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -52,9 +43,7 @@ header{
   letter-spacing:2px;
 }
 
-.brand span{
-  color:#d3b36b;
-}
+.brand span{color:#d3b36b}
 
 nav button{
   background:none;
@@ -77,9 +66,7 @@ main{
   padding:35px 20px;
 }
 
-.hidden{
-  display:none!important;
-}
+.hidden{display:none!important}
 
 .hero{
   display:grid;
@@ -94,9 +81,7 @@ h1{
   margin:0 0 10px;
 }
 
-h2{
-  margin:8px 0;
-}
+h2{margin:8px 0}
 
 .eyebrow{
   text-transform:uppercase;
@@ -120,9 +105,7 @@ h2{
   gap:18px;
 }
 
-.muted{
-  color:var(--muted);
-}
+.muted{color:var(--muted)}
 
 .leader{
   display:grid;
@@ -157,10 +140,6 @@ h2{
   text-transform:uppercase;
 }
 
-.pending{
-  background:#f0e9d7;
-}
-
 .btn{
   border:0;
   border-radius:8px;
@@ -168,6 +147,8 @@ h2{
   background:var(--ink);
   color:white;
   cursor:pointer;
+  margin-right:6px;
+  margin-top:5px;
 }
 
 .btn:disabled{
@@ -175,12 +156,9 @@ h2{
   cursor:not-allowed;
 }
 
-.alt{
-  background:var(--gold);
-}
+.alt{background:var(--gold)}
 
-input,
-select{
+input,select{
   width:100%;
   padding:10px;
   border:1px solid #cfc7b8;
@@ -222,567 +200,254 @@ label{
   margin:12px 0;
 }
 
-.match-meta{
-  margin:10px 0;
-}
+.error{color:#8b3030}
+.success{color:#315d45}
 
-.match-type{
-  font-weight:bold;
-}
-
-.error{
-  color:#8b3030;
-}
-
-.success{
-  color:#315d45;
+.edit-box{
+  border-top:1px solid var(--line);
+  margin-top:18px;
+  padding-top:18px;
 }
 
 @media(max-width:760px){
-
-  .hero,
-  .grid,
-  .formgrid{
-    grid-template-columns:1fr;
-  }
-
-  h1{
-    font-size:38px;
-  }
-
-  .leader{
-    grid-template-columns:35px 1fr auto;
-  }
-
-  .avg{
-    display:none;
-  }
-
+  .hero,.grid,.formgrid{grid-template-columns:1fr}
+  h1{font-size:38px}
+  .leader{grid-template-columns:35px 1fr auto}
+  .avg{display:none}
   header{
     flex-direction:column;
     align-items:flex-start;
   }
-
 }
-
 </style>
-
 </head>
-
 
 <body>
 
-
 <header>
-
-<div class="brand">
-🐉 DRAGON <span>SCRAMBLE</span>
-</div>
+<div class="brand">🐉 DRAGON <span>SCRAMBLE</span></div>
 
 <nav>
-
-<button onclick="show('home')">
-Leaderboard
-</button>
-
-<button onclick="show('matches')">
-Matches
-</button>
-
-<button onclick="show('roster')">
-Roster
-</button>
-
-<button onclick="show('rules')">
-Rules
-</button>
-
-<button onclick="show('account')">
-Account
-</button>
-
-<button
-  class="admin"
-  onclick="show('admin')">
-Admin
-</button>
-
+<button onclick="show('home')">Leaderboard</button>
+<button onclick="show('matches')">Matches</button>
+<button onclick="show('roster')">Roster</button>
+<button onclick="show('rules')">Rules</button>
+<button onclick="show('account')">Account</button>
+<button class="admin" onclick="show('admin')">Admin</button>
 </nav>
-
 </header>
 
-
 <main>
-
-
-<!-- LEADERBOARD -->
 
 <section id="home">
 
 <div class="hero">
-
 <div>
-
-<div class="eyebrow">
-American Mahjong · Friendly Competition
+<div class="eyebrow">American Mahjong · Friendly Competition</div>
+<h1>The Dragon Scramble</h1>
+<p class="muted">Play four. Climb the board. Keep it social.</p>
 </div>
-
-<h1>
-The Dragon Scramble
-</h1>
-
-<p class="muted">
-Play four. Climb the board. Keep it social.
-</p>
-
-</div>
-
 
 <div class="card">
-
-<div class="eyebrow">
-Your standing
+<div class="eyebrow">Your standing</div>
+<div id="my-rank" style="font-size:34px">—</div>
+<b id="my-nickname">Sign in to view</b>
+<div id="my-stats" class="muted"></div>
 </div>
-
-<div
-  id="my-rank"
-  style="font-size:34px">
-—
 </div>
-
-<b id="my-nickname">
-Sign in to view
-</b>
-
-<div
-  id="my-stats"
-  class="muted">
-</div>
-
-</div>
-
-</div>
-
 
 <div class="card">
-
-<div class="eyebrow">
-Current leaderboard
-</div>
-
+<div class="eyebrow">Current leaderboard</div>
 <div id="board">
-
-<p class="muted">
-Loading leaderboard...
-</p>
-
+<p class="muted">Loading leaderboard...</p>
 </div>
-
 </div>
-
 
 <div class="grid">
-
 <div class="card">
-
-<div class="eyebrow">
-Next confirmed match
-</div>
-
+<div class="eyebrow">Next confirmed match</div>
 <div id="next-confirmed-home">
-
-<p class="muted">
-Loading...
-</p>
-
+<p class="muted">Loading...</p>
 </div>
-
 </div>
-
 
 <div class="card">
-
-<div class="eyebrow">
-Open table
-</div>
-
+<div class="eyebrow">Open table</div>
 <div id="next-open-home">
-
-<p class="muted">
-Loading...
-</p>
-
+<p class="muted">Loading...</p>
 </div>
-
 </div>
-
 </div>
 
 </section>
 
 
-
-<!-- MATCHES -->
-
-<section
-  id="matches"
-  class="hidden">
+<section id="matches" class="hidden">
 
 <div class="hero">
-
 <div>
-
-<div class="eyebrow">
-Tables
-</div>
-
-<h1>
-Matches
-</h1>
-
+<div class="eyebrow">Tables</div>
+<h1>Matches</h1>
 <p class="muted">
 Only active, payment-confirmed players can propose or join.
 </p>
-
 </div>
-
 
 <button
-  id="proposal-toggle"
-  class="btn alt"
-  onclick="toggleProposal()">
-
+id="proposal-toggle"
+class="btn alt"
+onclick="toggleProposal()">
 + Propose a match
-
 </button>
-
 </div>
-
 
 <div
-  id="match-eligibility-message"
-  class="notice hidden">
+id="match-eligibility-message"
+class="notice hidden">
 </div>
 
+<div id="proposal" class="card hidden">
 
-<div
-  id="proposal"
-  class="card hidden">
-
-<div class="eyebrow">
-New Match
-</div>
-
-<h2>
-Propose a Match
-</h2>
-
+<div class="eyebrow">New Match</div>
+<h2>Propose a Match</h2>
 
 <div class="formgrid">
+<div>
+<label>Date</label>
+<input id="match-date" type="date">
+</div>
 
 <div>
-
-<label>
-Date
-</label>
-
-<input
-  id="match-date"
-  type="date">
-
+<label>Time</label>
+<input id="match-time" type="time">
+</div>
 </div>
 
-
-<div>
-
-<label>
-Time
-</label>
-
+<label>Location</label>
 <input
-  id="match-time"
-  type="time">
+id="match-location"
+type="text"
+placeholder="Match location">
 
-</div>
-
-</div>
-
-
-<label>
-Location
-</label>
-
-<input
-  id="match-location"
-  type="text"
-  placeholder="Match location">
-
-
-<label>
-Match Type
-</label>
+<label>Match Type</label>
 
 <select id="match-type">
-
-<option value="social">
-Social
-</option>
-
-<option value="focused">
-Focused
-</option>
-
+<option value="social">Social</option>
+<option value="focused">Focused</option>
 </select>
 
-
 <div class="notice">
-
-<b>Social:</b>
-same Dragon Scramble rules, with a more relaxed expectation for pace of play.
-
+<b>Social:</b> same Dragon Scramble rules, with a more relaxed expectation for pace of play.
 <br><br>
-
-<b>Focused:</b>
-same Dragon Scramble rules, with players expected to maintain a faster pace.
-
+<b>Focused:</b> same rules, with players expected to maintain a faster pace.
 </div>
-
 
 <div class="notice">
-
-The proposer is responsible for providing the
-<b>Mahjong tiles, mat, racks and dice</b>
-for the match.
-
+The proposer provides the
+<b>Mahjong tiles, mat, racks and dice</b>.
 </div>
-
 
 <button
-  id="post-match-button"
-  class="btn"
-  onclick="createMatch()">
-
+id="post-match-button"
+class="btn"
+onclick="createMatch()">
 Post Match
-
 </button>
 
-
-<p
-  id="proposal-message"
-  class="muted">
-</p>
+<p id="proposal-message" class="muted"></p>
 
 </div>
-
 
 <div id="match-list">
-
 <div class="card">
-
-<p class="muted">
-Loading matches...
-</p>
-
+<p class="muted">Loading matches...</p>
 </div>
-
 </div>
 
 </section>
 
 
+<section id="roster" class="hidden">
 
-<!-- ROSTER -->
-
-<section
-  id="roster"
-  class="hidden">
-
-<div class="eyebrow">
-Active players
-</div>
-
-<h1>
-Player Roster
-</h1>
+<div class="eyebrow">Active players</div>
+<h1>Player Roster</h1>
 
 <p class="muted">
 Phone numbers are visible to authenticated players for coordinating games and substitutions.
 </p>
 
-<div
-  class="card"
-  id="rosterlist">
-
-<p class="muted">
-Loading players...
-</p>
-
+<div class="card" id="rosterlist">
+<p class="muted">Loading players...</p>
 </div>
 
 </section>
 
 
+<section id="rules" class="hidden">
 
-<!-- RULES -->
-
-<section
-  id="rules"
-  class="hidden">
-
-<div class="eyebrow">
-Play fair · Have fun
-</div>
-
-<h1>
-Dragon Scramble Rules
-</h1>
+<div class="eyebrow">Play fair · Have fun</div>
+<h1>Dragon Scramble Rules</h1>
 
 <div class="card">
 
-
 <div class="rule">
-
-<b>NMJL</b>
-
-<br>
-
+<b>NMJL</b><br>
 All National Mah Jongg League rules apply.
-
 </div>
 
-
 <div class="rule">
-
-<b>Match format</b>
-
-<br>
-
-Each match consists of four games, with each player serving as East once.
-
+<b>Four games</b><br>
+Every match has four games, with each player East once.
 </div>
 
-
 <div class="rule">
-
-<b>Social vs. Focused</b>
-
-<br>
-
-All matches follow the same Dragon Scramble rules.
-
-Social matches have a more relaxed expectation for speed of play.
-
-Focused matches require players to maintain a faster pace.
-
+<b>Social vs. Focused</b><br>
+All matches use the same rules. Social has a more relaxed pace expectation. Focused requires a faster pace.
 </div>
 
-
 <div class="rule">
-
-<b>Proposer equipment</b>
-
-<br>
-
+<b>Proposer equipment</b><br>
 The match proposer provides the Mahjong tiles, mat, racks and dice.
-
 </div>
 
-
 <div class="rule">
-
-<b>Charleston passing</b>
-
-<br>
-
-During all Charleston passes, all four players must place their tiles on the mat before any player picks up the incoming tiles.
-
+<b>Charleston passing</b><br>
+All four players must place their tiles on the mat before anyone picks up the incoming tiles.
 </div>
 
-
 <div class="rule">
-
-<b>Phones</b>
-
-<br>
-
-No phone above table height during play.
-
-No photos of tiles, racks, hands or the table.
-
-No AI or electronic assistance.
-
+<b>Phones</b><br>
+No phone above table height. No photos of tiles, racks, hands or the table. No AI or electronic assistance.
 </div>
 
-
 <div class="rule">
-
-<b>Notifications</b>
-
-<br>
-
-All phone notification sounds must be off for the entire match.
-
+<b>Notifications</b><br>
+All phone notification sounds must be off.
 </div>
 
-
 <div class="rule">
-
-<b>Scoring</b>
-
-<br>
-
-Winner receives the NMJL hand value.
-
-Self-picked last tile +10.
-
-Jokerless Mahjong +20.
-
-Wall Game = +10 to each player and no other points for that game.
-
+<b>Scoring</b><br>
+NMJL hand value. Self-pick +10. Jokerless +20. Wall Game = +10 each and no other points for that game.
 </div>
 
-
 <div class="rule">
-
-<b>Proposer</b>
-
-<br>
-
-+5 points once for every completed four-game match proposed.
-
+<b>Proposer</b><br>
++5 points for every completed four-game match proposed.
 </div>
 
-
 <div class="rule">
-
-<b>Withdrawal</b>
-
-<br>
-
+<b>Withdrawal</b><br>
 Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.
-
 </div>
 
-
 <div class="rule">
-
-<b>Late</b>
-
-<br>
-
+<b>Late</b><br>
 More than 20 minutes late: match cancelled; late player −20, other three +25 each.
-
 </div>
 
-
 <div class="rule">
-
-<b>Emergency</b>
-
-<br>
-
+<b>Emergency</b><br>
 If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.
-
 </div>
 
 </div>
@@ -790,260 +455,115 @@ If an emergency occurs after play begins, every unfinished game becomes a Wall G
 </section>
 
 
+<section id="account" class="hidden">
 
-<!-- ACCOUNT -->
+<div class="eyebrow">Player Account</div>
+<h1>Join Dragon Scramble</h1>
 
-<section
-  id="account"
-  class="hidden">
+<div id="logged-in-player" class="card hidden">
 
-<div class="eyebrow">
-Player Account
-</div>
-
-<h1>
-Join Dragon Scramble
-</h1>
-
-
-<div
-  id="logged-in-player"
-  class="card hidden">
-
-<div class="eyebrow">
-Your Account
-</div>
+<div class="eyebrow">Your Account</div>
 
 <h2>
-
 Welcome,
 <span id="player-nickname"></span>
-
 </h2>
 
-<p
-  id="player-name"
-  class="muted">
-</p>
+<p id="player-name" class="muted"></p>
 
 <button
-  class="btn alt"
-  onclick="signOutPlayer()">
-
+class="btn alt"
+onclick="signOutPlayer()">
 Sign Out
-
 </button>
 
 </div>
 
 
+<div id="signup-card" class="card">
 
-<div
-  id="signup-card"
-  class="card">
+<div class="eyebrow">New Player</div>
+<h2>Create Account</h2>
 
-<div class="eyebrow">
-New Player
-</div>
+<label>Full Name</label>
+<input id="signup-name" type="text">
 
-<h2>
+<label>Mahjong Nickname</label>
+<input id="signup-nickname" type="text">
+
+<label>Phone</label>
+<input id="signup-phone" type="tel">
+
+<label>Email</label>
+<input id="signup-email" type="email">
+
+<label>Password</label>
+<input id="signup-password" type="password">
+
+<button class="btn" onclick="signUpPlayer()">
 Create Account
-</h2>
-
-
-<label>
-Full Name
-</label>
-
-<input
-  id="signup-name"
-  type="text"
-  placeholder="Full name">
-
-
-<label>
-Mahjong Nickname
-</label>
-
-<input
-  id="signup-nickname"
-  type="text"
-  placeholder="Nickname">
-
-
-<label>
-Phone
-</label>
-
-<input
-  id="signup-phone"
-  type="tel"
-  placeholder="Phone number">
-
-
-<label>
-Email
-</label>
-
-<input
-  id="signup-email"
-  type="email"
-  placeholder="Email address">
-
-
-<label>
-Password
-</label>
-
-<input
-  id="signup-password"
-  type="password"
-  placeholder="Create a password">
-
-
-<button
-  class="btn"
-  onclick="signUpPlayer()">
-
-Create Account
-
 </button>
 
-
-<p
-  id="signup-message"
-  class="muted">
-</p>
+<p id="signup-message" class="muted"></p>
 
 </div>
 
 
+<div id="login-card" class="card">
 
-<div
-  id="login-card"
-  class="card">
+<div class="eyebrow">Returning Player</div>
+<h2>Sign In</h2>
 
-<div class="eyebrow">
-Returning Player
-</div>
+<label>Email</label>
+<input id="login-email" type="email">
 
-<h2>
+<label>Password</label>
+<input id="login-password" type="password">
+
+<button class="btn alt" onclick="signInPlayer()">
 Sign In
-</h2>
-
-
-<label>
-Email
-</label>
-
-<input
-  id="login-email"
-  type="email"
-  placeholder="Email address">
-
-
-<label>
-Password
-</label>
-
-<input
-  id="login-password"
-  type="password"
-  placeholder="Password">
-
-
-<button
-  class="btn alt"
-  onclick="signInPlayer()">
-
-Sign In
-
 </button>
 
-
-<p
-  id="login-message"
-  class="muted">
-</p>
+<p id="login-message" class="muted"></p>
 
 </div>
 
 </section>
 
 
+<section id="admin" class="hidden">
 
-<!-- ADMIN -->
-
-<section
-  id="admin"
-  class="hidden">
-
-<div class="eyebrow">
-Administration
-</div>
-
-<h1>
-Admin Dashboard
-</h1>
-
+<div class="eyebrow">Administration</div>
+<h1>Admin Dashboard</h1>
 
 <div class="card">
-
-<div class="eyebrow">
-Payment confirmation
-</div>
-
-<h2>
-Payment is handled separately
-</h2>
-
+<h2>Payment confirmation</h2>
 <p class="muted">
-
-Admin payment confirmation will be connected to Supabase next.
-
+Admin payment controls will be connected later.
 </p>
-
 </div>
-
 
 <div class="card">
-
-<div class="eyebrow">
-Score entry
-</div>
-
-<h2>
-Completed Match
-</h2>
-
+<h2>Completed Match</h2>
 <p class="muted">
-
-Real score entry will be connected to the games and scores tables next.
-
+Real score entry will be connected next.
 </p>
-
 </div>
 
 </section>
-
 
 </main>
 
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
 <script>
-
 
 const SUPABASE_URL =
 "https://jjrxvynomtdsqsuwyfsd.supabase.co";
 
-
 const SUPABASE_KEY =
 "sb_publishable_loxGwZ8cgC_QKFuS3ZnDNQ_KfcJAO3F";
-
 
 const supabaseClient =
 supabase.createClient(
@@ -1051,20 +571,14 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
-
 let currentUser = null;
-
 let currentScramble = null;
 
 let currentEligibility = {
-  active:false,
-  paid:false,
-  eligible:false
+active:false,
+paid:false,
+eligible:false
 };
-
-
-
-/* ---------- SAFE TEXT ---------- */
 
 
 function escapeHtml(value){
@@ -1079,10 +593,6 @@ return String(value ?? "")
 }
 
 
-
-/* ---------- NAVIGATION ---------- */
-
-
 function show(id){
 
 document
@@ -1091,85 +601,43 @@ document
 section.classList.add("hidden")
 );
 
-
 document
 .getElementById(id)
 .classList.remove("hidden");
 
-
 window.scrollTo(0,0);
 
-
 if(id === "home"){
-
 loadLeaderboard();
-
 loadHomeMatches();
-
 }
-
 
 if(id === "matches"){
-
 loadMatchesPage();
-
 }
-
 
 if(id === "roster"){
-
 roster();
-
 }
 
 }
-
-
-
-/* ---------- ACTIVE SCRAMBLE ---------- */
 
 
 async function getActiveScramble(){
 
-const {
-  data,
-  error
-} = await supabaseClient
-
+const {data,error} =
+await supabaseClient
 .from("scrambles")
-
-.select(
-"id, name, start_date, end_date, status"
-)
-
-.eq(
-"status",
-"active"
-)
-
-.order(
-"start_date",
-{
-  ascending:false
-}
-)
-
+.select("id,name,start_date,end_date,status")
+.eq("status","active")
+.order("start_date",{ascending:false})
 .limit(1)
-
 .maybeSingle();
 
-
 if(error){
-
-console.error(
-"Could not load active Scramble:",
-error
-);
-
+console.error("Could not load active Scramble:",error);
 return null;
-
 }
-
 
 currentScramble = data || null;
 
@@ -1178,132 +646,60 @@ return currentScramble;
 }
 
 
-
-/* ---------- ELIGIBILITY ---------- */
-
-
 async function checkEligibility(){
 
 currentEligibility = {
-  active:false,
-  paid:false,
-  eligible:false
+active:false,
+paid:false,
+eligible:false
 };
 
-
-if(
-!currentUser ||
-!currentScramble
-){
-
+if(!currentUser || !currentScramble){
 return currentEligibility;
-
 }
-
 
 const [
-  membershipResult,
-  paymentResult
+membershipResult,
+paymentResult
 ] = await Promise.all([
 
-
 supabaseClient
-
 .from("scramble_players")
-
-.select(
-"active"
-)
-
-.eq(
-"scramble_id",
-currentScramble.id
-)
-
-.eq(
-"player_id",
-currentUser.id
-)
-
+.select("active")
+.eq("scramble_id",currentScramble.id)
+.eq("player_id",currentUser.id)
 .maybeSingle(),
 
-
 supabaseClient
-
 .from("payment_status")
-
-.select(
-"status"
-)
-
-.eq(
-"scramble_id",
-currentScramble.id
-)
-
-.eq(
-"player_id",
-currentUser.id
-)
-
+.select("status")
+.eq("scramble_id",currentScramble.id)
+.eq("player_id",currentUser.id)
 .maybeSingle()
 
-
 ]);
-
-
-if(membershipResult.error){
-
-console.error(
-"Membership check failed:",
-membershipResult.error
-);
-
-}
-
-
-if(paymentResult.error){
-
-console.error(
-"Payment check failed:",
-paymentResult.error
-);
-
-}
-
 
 currentEligibility.active =
 membershipResult.data?.active === true;
 
-
 currentEligibility.paid =
 paymentResult.data?.status === "paid";
-
 
 currentEligibility.eligible =
 currentEligibility.active &&
 currentEligibility.paid;
 
-
 return currentEligibility;
 
 }
 
 
-
-/* ---------- MATCH PAGE ---------- */
-
-
 function toggleProposal(){
 
 if(!currentUser){
-
 show("account");
-
 return;
-
 }
-
 
 if(!currentEligibility.eligible){
 
@@ -1312,634 +708,404 @@ document.getElementById(
 "match-eligibility-message"
 );
 
-
 message.textContent =
 "You must be an active, paid Dragon Scramble player to propose a match.";
 
-
-message.classList.remove(
-"hidden"
-);
-
+message.classList.remove("hidden");
 
 return;
-
 }
-
 
 document
-.getElementById(
-"proposal"
-)
-.classList
-.toggle(
-"hidden"
-);
+.getElementById("proposal")
+.classList.toggle("hidden");
 
 }
-
 
 
 async function loadMatchesPage(){
 
 const list =
-document.getElementById(
-"match-list"
-);
-
+document.getElementById("match-list");
 
 list.innerHTML =
 '<div class="card"><p class="muted">Loading matches...</p></div>';
 
-
-const eligibilityMessage =
-document.getElementById(
-"match-eligibility-message"
-);
-
-
-eligibilityMessage.classList.add(
-"hidden"
-);
-
-
 if(!currentUser){
 
 list.innerHTML = `
-
 <div class="card">
-
 <h2>Sign in to view matches</h2>
-
-<p class="muted">
-Dragon Scramble matches are available to registered players.
-</p>
-
-<button
-class="btn"
-onclick="show('account')">
-
+<button class="btn" onclick="show('account')">
 Sign In
-
 </button>
-
 </div>
-
 `;
 
 return;
-
 }
-
 
 await getActiveScramble();
 
-
 if(!currentScramble){
 
-list.innerHTML = `
-
-<div class="card">
-
-<p class="muted">
-There is no active Dragon Scramble season.
-</p>
-
-</div>
-
-`;
+list.innerHTML =
+'<div class="card"><p class="muted">There is no active Scramble.</p></div>';
 
 return;
-
 }
-
 
 await checkEligibility();
-
-
-if(!currentEligibility.eligible){
-
-eligibilityMessage.innerHTML =
-
-currentEligibility.active
-
-? "Your Scramble membership is active, but your payment has not been marked paid."
-
-: "Your account is not currently an active member of this Scramble.";
-
-
-eligibilityMessage.classList.remove(
-"hidden"
-);
-
-}
-
 
 await loadMatches();
 
 }
-
-
-
-/* ---------- CREATE MATCH ---------- */
 
 
 async function createMatch(){
 
 const message =
-document.getElementById(
-"proposal-message"
-);
-
-
-message.className =
-"muted";
-
-
-if(!currentUser){
-
-message.textContent =
-"Please sign in first.";
-
-return;
-
-}
-
+document.getElementById("proposal-message");
 
 await getActiveScramble();
-
 await checkEligibility();
 
-
-if(
-!currentScramble ||
-!currentEligibility.eligible
-){
+if(!currentEligibility.eligible){
 
 message.textContent =
-"You must be an active, paid player to propose a match.";
-
-message.className =
-"error";
+"You must be an active, paid player.";
 
 return;
-
 }
-
 
 const date =
-document.getElementById(
-"match-date"
-).value;
-
+document.getElementById("match-date").value;
 
 const time =
-document.getElementById(
-"match-time"
-).value;
-
+document.getElementById("match-time").value;
 
 const location =
-document.getElementById(
-"match-location"
-).value.trim();
-
+document.getElementById("match-location").value.trim();
 
 const matchType =
-document.getElementById(
-"match-type"
-).value;
+document.getElementById("match-type").value;
 
-
-if(
-!date ||
-!time ||
-!location
-){
+if(!date || !time || !location){
 
 message.textContent =
-"Please enter the date, time and location.";
-
-message.className =
-"error";
+"Please enter date, time and location.";
 
 return;
-
 }
-
-
-if(
-matchType !== "social" &&
-matchType !== "focused"
-){
-
-message.textContent =
-"Please select a valid match type.";
-
-message.className =
-"error";
-
-return;
-
-}
-
 
 const localDate =
-new Date(
-`${date}T${time}:00`
-);
+new Date(`${date}T${time}:00`);
 
-
-if(
-Number.isNaN(
-localDate.getTime()
-)
-){
+if(localDate <= new Date()){
 
 message.textContent =
-"Please enter a valid date and time.";
-
-message.className =
-"error";
+"The match must be in the future.";
 
 return;
-
 }
 
-
-if(
-localDate <=
-new Date()
-){
-
-message.textContent =
-"The match must be scheduled in the future.";
-
-message.className =
-"error";
-
-return;
-
-}
-
-
-const scheduledAt =
-localDate.toISOString();
-
-
-const button =
-document.getElementById(
-"post-match-button"
-);
-
-
-button.disabled = true;
-
-message.textContent =
-"Posting match...";
-
-
-const {
-  data:newMatch,
-  error
-} = await supabaseClient
-
+const {error} =
+await supabaseClient
 .from("matches")
-
 .insert({
 
-scramble_id:
-currentScramble.id,
+scramble_id:currentScramble.id,
+proposer_id:currentUser.id,
+scheduled_at:localDate.toISOString(),
+location:location,
+match_type:matchType,
+status:"open"
 
-proposer_id:
-currentUser.id,
-
-scheduled_at:
-scheduledAt,
-
-location:
-location,
-
-match_type:
-matchType,
-
-status:
-"open"
-
-})
-
-.select(
-"id"
-)
-
-.single();
-
-
-button.disabled = false;
-
+});
 
 if(error){
 
-console.error(
-"Could not create match:",
-error
-);
-
+console.error(error);
 
 message.textContent =
 "Match could not be created: " +
 error.message;
 
-
-message.className =
-"error";
-
 return;
-
 }
 
-
-if(!newMatch){
-
 message.textContent =
-"Match could not be created.";
-
-message.className =
-"error";
-
-return;
-
-}
-
-
-message.textContent =
-"Match posted successfully. You are Player #1.";
-
-
-message.className =
-"success";
-
+"Match posted successfully.";
 
 document
-.getElementById(
-"match-date"
-).value = "";
-
-
-document
-.getElementById(
-"match-time"
-).value = "";
-
-
-document
-.getElementById(
-"match-location"
-).value = "";
-
-
-document
-.getElementById(
-"proposal"
-).classList.add(
-"hidden"
-);
-
+.getElementById("proposal")
+.classList.add("hidden");
 
 await loadMatches();
-
 await loadHomeMatches();
 
 }
 
 
+function toggleEdit(matchId){
 
-/* ---------- LOAD REAL MATCHES ---------- */
+document
+.getElementById(
+`edit-${matchId}`
+)
+.classList.toggle("hidden");
+
+}
+
+
+async function updateMatch(
+matchId,
+status,
+originalScheduledAt
+){
+
+const message =
+document.getElementById(
+`edit-message-${matchId}`
+);
+
+const location =
+document.getElementById(
+`edit-location-${matchId}`
+).value.trim();
+
+if(!location){
+
+message.textContent =
+"Location is required.";
+
+return;
+}
+
+
+if(status === "confirmed"){
+
+const scheduled =
+new Date(originalScheduledAt);
+
+const sixHoursBefore =
+new Date(
+scheduled.getTime() -
+6 * 60 * 60 * 1000
+);
+
+if(new Date() >= sixHoursBefore){
+
+message.textContent =
+"Location can no longer be changed because the match begins within 6 hours.";
+
+return;
+}
+
+
+const {error} =
+await supabaseClient
+.from("matches")
+.update({
+location:location
+})
+.eq("id",matchId)
+.eq("proposer_id",currentUser.id);
+
+if(error){
+
+message.textContent =
+"Could not update match: " +
+error.message;
+
+return;
+}
+
+message.textContent =
+"Location updated.";
+
+await loadMatches();
+await loadHomeMatches();
+
+return;
+
+}
+
+
+/* OPEN MATCH */
+
+const date =
+document.getElementById(
+`edit-date-${matchId}`
+).value;
+
+const time =
+document.getElementById(
+`edit-time-${matchId}`
+).value;
+
+const type =
+document.getElementById(
+`edit-type-${matchId}`
+).value;
+
+if(!date || !time){
+
+message.textContent =
+"Date and time are required.";
+
+return;
+}
+
+const scheduled =
+new Date(
+`${date}T${time}:00`
+);
+
+if(scheduled <= new Date()){
+
+message.textContent =
+"The match must be scheduled in the future.";
+
+return;
+}
+
+
+const {error} =
+await supabaseClient
+.from("matches")
+.update({
+
+scheduled_at:
+scheduled.toISOString(),
+
+location:
+location,
+
+match_type:
+type
+
+})
+.eq("id",matchId)
+.eq("proposer_id",currentUser.id);
+
+
+if(error){
+
+console.error(error);
+
+message.textContent =
+"Could not update match: " +
+error.message;
+
+return;
+}
+
+
+message.textContent =
+"Match updated successfully.";
+
+await loadMatches();
+await loadHomeMatches();
+
+}
 
 
 async function loadMatches(){
 
 const list =
-document.getElementById(
-"match-list"
-);
+document.getElementById("match-list");
 
-
-if(
-!currentScramble ||
-!currentUser
-){
-
-return;
-
-}
-
-
-const {
-  data:matches,
-  error:matchError
-} = await supabaseClient
-
+const {data:matches,error} =
+await supabaseClient
 .from("matches")
-
 .select(
-"id, proposer_id, scheduled_at, location, match_type, status, confirmed_at"
+"id,proposer_id,scheduled_at,location,match_type,status,confirmed_at"
 )
+.eq("scramble_id",currentScramble.id)
+.in("status",["open","confirmed"])
+.order("scheduled_at",{ascending:true});
 
-.eq(
-"scramble_id",
-currentScramble.id
-)
+if(error){
 
-.in(
-"status",
-[
-"open",
-"confirmed"
-]
-)
-
-.order(
-"scheduled_at",
-{
-  ascending:true
-}
-);
-
-
-if(matchError){
-
-console.error(
-"Could not load matches:",
-matchError
-);
-
-
-list.innerHTML = `
-
-<div class="card">
-
-<p class="error">
-Unable to load matches.
-</p>
-
-</div>
-
-`;
+list.innerHTML =
+'<div class="card"><p class="error">Unable to load matches.</p></div>';
 
 return;
-
 }
 
+if(!matches || matches.length === 0){
 
-if(
-!matches ||
-matches.length === 0
-){
-
-list.innerHTML = `
-
-<div class="card">
-
-<h2>No upcoming matches yet</h2>
-
-<p class="muted">
-Be the first player to propose one.
-</p>
-
-</div>
-
-`;
+list.innerHTML =
+'<div class="card"><h2>No upcoming matches yet</h2></div>';
 
 return;
-
 }
 
 
 const matchIds =
-matches.map(
-match => match.id
-);
+matches.map(match => match.id);
 
 
 const [
-  seatsResult,
-  playersResult
+seatsResult,
+playersResult
 ] = await Promise.all([
 
-
 supabaseClient
-
 .from("match_players")
-
-.select(
-"match_id, player_id, joined_at"
-)
-
-.in(
-"match_id",
-matchIds
-),
-
+.select("match_id,player_id,joined_at")
+.in("match_id",matchIds),
 
 supabaseClient
-
 .from("players")
-
-.select(
-"id, nickname, full_name"
-)
-
+.select("id,nickname,full_name")
 
 ]);
-
-
-if(seatsResult.error){
-
-console.error(
-"Could not load match players:",
-seatsResult.error
-);
-
-}
-
-
-if(playersResult.error){
-
-console.error(
-"Could not load player names:",
-playersResult.error
-);
-
-}
 
 
 const seats =
 seatsResult.data || [];
 
-
-const playerRows =
-playersResult.data || [];
-
-
 const playerMap =
 new Map(
-playerRows.map(
-player => [
+(playersResult.data || [])
+.map(player => [
 player.id,
 player
-]
-)
+])
 );
 
 
 list.innerHTML =
 matches.map(match => {
 
-
 const matchSeats =
 seats
-
-.filter(
-seat =>
+.filter(seat =>
 seat.match_id === match.id
 )
-
-.sort(
-(a,b) =>
+.sort((a,b) =>
 new Date(a.joined_at) -
 new Date(b.joined_at)
 );
 
-
 const seatCount =
 matchSeats.length;
 
-
 const alreadyJoined =
-matchSeats.some(
-seat =>
-seat.player_id ===
-currentUser.id
+matchSeats.some(seat =>
+seat.player_id === currentUser.id
 );
-
 
 const proposer =
-playerMap.get(
-match.proposer_id
-);
-
+playerMap.get(match.proposer_id);
 
 const proposerName =
-proposer?.nickname ||
-"Player";
-
+proposer?.nickname || "Player";
 
 const scheduled =
-new Date(
-match.scheduled_at
-);
-
+new Date(match.scheduled_at);
 
 const dateText =
 scheduled.toLocaleDateString(
@@ -1952,7 +1118,6 @@ year:"numeric"
 }
 );
 
-
 const timeText =
 scheduled.toLocaleTimeString(
 undefined,
@@ -1962,105 +1127,228 @@ minute:"2-digit"
 }
 );
 
-
 const typeLabel =
 match.match_type === "focused"
 ? "Focused"
 : "Social";
 
-
-const typeDescription =
-match.match_type === "focused"
-
-? "Fast pace expected"
-
-: "Relaxed pace expectation";
-
-
 const participantNames =
-matchSeats.map(
-seat => {
+matchSeats.map(seat => {
 
 const player =
-playerMap.get(
-seat.player_id
-);
+playerMap.get(seat.player_id);
 
 return escapeHtml(
-player?.nickname ||
-"Player"
+player?.nickname || "Player"
 );
 
-}
-);
-
+});
 
 const emptySeats =
 Math.max(
 0,
-4 - seatCount
+4-seatCount
 );
+
+const isProposer =
+currentUser.id === match.proposer_id;
+
+const sixHoursBefore =
+new Date(
+scheduled.getTime() -
+6 * 60 * 60 * 1000
+);
+
+const confirmedLocationEditable =
+match.status === "confirmed" &&
+new Date() < sixHoursBefore;
 
 
 let action = "";
 
+if(match.status === "confirmed"){
 
-if(
-match.status === "confirmed" ||
-seatCount >= 4
-){
-
-action = `
-
-<span class="pill">
-Confirmed
-</span>
-
-`;
+action =
+'<span class="pill">Confirmed</span>';
 
 }
-
 else if(alreadyJoined){
 
-action = `
-
-<span class="pill">
-You're in
-</span>
-
-`;
+action =
+'<span class="pill">You’re in</span>';
 
 }
-
-else if(!currentEligibility.eligible){
-
-action = `
-
-<button
-class="btn"
-disabled>
-
-Paid members only
-
-</button>
-
-`;
-
-}
-
-else{
+else if(currentEligibility.eligible){
 
 action = `
-
 <button
 class="btn"
 onclick="joinMatch('${match.id}')">
-
 Join Match
+</button>
+`;
 
+}
+
+
+let editButton = "";
+
+if(
+isProposer &&
+(
+match.status === "open" ||
+confirmedLocationEditable
+)
+){
+
+editButton = `
+<button
+class="btn alt"
+onclick="toggleEdit('${match.id}')">
+Edit Match
+</button>
+`;
+
+}
+
+
+const localDate =
+`${scheduled.getFullYear()}-${String(
+scheduled.getMonth()+1
+).padStart(2,"0")}-${String(
+scheduled.getDate()
+).padStart(2,"0")}`;
+
+const localTime =
+`${String(
+scheduled.getHours()
+).padStart(2,"0")}:${String(
+scheduled.getMinutes()
+).padStart(2,"0")}`;
+
+
+let editForm = "";
+
+if(isProposer){
+
+if(match.status === "open"){
+
+editForm = `
+
+<div
+id="edit-${match.id}"
+class="edit-box hidden">
+
+<h3>Edit Match</h3>
+
+<div class="formgrid">
+
+<div>
+<label>Date</label>
+<input
+id="edit-date-${match.id}"
+type="date"
+value="${localDate}">
+</div>
+
+<div>
+<label>Time</label>
+<input
+id="edit-time-${match.id}"
+type="time"
+value="${localTime}">
+</div>
+
+</div>
+
+<label>Location</label>
+
+<input
+id="edit-location-${match.id}"
+value="${escapeHtml(match.location)}">
+
+<label>Match Type</label>
+
+<select id="edit-type-${match.id}">
+
+<option
+value="social"
+${match.match_type === "social" ? "selected" : ""}>
+Social
+</option>
+
+<option
+value="focused"
+${match.match_type === "focused" ? "selected" : ""}>
+Focused
+</option>
+
+</select>
+
+<button
+class="btn"
+onclick="updateMatch(
+'${match.id}',
+'open',
+'${match.scheduled_at}'
+)">
+Save Changes
 </button>
 
+<p
+id="edit-message-${match.id}"
+class="muted">
+</p>
+
+</div>
+
 `;
+
+}
+
+else if(
+match.status === "confirmed" &&
+confirmedLocationEditable
+){
+
+editForm = `
+
+<div
+id="edit-${match.id}"
+class="edit-box hidden">
+
+<h3>Update Location</h3>
+
+<p class="muted">
+This match is confirmed. Date, time and match type are locked.
+</p>
+
+<label>Location</label>
+
+<input
+id="edit-location-${match.id}"
+value="${escapeHtml(match.location)}">
+
+<button
+class="btn"
+onclick="updateMatch(
+'${match.id}',
+'confirmed',
+'${match.scheduled_at}'
+)">
+Save Location
+</button>
+
+<p
+id="edit-message-${match.id}"
+class="muted">
+</p>
+
+</div>
+
+`;
+
+}
 
 }
 
@@ -2070,76 +1358,43 @@ return `
 <div class="card">
 
 <div>
-
-<span class="pill">
-${seatCount} / 4
-</span>
-
+<span class="pill">${seatCount} / 4</span>
 &nbsp;
-
-<span class="pill">
-${escapeHtml(typeLabel)}
-</span>
-
+<span class="pill">${typeLabel}</span>
 </div>
 
-
 <h2>
-${escapeHtml(dateText)} ·
+${escapeHtml(dateText)}
+·
 ${escapeHtml(timeText)}
 </h2>
-
 
 <p>
 📍 ${escapeHtml(match.location)}
 </p>
 
-
-<div class="match-meta">
-
-<b>
-${escapeHtml(typeLabel)}
-</b>
-
-·
-
-<span class="muted">
-${escapeHtml(typeDescription)}
-</span>
-
-</div>
-
-
 <p class="muted">
-
 Proposed by
 <b>${escapeHtml(proposerName)}</b>
-
 </p>
-
 
 <div class="players">
 
-${
-participantNames.length
-
-? participantNames.join(" · ")
-
-: "No players yet"
-}
+${participantNames.join(" · ")}
 
 ${
 emptySeats > 0
-
 ? `<br><span class="muted">${emptySeats} seat${emptySeats === 1 ? "" : "s"} open</span>`
-
 : ""
 }
 
 </div>
 
-
 ${action}
+
+${editButton}
+
+${editForm}
 
 </div>
 
@@ -2150,118 +1405,48 @@ ${action}
 }
 
 
-
-/* ---------- JOIN MATCH ---------- */
-
-
-async function joinMatch(
-matchId
-){
-
-if(!currentUser){
-
-show(
-"account"
-);
-
-return;
-
-}
-
+async function joinMatch(matchId){
 
 await getActiveScramble();
-
 await checkEligibility();
 
-
-if(
-!currentEligibility.eligible
-){
+if(!currentEligibility.eligible){
 
 alert(
-"Only active, paid Dragon Scramble players can join matches."
+"Only active, paid players can join."
 );
 
 return;
-
 }
 
 
-/*
-The database trigger handles:
-- maximum 4 players
-- automatic confirmation at Player #4
-*/
-
-
-const {
-  error
-} = await supabaseClient
-
-.from(
-"match_players"
-)
-
+const {error} =
+await supabaseClient
+.from("match_players")
 .insert({
 
-match_id:
-matchId,
-
-player_id:
-currentUser.id,
-
-joined_at:
-new Date().toISOString()
+match_id:matchId,
+player_id:currentUser.id,
+joined_at:new Date().toISOString()
 
 });
 
 
 if(error){
 
-console.error(
-"Could not join match:",
-error
-);
-
-
-if(
-error.message
-.toLowerCase()
-.includes(
-"duplicate"
-)
-){
-
-alert(
-"You have already joined this match."
-);
-
-}
-
-else{
-
 alert(
 "Could not join match: " +
 error.message
 );
 
-}
-
-
 return;
-
 }
 
 
 await loadMatches();
-
 await loadHomeMatches();
 
 }
-
-
-
-/* ---------- HOME MATCH CARDS ---------- */
 
 
 async function loadHomeMatches(){
@@ -2271,145 +1456,75 @@ document.getElementById(
 "next-confirmed-home"
 );
 
-
 const openBox =
 document.getElementById(
 "next-open-home"
 );
-
 
 if(!currentUser){
 
 confirmedBox.innerHTML =
 '<p class="muted">Sign in to view your matches.</p>';
 
-
 openBox.innerHTML =
 '<p class="muted">Sign in to view open tables.</p>';
 
-
 return;
-
 }
-
 
 await getActiveScramble();
 
-
 if(!currentScramble){
-
-confirmedBox.innerHTML =
-'<p class="muted">No active Scramble.</p>';
-
-
-openBox.innerHTML =
-'<p class="muted">No active Scramble.</p>';
-
-
 return;
-
 }
 
 
-const {
-data:matches,
-error
-} = await supabaseClient
-
+const {data:matches} =
+await supabaseClient
 .from("matches")
-
 .select(
-"id, scheduled_at, location, status, match_type"
+"id,scheduled_at,location,status,match_type"
 )
-
-.eq(
-"scramble_id",
-currentScramble.id
-)
-
-.in(
-"status",
-[
-"open",
-"confirmed"
-]
-)
-
-.order(
-"scheduled_at",
-{
-ascending:true
-}
-);
-
-
-if(error){
-
-confirmedBox.innerHTML =
-'<p class="muted">Unable to load matches.</p>';
-
-
-openBox.innerHTML =
-'<p class="muted">Unable to load matches.</p>';
-
-
-return;
-
-}
-
-
-const now =
-new Date();
+.eq("scramble_id",currentScramble.id)
+.in("status",["open","confirmed"])
+.order("scheduled_at",{ascending:true});
 
 
 const upcoming =
 (matches || [])
-.filter(
-match =>
-new Date(
-match.scheduled_at
-) >= now
+.filter(match =>
+new Date(match.scheduled_at) >=
+new Date()
 );
 
 
 const confirmed =
-upcoming.find(
-match =>
-match.status ===
-"confirmed"
+upcoming.find(match =>
+match.status === "confirmed"
 );
 
-
 const openMatch =
-upcoming.find(
-match =>
-match.status ===
-"open"
+upcoming.find(match =>
+match.status === "open"
 );
 
 
 if(confirmed){
 
-const date =
+const d =
 new Date(
 confirmed.scheduled_at
 );
 
-
 confirmedBox.innerHTML = `
 
 <h2>
-${escapeHtml(
-date.toLocaleDateString()
-)}
+${escapeHtml(d.toLocaleDateString())}
 ·
 ${escapeHtml(
-date.toLocaleTimeString(
+d.toLocaleTimeString(
 undefined,
-{
-hour:"numeric",
-minute:"2-digit"
-}
+{hour:"numeric",minute:"2-digit"}
 )
 )}
 </h2>
@@ -2425,7 +1540,6 @@ Confirmed
 `;
 
 }
-
 else{
 
 confirmedBox.innerHTML =
@@ -2436,26 +1550,20 @@ confirmedBox.innerHTML =
 
 if(openMatch){
 
-const date =
+const d =
 new Date(
 openMatch.scheduled_at
 );
 
-
 openBox.innerHTML = `
 
 <h2>
-${escapeHtml(
-date.toLocaleDateString()
-)}
+${escapeHtml(d.toLocaleDateString())}
 ·
 ${escapeHtml(
-date.toLocaleTimeString(
+d.toLocaleTimeString(
 undefined,
-{
-hour:"numeric",
-minute:"2-digit"
-}
+{hour:"numeric",minute:"2-digit"}
 )
 )}
 </h2>
@@ -2467,15 +1575,12 @@ minute:"2-digit"
 <button
 class="btn"
 onclick="show('matches')">
-
 View Match
-
 </button>
 
 `;
 
 }
-
 else{
 
 openBox.innerHTML =
@@ -2486,37 +1591,20 @@ openBox.innerHTML =
 }
 
 
-
-/* ---------- LEADERBOARD ---------- */
-
-
 async function loadLeaderboard(){
 
 const board =
-document.getElementById(
-"board"
-);
-
+document.getElementById("board");
 
 if(!currentUser){
 
 board.innerHTML =
 '<p class="muted">Sign in to view the leaderboard.</p>';
 
-
-updateMyStanding(
-[],
-null
-);
-
+updateMyStanding([],null);
 
 return;
-
 }
-
-
-board.innerHTML =
-'<p class="muted">Loading leaderboard...</p>';
 
 
 const [
@@ -2526,34 +1614,21 @@ gamesResult,
 matchesResult
 ] = await Promise.all([
 
-
 supabaseClient
 .from("players")
-.select(
-"id, nickname, full_name"
-),
-
+.select("id,nickname,full_name"),
 
 supabaseClient
 .from("scores")
-.select(
-"player_id, game_id, points"
-),
-
+.select("player_id,game_id,points"),
 
 supabaseClient
 .from("games")
-.select(
-"id, match_id"
-),
-
+.select("id,match_id"),
 
 supabaseClient
 .from("matches")
-.select(
-"id, proposer_id, status, completed_at"
-)
-
+.select("id,proposer_id,status,completed_at")
 
 ]);
 
@@ -2567,58 +1642,34 @@ matchesResult.error;
 
 if(error){
 
-console.error(
-"Could not load leaderboard:",
-error
-);
-
-
 board.innerHTML =
-'<p class="muted">Unable to load the leaderboard.</p>';
-
+'<p class="muted">Unable to load leaderboard.</p>';
 
 return;
-
 }
-
-
-const playerRows =
-playersResult.data || [];
-
-
-const scoreRows =
-scoresResult.data || [];
-
-
-const gameRows =
-gamesResult.data || [];
-
-
-const matchRows =
-matchesResult.data || [];
 
 
 const gameToMatch =
 new Map(
-gameRows.map(
-game => [
+(matchesResult.data || []).length >= 0
+? (gamesResult.data || [])
+.map(game => [
 game.id,
 game.match_id
-]
-)
+])
+: []
 );
 
 
 const completedMatches =
-matchRows.filter(
-match =>
-match.status ===
-"completed" ||
+(matchesResult.data || [])
+.filter(match =>
+match.status === "completed" ||
 !!match.completed_at
 );
 
 
-const completedMatchIds =
+const completedIds =
 new Set(
 completedMatches.map(
 match => match.id
@@ -2632,89 +1683,49 @@ new Map();
 
 for(
 const player of
-playerRows
+(playersResult.data || [])
 ){
 
 leaderboard.set(
 player.id,
 {
-
-id:
-player.id,
-
-nickname:
-player.nickname ||
-"Player",
-
-full_name:
-player.full_name ||
-"",
-
-total_points:
-0,
-
-matches:
-new Set()
-
+id:player.id,
+nickname:player.nickname || "Player",
+total_points:0,
+matches:new Set()
 }
 );
 
 }
-
 
 
 for(
 const score of
-scoreRows
+(scoresResult.data || [])
 ){
 
 const player =
-leaderboard.get(
-score.player_id
-);
+leaderboard.get(score.player_id);
 
-
-if(!player){
-
-continue;
-
-}
-
+if(!player) continue;
 
 const matchId =
-gameToMatch.get(
-score.game_id
-);
-
+gameToMatch.get(score.game_id);
 
 if(
 !matchId ||
-!completedMatchIds.has(
-matchId
-)
+!completedIds.has(matchId)
 ){
-
 continue;
-
 }
-
 
 player.total_points +=
-Number(
-score.points ||
-0
-);
+Number(score.points || 0);
 
-
-player.matches.add(
-matchId
-);
+player.matches.add(matchId);
 
 }
 
-
-
-/* +5 proposer points */
 
 for(
 const match of
@@ -2726,102 +1737,53 @@ leaderboard.get(
 match.proposer_id
 );
 
-
 if(proposer){
 
-proposer.total_points +=
-5;
+proposer.total_points += 5;
 
 }
 
 }
-
 
 
 const rows =
 Array.from(
 leaderboard.values()
 )
+.map(player => {
 
-.map(
-player => {
-
-
-const matchesPlayed =
+const count =
 player.matches.size;
 
-
 return {
-
 ...player,
-
-matches_played:
-matchesPlayed,
-
+matches_played:count,
 average:
-matchesPlayed > 0
-
-? player.total_points /
-matchesPlayed
-
+count > 0
+? player.total_points / count
 : 0
-
 };
 
-}
-)
-
-.filter(
-player =>
+})
+.filter(player =>
 player.matches_played > 0 ||
 player.total_points !== 0
 )
-
-.sort(
-(a,b) => {
-
-
-if(
-b.total_points !==
-a.total_points
-){
-
-return (
+.sort((a,b) =>
 b.total_points -
 a.total_points
 );
 
-}
 
-
-return (
-b.average -
-a.average
-);
-
-}
-);
-
-
-
-if(
-rows.length === 0
-){
+if(rows.length === 0){
 
 board.innerHTML =
 '<p class="muted">No completed matches yet.</p>';
 
-
-updateMyStanding(
-[],
-currentUser
-);
-
+updateMyStanding([],currentUser);
 
 return;
-
 }
-
 
 
 board.innerHTML =
@@ -2830,42 +1792,30 @@ rows.map(
 
 <div class="leader">
 
-
 <div class="rank">
-${index + 1}
+${index+1}
 </div>
-
 
 <div>
 
 <div class="nick">
-${escapeHtml(
-player.nickname
-)}
+${escapeHtml(player.nickname)}
 </div>
 
 <div class="muted">
-
 ${player.matches_played}
-
-${player.matches_played === 1
-? "match"
-: "matches"}
-
+${player.matches_played === 1 ? "match" : "matches"}
 </div>
 
 </div>
-
 
 <div class="score">
 ${player.total_points} pts
 </div>
 
-
 <div class="avg">
 ${player.average.toFixed(1)} avg
 </div>
-
 
 </div>
 
@@ -2881,28 +1831,22 @@ currentUser
 }
 
 
-
-/* ---------- PERSONAL STANDING ---------- */
-
-
 function updateMyStanding(
 rows,
 user
 ){
 
-const rankEl =
+const rank =
 document.getElementById(
 "my-rank"
 );
 
-
-const nickEl =
+const nickname =
 document.getElementById(
 "my-nickname"
 );
 
-
-const statsEl =
+const stats =
 document.getElementById(
 "my-stats"
 );
@@ -2910,256 +1854,148 @@ document.getElementById(
 
 if(!user){
 
-rankEl.textContent =
-"—";
-
-
-nickEl.textContent =
+rank.textContent = "—";
+nickname.textContent =
 "Sign in to view";
-
-
-statsEl.textContent =
-"";
-
+stats.textContent = "";
 
 return;
-
 }
 
 
 const index =
 rows.findIndex(
-row =>
-row.id ===
-user.id
+row => row.id === user.id
 );
 
 
 if(index === -1){
 
-rankEl.textContent =
-"—";
+rank.textContent = "—";
 
-
-nickEl.textContent =
+nickname.textContent =
 "No completed matches yet";
 
-
-statsEl.textContent =
-"";
-
+stats.textContent = "";
 
 return;
-
 }
 
 
 const player =
 rows[index];
 
+rank.textContent =
+`#${index+1}`;
 
-rankEl.textContent =
-`#${index + 1}`;
-
-
-nickEl.textContent =
+nickname.textContent =
 player.nickname;
 
-
-statsEl.textContent =
+stats.textContent =
 `${player.total_points} points · ${player.average.toFixed(1)} average`;
 
 }
 
 
-
-/* ---------- ROSTER ---------- */
-
-
 async function roster(){
 
-const rosterList =
+const list =
 document.getElementById(
 "rosterlist"
 );
 
-
 if(!currentUser){
 
-rosterList.innerHTML = `
-
-<p class="muted">
-Sign in to view the player roster.
-</p>
-
-`;
+list.innerHTML =
+'<p class="muted">Sign in to view the roster.</p>';
 
 return;
-
 }
 
 
-rosterList.innerHTML =
-'<p class="muted">Loading players...</p>';
-
-
-const {
-data:rosterPlayers,
-error
-} = await supabaseClient
-
+const {data,error} =
+await supabaseClient
 .from("players")
-
 .select(
-"nickname, full_name, phone"
+"nickname,full_name,phone"
 )
-
 .order(
 "nickname",
-{
-ascending:true
-}
+{ascending:true}
 );
 
 
 if(error){
 
-console.error(
-"Could not load roster:",
-error
-);
-
-
-rosterList.innerHTML =
-'<p class="muted">Unable to load the player roster.</p>';
-
+list.innerHTML =
+'<p class="muted">Unable to load roster.</p>';
 
 return;
-
 }
 
 
-if(
-!rosterPlayers ||
-rosterPlayers.length ===
-0
-){
-
-rosterList.innerHTML =
-'<p class="muted">No players yet.</p>';
-
-
-return;
-
-}
-
-
-rosterList.innerHTML =
-rosterPlayers.map(
-player => `
+list.innerHTML =
+(data || [])
+.map(player => `
 
 <div class="leader">
 
-
 <div></div>
-
 
 <div>
 
 <div class="nick">
-
-${escapeHtml(
-player.nickname ||
-"Player"
-)}
-
+${escapeHtml(player.nickname)}
 </div>
-
 
 <div class="muted">
-
-${escapeHtml(
-player.full_name ||
-""
-)}
-
+${escapeHtml(player.full_name)}
 </div>
 
 </div>
-
 
 <div>
-
-${escapeHtml(
-player.phone ||
-""
-)}
-
+${escapeHtml(player.phone)}
 </div>
-
 
 <span class="pill">
 Player
 </span>
 
-
 </div>
 
-`
-).join("");
+`)
+.join("");
 
 }
-
-
-
-/* ---------- CREATE ACCOUNT ---------- */
 
 
 async function signUpPlayer(){
 
 const fullName =
-document
-.getElementById(
+document.getElementById(
 "signup-name"
-)
-.value
-.trim();
-
+).value.trim();
 
 const nickname =
-document
-.getElementById(
+document.getElementById(
 "signup-nickname"
-)
-.value
-.trim();
-
+).value.trim();
 
 const phone =
-document
-.getElementById(
+document.getElementById(
 "signup-phone"
-)
-.value
-.trim();
-
+).value.trim();
 
 const email =
-document
-.getElementById(
+document.getElementById(
 "signup-email"
-)
-.value
-.trim();
-
+).value.trim();
 
 const password =
-document
-.getElementById(
+document.getElementById(
 "signup-password"
-)
-.value;
-
+).value;
 
 const message =
 document.getElementById(
@@ -3167,132 +2003,57 @@ document.getElementById(
 );
 
 
-if(
-!fullName ||
-!nickname ||
-!phone ||
-!email ||
-!password
-){
-
-message.textContent =
-"Please complete all fields.";
-
-
-return;
-
-}
-
-
-message.textContent =
-"Creating account...";
-
-
-const {
-error
-} = await supabaseClient
+const {error} =
+await supabaseClient
 .auth
 .signUp({
 
-
-email:
-email,
-
-
-password:
-password,
-
+email:email,
+password:password,
 
 options:{
 
-
 data:{
-
-full_name:
-fullName,
-
-nickname:
-nickname,
-
-phone:
-phone
-
+full_name:fullName,
+nickname:nickname,
+phone:phone
 },
-
 
 emailRedirectTo:
 "https://dragonscramble.github.io/dragon-scramble/"
 
-
 }
-
 
 });
 
 
 if(error){
 
-console.error(
-error
-);
-
-
-if(
-error.message &&
-error.message
-.toLowerCase()
-.includes(
-"database error"
-)
-){
-
-message.textContent =
-"Account could not be created. The nickname may already be in use. Please choose another nickname.";
-
-}
-
-else{
-
 message.textContent =
 "Account could not be created: " +
 error.message;
 
-}
-
-
 return;
-
 }
 
 
 message.textContent =
-"Account created. Please check your email to confirm your account.";
+"Account created. Please check your email.";
 
 }
-
-
-
-/* ---------- SIGN IN ---------- */
 
 
 async function signInPlayer(){
 
 const email =
-document
-.getElementById(
+document.getElementById(
 "login-email"
-)
-.value
-.trim();
-
+).value.trim();
 
 const password =
-document
-.getElementById(
+document.getElementById(
 "login-password"
-)
-.value;
-
+).value;
 
 const message =
 document.getElementById(
@@ -3300,43 +2061,24 @@ document.getElementById(
 );
 
 
-message.textContent =
-"Signing in...";
-
-
-const {
-data,
-error
-} = await supabaseClient
+const {data,error} =
+await supabaseClient
 .auth
 .signInWithPassword({
 
-
-email:
-email,
-
-
-password:
-password
-
+email:email,
+password:password
 
 });
 
 
 if(error){
 
-console.error(
-error
-);
-
-
 message.textContent =
 "Sign in failed: " +
 error.message;
 
-
 return;
-
 }
 
 
@@ -3344,18 +2086,14 @@ message.textContent =
 "Signed in successfully.";
 
 
-if(
-data?.user
-){
+if(data?.user){
 
 currentUser =
 data.user;
 
-
 await showLoggedInPlayer(
 data.user
 );
-
 
 await getActiveScramble();
 
@@ -3370,195 +2108,79 @@ await loadHomeMatches();
 }
 
 
+async function showLoggedInPlayer(user){
 
-/* ---------- SHOW ACCOUNT ---------- */
-
-
-async function showLoggedInPlayer(
-user
-){
-
-if(!user){
-
-return;
-
-}
-
-
-const {
-data:player,
-error
-} = await supabaseClient
-
+const {data:player,error} =
+await supabaseClient
 .from("players")
-
-.select(
-"full_name, nickname"
-)
-
-.eq(
-"id",
-user.id
-)
-
+.select("full_name,nickname")
+.eq("id",user.id)
 .single();
 
 
 if(error){
-
-console.error(
-"Could not load player profile:",
-error
-);
-
-
 return;
-
 }
 
 
-document
-.getElementById(
+document.getElementById(
 "player-nickname"
-)
-.textContent =
-player.nickname ||
-"Player";
+).textContent =
+player.nickname;
 
 
-document
-.getElementById(
+document.getElementById(
 "player-name"
-)
-.textContent =
-player.full_name ||
-"";
+).textContent =
+player.full_name;
 
 
-document
-.getElementById(
+document.getElementById(
 "logged-in-player"
-)
-.classList
-.remove(
-"hidden"
-);
+).classList.remove("hidden");
 
 
-document
-.getElementById(
+document.getElementById(
 "signup-card"
-)
-.classList
-.add(
-"hidden"
-);
+).classList.add("hidden");
 
 
-document
-.getElementById(
+document.getElementById(
 "login-card"
-)
-.classList
-.add(
-"hidden"
-);
+).classList.add("hidden");
 
 }
-
-
-
-/* ---------- SIGN OUT ---------- */
 
 
 async function signOutPlayer(){
 
-const {
-error
-} = await supabaseClient
+await supabaseClient
 .auth
 .signOut();
 
-
-if(error){
-
-console.error(
-"Sign out failed:",
-error
-);
-
-
-return;
-
-}
-
-
-currentUser =
-null;
-
-
-currentScramble =
-null;
-
-
-currentEligibility = {
-
-active:false,
-
-paid:false,
-
-eligible:false
-
-};
-
+currentUser = null;
+currentScramble = null;
 
 document
 .getElementById(
 "logged-in-player"
-)
-.classList
-.add(
-"hidden"
-);
-
+).classList.add("hidden");
 
 document
 .getElementById(
 "signup-card"
-)
-.classList
-.remove(
-"hidden"
-);
-
+).classList.remove("hidden");
 
 document
 .getElementById(
 "login-card"
-)
-.classList
-.remove(
-"hidden"
-);
-
-
-document
-.getElementById(
-"login-message"
-)
-.textContent =
-"Signed out successfully.";
-
+).classList.remove("hidden");
 
 await loadLeaderboard();
 
 await loadHomeMatches();
 
 }
-
-
-
-/* ---------- RESTORE SESSION ---------- */
 
 
 supabaseClient
@@ -3566,43 +2188,31 @@ supabaseClient
 .onAuthStateChange(
 (event,session) => {
 
-
 if(
 (
-event ===
-"INITIAL_SESSION"
-||
-event ===
-"SIGNED_IN"
+event === "INITIAL_SESSION" ||
+event === "SIGNED_IN"
 )
-&&
-session?.user
+&& session?.user
 ){
 
 currentUser =
 session.user;
 
-
 setTimeout(
 async () => {
-
 
 await showLoggedInPlayer(
 session.user
 );
 
-
 await getActiveScramble();
-
 
 await checkEligibility();
 
-
 await loadLeaderboard();
 
-
 await loadHomeMatches();
-
 
 },
 0
@@ -3610,73 +2220,18 @@ await loadHomeMatches();
 
 }
 
-
-if(
-event ===
-"SIGNED_OUT"
-){
-
-currentUser =
-null;
-
-
-currentScramble =
-null;
-
-
-document
-.getElementById(
-"logged-in-player"
-)
-.classList
-.add(
-"hidden"
-);
-
-
-document
-.getElementById(
-"signup-card"
-)
-.classList
-.remove(
-"hidden"
-);
-
-
-document
-.getElementById(
-"login-card"
-)
-.classList
-.remove(
-"hidden"
-);
-
-}
-
-
 }
 );
-
-
-
-/* ---------- START ---------- */
 
 
 loadLeaderboard();
-
 loadHomeMatches();
-
 
 console.log(
 "Dragon Scramble connected to Supabase"
 );
 
-
 </script>
 
-
 </body>
-
 </html>
