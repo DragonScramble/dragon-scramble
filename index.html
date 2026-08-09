@@ -84,7 +84,6 @@ h1{
 
 h2{margin:8px 0}
 h3{margin:8px 0}
-h4{margin:5px 0}
 
 .eyebrow{
   text-transform:uppercase;
@@ -266,10 +265,6 @@ label{
   border-radius:10px;
 }
 
-.game-result strong{
-  font-size:16px;
-}
-
 .match-total{
   padding:15px;
   background:#e5eee7;
@@ -356,7 +351,6 @@ Admin
 
 </header>
 
-
 <main>
 
 <!-- LEADERBOARD -->
@@ -373,60 +367,35 @@ Admin
 </div>
 
 <div class="card">
-
 <div class="eyebrow">Your Standing</div>
-
 <div id="my-rank" style="font-size:34px">—</div>
-
-<b id="my-nickname">
-Sign in to view
-</b>
-
+<b id="my-nickname">Sign in to view</b>
 <div id="my-stats" class="muted"></div>
-
 </div>
 
 </div>
-
 
 <div class="card">
-
-<div class="eyebrow">
-Current Leaderboard
-</div>
-
+<div class="eyebrow">Current Leaderboard</div>
 <div id="board">
 <p class="muted">Loading leaderboard...</p>
 </div>
-
 </div>
-
 
 <div class="grid">
 
 <div class="card">
-
-<div class="eyebrow">
-Next Confirmed Match
-</div>
-
+<div class="eyebrow">Next Confirmed Match</div>
 <div id="next-confirmed-home">
 <p class="muted">Loading...</p>
 </div>
-
 </div>
-
 
 <div class="card">
-
-<div class="eyebrow">
-Open Table
-</div>
-
+<div class="eyebrow">Open Table</div>
 <div id="next-open-home">
 <p class="muted">Loading...</p>
 </div>
-
 </div>
 
 </div>
@@ -441,21 +410,13 @@ Open Table
 <div class="hero">
 
 <div>
-
-<div class="eyebrow">
-Tables
-</div>
-
-<h1>
-Matches
-</h1>
-
+<div class="eyebrow">Tables</div>
+<h1>Matches</h1>
 <h2 id="matches-scramble-name"></h2>
 
 <p class="muted">
 Only active, payment-confirmed players can propose or join.
 </p>
-
 </div>
 
 <button
@@ -466,7 +427,6 @@ onclick="toggleProposal()">
 
 </div>
 
-
 <div
 id="match-eligibility-message"
 class="notice hidden">
@@ -475,13 +435,8 @@ class="notice hidden">
 
 <div id="proposal" class="card hidden">
 
-<div class="eyebrow">
-New Match
-</div>
-
-<h2>
-Propose a Match
-</h2>
+<div class="eyebrow">New Match</div>
+<h2>Propose a Match</h2>
 
 <div class="formgrid">
 
@@ -541,13 +496,8 @@ Post Match
 
 <div>
 
-<div class="eyebrow">
-Upcoming
-</div>
-
-<h2>
-Upcoming Matches
-</h2>
+<div class="eyebrow">Upcoming</div>
+<h2>Upcoming Matches</h2>
 
 <p class="muted">
 Next upcoming match appears first.
@@ -566,13 +516,8 @@ Next upcoming match appears first.
 
 <div class="section-divider">
 
-<div class="eyebrow">
-History
-</div>
-
-<h2>
-Played Matches
-</h2>
+<div class="eyebrow">History</div>
+<h2>Played Matches</h2>
 
 <p class="muted">
 Most recently played match appears first.
@@ -595,13 +540,8 @@ Most recently played match appears first.
 
 <section id="roster" class="hidden">
 
-<div class="eyebrow">
-Active Players
-</div>
-
-<h1>
-Player Roster
-</h1>
+<div class="eyebrow">Active Players</div>
+<h1>Player Roster</h1>
 
 <h2 id="roster-scramble-name"></h2>
 
@@ -620,13 +560,8 @@ Only active players for the current Scramble appear here.
 
 <section id="hall" class="hidden">
 
-<div class="eyebrow">
-Dragon Scramble History
-</div>
-
-<h1>
-Hall of Fame
-</h1>
+<div class="eyebrow">Dragon Scramble History</div>
+<h1>Hall of Fame</h1>
 
 <p class="muted">
 Closed Scrambles are preserved here with their final standings.
@@ -643,19 +578,12 @@ Closed Scrambles are preserved here with their final standings.
 
 <section id="rules" class="hidden">
 
-<div class="eyebrow">
-Play fair · Have fun
-</div>
-
-<h1>
-Dragon Scramble Rules
-</h1>
+<div class="eyebrow">Play fair · Have fun</div>
+<h1>Dragon Scramble Rules</h1>
 
 <div class="card">
 
-<div class="eyebrow">
-Participation & Payment
-</div>
+<div class="eyebrow">Participation & Payment</div>
 
 <h2 id="rules-scramble-name">
 Current Scramble
@@ -694,7 +622,8 @@ All matches use the same rules. Social has a more relaxed pace expectation. Focu
 
 <div class="rule">
 <b>Proposer equipment</b><br>
-The proposer provides the Mahjong tiles, mat, racks and dice.
+The current match proposer provides the Mahjong tiles, mat, racks and dice.
+If the proposer leaves an open match, proposer responsibility transfers to the next player who joined.
 </div>
 
 <div class="rule">
@@ -714,12 +643,13 @@ All phone notification sounds must be off.
 
 <div class="rule">
 <b>Scoring</b><br>
-Winner receives NMJL hand value. Self-picked last tile +10. Jokerless Mahjong +20. Wall Game = +10 to each player and no other points for that game.
+Winner receives NMJL hand value. Self-picked last tile +10. Jokerless Mahjong +20.
+Wall Game = +10 to each player and no other points for that game.
 </div>
 
 <div class="rule">
 <b>Proposer</b><br>
-+5 points for every completed four-game match proposed.
+The proposer at the time the match is completed receives +5 points.
 </div>
 
 <div class="rule">
@@ -746,22 +676,14 @@ If an emergency occurs after play begins, every unfinished game becomes a Wall G
 
 <section id="account" class="hidden">
 
-<div class="eyebrow">
-Player Account
-</div>
-
-<h1>
-Dragon Scramble Account
-</h1>
-
+<div class="eyebrow">Player Account</div>
+<h1>Dragon Scramble Account</h1>
 
 <div
 id="logged-in-player"
 class="card hidden">
 
-<div class="eyebrow">
-Your Account
-</div>
+<div class="eyebrow">Your Account</div>
 
 <h2>
 Welcome,
@@ -770,15 +692,11 @@ Welcome,
 
 <p id="player-name" class="muted"></p>
 
-
 <div
 id="account-payment-section"
 class="hidden">
 
-<div class="eyebrow">
-Current Scramble
-</div>
-
+<div class="eyebrow">Current Scramble</div>
 <h2 id="account-scramble-name"></h2>
 
 <div
@@ -791,7 +709,6 @@ Loading payment instructions...
 
 </div>
 
-
 <button
 class="btn alt"
 onclick="signOutPlayer()">
@@ -803,13 +720,8 @@ Sign Out
 
 <div id="signup-card" class="card">
 
-<div class="eyebrow">
-New Player
-</div>
-
-<h2>
-Create Account
-</h2>
+<div class="eyebrow">New Player</div>
+<h2>Create Account</h2>
 
 <label>Full Name</label>
 <input id="signup-name" type="text">
@@ -839,13 +751,8 @@ Create Account
 
 <div id="login-card" class="card">
 
-<div class="eyebrow">
-Returning Player
-</div>
-
-<h2>
-Sign In
-</h2>
+<div class="eyebrow">Returning Player</div>
+<h2>Sign In</h2>
 
 <label>Email</label>
 <input id="login-email" type="email">
@@ -870,13 +777,8 @@ Sign In
 
 <section id="results" class="hidden">
 
-<div class="eyebrow">
-Match Results
-</div>
-
-<h1>
-Enter Results
-</h1>
+<div class="eyebrow">Match Results</div>
+<h1>Enter Results</h1>
 
 <p class="muted">
 Any player in a confirmed match may submit the results.
@@ -898,13 +800,8 @@ Admin may submit results for any confirmed match.
 
 <section id="admin" class="hidden">
 
-<div class="eyebrow">
-Administration
-</div>
-
-<h1>
-Admin Dashboard
-</h1>
+<div class="eyebrow">Administration</div>
+<h1>Admin Dashboard</h1>
 
 
 <div class="card">
@@ -913,9 +810,7 @@ Admin Dashboard
 Scramble History & Management
 </div>
 
-<h2>
-Scrambles
-</h2>
+<h2>Scrambles</h2>
 
 <p class="muted">
 Names and dates may be edited. Closed Scrambles remain locked for scoring.
@@ -932,9 +827,7 @@ class="hidden">
 
 <div class="edit-box">
 
-<h3>
-Create New Scramble
-</h3>
+<h3>Create New Scramble</h3>
 
 <label>Scramble Name</label>
 
@@ -973,17 +866,10 @@ Create Active Scramble
 
 <div id="admin-payment-card" class="card">
 
-<div class="eyebrow">
-Current Scramble Settings
-</div>
+<div class="eyebrow">Current Scramble Settings</div>
+<h2>Payment Instructions</h2>
 
-<h2>
-Payment Instructions
-</h2>
-
-<label>
-Payment Message
-</label>
+<label>Payment Message</label>
 
 <textarea id="admin-payment-instructions"></textarea>
 
@@ -1000,13 +886,8 @@ Save Payment Instructions
 
 <div id="admin-player-card" class="card">
 
-<div class="eyebrow">
-Player Management
-</div>
-
-<h2>
-Players & Payments
-</h2>
+<div class="eyebrow">Player Management</div>
+<h2>Players & Payments</h2>
 
 <div id="admin-player-list">
 <p class="muted">Loading players...</p>
@@ -1017,13 +898,8 @@ Players & Payments
 
 <div class="card">
 
-<div class="eyebrow">
-Match Management
-</div>
-
-<h2>
-All Matches
-</h2>
+<div class="eyebrow">Match Management</div>
+<h2>All Matches</h2>
 
 <p class="muted">
 Admin may permanently remove test or invalid matches.
@@ -1038,13 +914,8 @@ Admin may permanently remove test or invalid matches.
 
 <div id="admin-score-card" class="card">
 
-<div class="eyebrow">
-Score Entry
-</div>
-
-<h2>
-Confirmed Matches
-</h2>
+<div class="eyebrow">Score Entry</div>
+<h2>Confirmed Matches</h2>
 
 <div id="admin-score-list">
 <p class="muted">Loading confirmed matches...</p>
@@ -1100,18 +971,16 @@ function escapeHtml(value){
 
 function dateText(value){
 
-  const date =
-    new Date(value);
-
-  return date.toLocaleDateString(
-    undefined,
-    {
-      weekday:"short",
-      month:"short",
-      day:"numeric",
-      year:"numeric"
-    }
-  );
+  return new Date(value)
+    .toLocaleDateString(
+      undefined,
+      {
+        weekday:"short",
+        month:"short",
+        day:"numeric",
+        year:"numeric"
+      }
+    );
 
 }
 
@@ -1194,14 +1063,8 @@ async function getActiveScramble(){
       .select(
         "id,name,start_date,end_date,status,closed_at,payment_instructions"
       )
-      .eq(
-        "status",
-        "active"
-      )
-      .order(
-        "start_date",
-        {ascending:false}
-      )
+      .eq("status","active")
+      .order("start_date",{ascending:false})
       .limit(1)
       .maybeSingle();
 
@@ -1427,14 +1290,10 @@ async function loadAccountPaymentStatus(){
     statusBox.innerHTML = `
 
       <div class="notice">
-
         <b>Payment confirmed ✓</b>
-
         <br>
-
         You are active for
         <b>${escapeHtml(currentScramble.name)}</b>.
-
       </div>
 
     `;
@@ -1442,20 +1301,14 @@ async function loadAccountPaymentStatus(){
     return;
   }
 
-  if(
-    payment?.status === "paid"
-  ){
+  if(payment?.status === "paid"){
 
     statusBox.innerHTML = `
 
       <div class="notice">
-
         <b>Payment confirmed ✓</b>
-
         <br>
-
         Your participation is currently inactive.
-
       </div>
 
     `;
@@ -1471,13 +1324,9 @@ async function loadAccountPaymentStatus(){
     statusBox.innerHTML = `
 
       <div class="notice notice-pending">
-
         <b>Payment notice sent</b>
-
         <br>
-
         Awaiting Admin confirmation.
-
       </div>
 
     `;
@@ -1488,18 +1337,14 @@ async function loadAccountPaymentStatus(){
   statusBox.innerHTML = `
 
     <div class="notice">
-
       After sending payment,
       click below to notify the Admin.
-
     </div>
 
     <button
       class="btn alt"
       onclick="playerNotifyPayment()">
-
       I’ve Paid — Notify Admin
-
     </button>
 
   `;
@@ -1624,7 +1469,7 @@ async function loadMatchesPage(){
       '<div class="card"><p class="muted">There is currently no active Scramble.</p></div>';
 
     played.innerHTML =
-      '<div class="card"><p class="muted">Played-match details are not shown after a Scramble closes. See Hall of Fame for final standings.</p></div>';
+      '<div class="card"><p class="muted">See Hall of Fame for completed Scramble standings.</p></div>';
 
     return;
   }
@@ -1667,7 +1512,7 @@ async function loadMatchesPage(){
 }
 
 
-/* CREATE MATCH */
+/* PROPOSE MATCH */
 
 async function createMatch(){
 
@@ -1737,30 +1582,26 @@ async function createMatch(){
     return;
   }
 
+  message.textContent =
+    "Posting match...";
+
   const {error} =
     await supabaseClient
-      .from("matches")
-      .insert({
+      .rpc(
+        "propose_dragon_match",
+        {
 
-        scramble_id:
-          currentScramble.id,
+          p_scheduled_at:
+            scheduled.toISOString(),
 
-        proposer_id:
-          currentUser.id,
+          p_location:
+            location,
 
-        scheduled_at:
-          scheduled.toISOString(),
+          p_match_type:
+            matchType
 
-        location:
-          location,
-
-        match_type:
-          matchType,
-
-        status:
-          "open"
-
-      });
+        }
+      );
 
   if(error){
 
@@ -1775,13 +1616,20 @@ async function createMatch(){
     .getElementById("proposal")
     .classList.add("hidden");
 
+  document
+    .getElementById(
+      "match-location"
+    ).value = "";
+
+  message.textContent = "";
+
   await loadMatchesPage();
   await loadHomeMatches();
 
 }
 
 
-/* JOIN */
+/* JOIN MATCH */
 
 async function joinMatch(id){
 
@@ -1834,26 +1682,24 @@ async function loadUpcomingMatches(){
   const {
     data:matches,
     error
-  } = await supabaseClient
-    .from("matches")
-    .select(
-      "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at"
-    )
-    .eq(
-      "scramble_id",
-      currentScramble.id
-    )
-    .in(
-      "status",
-      [
-        "open",
-        "confirmed"
-      ]
-    )
-    .order(
-      "scheduled_at",
-      {ascending:true}
-    );
+  } =
+    await supabaseClient
+      .from("matches")
+      .select(
+        "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .in(
+        "status",
+        ["open","confirmed"]
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
 
   if(error){
 
@@ -1889,7 +1735,10 @@ async function loadUpcomingMatches(){
       .select(
         "match_id,player_id,joined_at"
       )
-      .in("match_id",ids),
+      .in(
+        "match_id",
+        ids
+      ),
 
     supabaseClient
       .from("players")
@@ -1948,6 +1797,12 @@ async function loadUpcomingMatches(){
         const count =
           matchSeats.length;
 
+        const proposerName =
+          playerMap.get(
+            match.proposer_id
+          )?.nickname ||
+          "Player";
+
         const names =
           matchSeats.map(
             seat =>
@@ -1979,9 +1834,7 @@ async function loadUpcomingMatches(){
               <button
                 class="btn alt"
                 onclick="show('results')">
-
                 Enter Results
-
               </button>
 
             `;
@@ -2004,18 +1857,19 @@ async function loadUpcomingMatches(){
             <button
               class="btn"
               onclick="joinMatch('${match.id}')">
-
               Join Match
-
             </button>
 
           `;
 
         }
 
+
+        /* EVERY PLAYER MAY LEAVE AN OPEN MATCH,
+           INCLUDING THE CURRENT PROPOSER */
+
         if(
           joined &&
-          !isProposer &&
           match.status === "open"
         ){
 
@@ -2023,7 +1877,10 @@ async function loadUpcomingMatches(){
 
             <button
               class="btn secondary"
-              onclick="leaveMatch('${match.id}')">
+              onclick="leaveMatch(
+                '${match.id}',
+                ${isProposer}
+              )">
 
               Leave Match
 
@@ -2033,9 +1890,15 @@ async function loadUpcomingMatches(){
 
         }
 
+
+        /* CURRENT PROPOSER ALSO HAS EDIT + CANCEL */
+
         if(
           isProposer &&
-          match.status === "open"
+          (
+            match.status === "open" ||
+            match.status === "confirmed"
+          )
         ){
 
           actions += `
@@ -2043,9 +1906,7 @@ async function loadUpcomingMatches(){
             <button
               class="btn secondary"
               onclick="toggleEdit('${match.id}')">
-
               Edit Match
-
             </button>
 
           `;
@@ -2059,14 +1920,13 @@ async function loadUpcomingMatches(){
             <button
               class="btn danger"
               onclick="toggleCancel('${match.id}')">
-
               Cancel Match
-
             </button>
 
           `;
 
         }
+
 
         const scheduled =
           new Date(
@@ -2087,6 +1947,9 @@ async function loadUpcomingMatches(){
             scheduled.getMinutes()
           ).padStart(2,"0")}`;
 
+        const confirmedEdit =
+          match.status === "confirmed";
+
         return `
 
           <div class="card">
@@ -2099,7 +1962,8 @@ async function loadUpcomingMatches(){
 
             <span class="pill">
               ${
-                match.match_type === "focused"
+                match.match_type ===
+                "focused"
                   ? "Focused"
                   : "Social"
               }
@@ -2108,19 +1972,32 @@ async function loadUpcomingMatches(){
             <h2>
 
               ${escapeHtml(
-                dateText(match.scheduled_at)
+                dateText(
+                  match.scheduled_at
+                )
               )}
 
               ·
 
               ${escapeHtml(
-                timeText(match.scheduled_at)
+                timeText(
+                  match.scheduled_at
+                )
               )}
 
             </h2>
 
             <p>
               📍 ${escapeHtml(match.location)}
+            </p>
+
+            <p class="muted">
+
+              Proposer:
+              <b>
+                ${escapeHtml(proposerName)}
+              </b>
+
             </p>
 
             <div class="players">
@@ -2137,113 +2014,150 @@ async function loadUpcomingMatches(){
 
             ${actions}
 
-            <div
-              id="edit-${match.id}"
-              class="edit-box hidden">
+            ${
+              isProposer
+                ? `
 
-              <h3>
-                Edit Match
-              </h3>
+                  <div
+                    id="edit-${match.id}"
+                    class="edit-box hidden">
 
-              <div class="formgrid">
+                    <h3>
+                      ${
+                        confirmedEdit
+                          ? "Update Match Location"
+                          : "Edit Match"
+                      }
+                    </h3>
 
-                <div>
+                    ${
+                      confirmedEdit
+                        ? `
 
-                  <label>
-                    Date
-                  </label>
+                          <div class="notice">
 
-                  <input
-                    id="edit-date-${match.id}"
-                    type="date"
-                    value="${localDate}">
+                            After confirmation, only the location may be changed,
+                            and only until 6 hours before the match.
 
-                </div>
+                          </div>
 
-                <div>
+                        `
+                        : `
 
-                  <label>
-                    Time
-                  </label>
+                          <div class="formgrid">
 
-                  <input
-                    id="edit-time-${match.id}"
-                    type="time"
-                    value="${localTime}">
+                            <div>
 
-                </div>
+                              <label>
+                                Date
+                              </label>
 
-              </div>
+                              <input
+                                id="edit-date-${match.id}"
+                                type="date"
+                                value="${localDate}">
 
-              <label>
-                Location
-              </label>
+                            </div>
 
-              <input
-                id="edit-location-${match.id}"
-                value="${escapeHtml(match.location)}">
+                            <div>
 
-              <label>
-                Match Type
-              </label>
+                              <label>
+                                Time
+                              </label>
 
-              <select
-                id="edit-type-${match.id}">
+                              <input
+                                id="edit-time-${match.id}"
+                                type="time"
+                                value="${localTime}">
 
-                <option
-                  value="social"
-                  ${match.match_type === "social" ? "selected" : ""}>
-                  Social
-                </option>
+                            </div>
 
-                <option
-                  value="focused"
-                  ${match.match_type === "focused" ? "selected" : ""}>
-                  Focused
-                </option>
+                          </div>
 
-              </select>
+                        `
+                    }
 
-              <button
-                class="btn"
-                onclick="updateMatch(
-                  '${match.id}',
-                  '${match.status}',
-                  '${match.scheduled_at}'
-                )">
+                    <label>
+                      Location
+                    </label>
 
-                Save Changes
+                    <input
+                      id="edit-location-${match.id}"
+                      value="${escapeHtml(match.location)}">
 
-              </button>
+                    ${
+                      confirmedEdit
+                        ? ""
+                        : `
 
-              <p
-                id="edit-message-${match.id}"
-                class="muted">
-              </p>
+                          <label>
+                            Match Type
+                          </label>
 
-            </div>
+                          <select
+                            id="edit-type-${match.id}">
 
-            <div
-              id="cancel-${match.id}"
-              class="edit-box hidden">
+                            <option
+                              value="social"
+                              ${match.match_type === "social" ? "selected" : ""}>
+                              Social
+                            </option>
 
-              <h3>
-                Cancel Match
-              </h3>
+                            <option
+                              value="focused"
+                              ${match.match_type === "focused" ? "selected" : ""}>
+                              Focused
+                            </option>
 
-              <textarea
-                id="cancel-reason-${match.id}"
-                placeholder="Cancellation reason"></textarea>
+                          </select>
 
-              <button
-                class="btn danger"
-                onclick="cancelMatch('${match.id}')">
+                        `
+                    }
 
-                Confirm Cancellation
+                    <button
+                      class="btn"
+                      onclick="updateMatch(
+                        '${match.id}',
+                        '${match.status}'
+                      )">
 
-              </button>
+                      Save Changes
 
-            </div>
+                    </button>
+
+                    <p
+                      id="edit-message-${match.id}"
+                      class="muted">
+                    </p>
+
+                  </div>
+
+
+                  <div
+                    id="cancel-${match.id}"
+                    class="edit-box hidden">
+
+                    <h3>
+                      Cancel Match
+                    </h3>
+
+                    <textarea
+                      id="cancel-reason-${match.id}"
+                      placeholder="Cancellation reason"></textarea>
+
+                    <button
+                      class="btn danger"
+                      onclick="cancelMatch('${match.id}')">
+
+                      Confirm Cancellation
+
+                    </button>
+
+                  </div>
+
+                `
+                : ""
+            }
 
           </div>
 
@@ -2251,6 +2165,247 @@ async function loadUpcomingMatches(){
 
       }
     ).join("");
+
+}
+
+
+/* EDIT MATCH */
+
+function toggleEdit(id){
+
+  document
+    .getElementById(
+      `edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function updateMatch(
+  id,
+  status
+){
+
+  const location =
+    document.getElementById(
+      `edit-location-${id}`
+    ).value.trim();
+
+  const message =
+    document.getElementById(
+      `edit-message-${id}`
+    );
+
+  if(!location){
+
+    message.textContent =
+      "Location is required.";
+
+    return;
+  }
+
+  message.textContent =
+    "Saving...";
+
+  if(status === "confirmed"){
+
+    const {error} =
+      await supabaseClient
+        .rpc(
+          "update_confirmed_match_location",
+          {
+            p_match_id:id,
+            p_location:location
+          }
+        );
+
+    if(error){
+
+      message.textContent =
+        error.message;
+
+      return;
+    }
+
+    await loadUpcomingMatches();
+    await loadHomeMatches();
+
+    return;
+  }
+
+  const date =
+    document.getElementById(
+      `edit-date-${id}`
+    ).value;
+
+  const time =
+    document.getElementById(
+      `edit-time-${id}`
+    ).value;
+
+  const type =
+    document.getElementById(
+      `edit-type-${id}`
+    ).value;
+
+  if(
+    !date ||
+    !time
+  ){
+
+    message.textContent =
+      "Date and time are required.";
+
+    return;
+  }
+
+  const scheduled =
+    new Date(
+      `${date}T${time}:00`
+    );
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "update_open_dragon_match",
+        {
+
+          p_match_id:id,
+
+          p_scheduled_at:
+            scheduled.toISOString(),
+
+          p_location:
+            location,
+
+          p_match_type:
+            type
+
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      error.message;
+
+    return;
+  }
+
+  await loadUpcomingMatches();
+  await loadHomeMatches();
+
+}
+
+
+/* LEAVE MATCH + PROPOSER TRANSFER */
+
+async function leaveMatch(
+  id,
+  isProposer
+){
+
+  let message =
+    "Leave this match? Your seat will become available.";
+
+  if(isProposer){
+
+    message =
+      "Leave this match as proposer?\n\n" +
+      "If another player has already joined, the first player who joined after you will automatically become the new proposer and will take over proposer responsibilities.\n\n" +
+      "If you are the only player, the match will be removed.";
+
+  }
+
+  if(!confirm(message)){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "leave_dragon_match",
+        {
+          p_match_id:id
+        }
+      );
+
+  if(error){
+
+    alert(
+      "Could not leave match: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadUpcomingMatches();
+  await loadHomeMatches();
+
+}
+
+
+/* CANCEL MATCH */
+
+function toggleCancel(id){
+
+  document
+    .getElementById(
+      `cancel-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function cancelMatch(id){
+
+  const reason =
+    document.getElementById(
+      `cancel-reason-${id}`
+    ).value.trim();
+
+  if(!reason){
+
+    alert(
+      "Please enter a cancellation reason."
+    );
+
+    return;
+  }
+
+  if(
+    !confirm(
+      "Cancel this match?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "cancel_dragon_match",
+        {
+          p_match_id:id,
+          p_reason:reason
+        }
+      );
+
+  if(error){
+
+    alert(
+      "Could not cancel match: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMatchesPage();
+  await loadHomeMatches();
 
 }
 
@@ -2451,7 +2606,8 @@ async function loadPlayedMatches(){
 
             <span class="pill">
               ${
-                match.match_type === "focused"
+                match.match_type ===
+                "focused"
                   ? "Focused"
                   : "Social"
               }
@@ -2460,13 +2616,17 @@ async function loadPlayedMatches(){
             <h2>
 
               ${escapeHtml(
-                dateText(match.scheduled_at)
+                dateText(
+                  match.scheduled_at
+                )
               )}
 
               ·
 
               ${escapeHtml(
-                timeText(match.scheduled_at)
+                timeText(
+                  match.scheduled_at
+                )
               )}
 
             </h2>
@@ -2481,7 +2641,7 @@ async function loadPlayedMatches(){
 
             <p class="muted">
 
-              Proposed by
+              Proposer:
               <b>${escapeHtml(proposerName)}</b>
 
             </p>
@@ -2489,9 +2649,7 @@ async function loadPlayedMatches(){
             <button
               class="btn"
               onclick="togglePlayedDetails('${match.id}')">
-
               View Details
-
             </button>
 
             ${
@@ -2501,9 +2659,7 @@ async function loadPlayedMatches(){
                   <button
                     class="btn alt"
                     onclick="toggleCompletedEdit('${match.id}')">
-
                     Edit Results
-
                   </button>
 
                 `
@@ -2583,9 +2739,11 @@ function renderCompletedMatchDetails(
   }
 
   let html = `
+
     <div class="eyebrow">
       Four-Game Breakdown
     </div>
+
   `;
 
   for(
@@ -2616,9 +2774,7 @@ function renderCompletedMatchDetails(
 
           <br><br>
 
-          <b>
-            Wall Game
-          </b>
+          <b>Wall Game</b>
 
           <br>
 
@@ -2650,11 +2806,15 @@ function renderCompletedMatchDetails(
     let extras = [];
 
     if(game.self_picked){
-      extras.push("Self-picked +10");
+      extras.push(
+        "Self-picked +10"
+      );
     }
 
     if(game.jokerless){
-      extras.push("Jokerless +20");
+      extras.push(
+        "Jokerless +20"
+      );
     }
 
     html += `
@@ -2678,7 +2838,10 @@ function renderCompletedMatchDetails(
         <br>
 
         NMJL Hand Value:
-        ${Number(game.base_hand_value || 0)} points
+        ${Number(
+          game.base_hand_value ||
+          0
+        )} points
 
         ${
           extras.length
@@ -2690,7 +2853,10 @@ function renderCompletedMatchDetails(
 
         <b>
           Total awarded:
-          ${Number(winnerScore?.points || 0)} points
+          ${Number(
+            winnerScore?.points ||
+            0
+          )} points
         </b>
 
       </div>
@@ -2709,9 +2875,7 @@ function renderCompletedMatchDetails(
 
     <div class="match-total">
 
-      <b>
-        Match Bonus
-      </b>
+      <b>Match Bonus</b>
 
       <br>
 
@@ -2756,9 +2920,12 @@ function renderAdminCompletedEdit(
   if(players.length !== 4){
 
     return `
+
       <p class="error">
-        This match cannot be edited because it does not contain exactly four players.
+        This match cannot be edited because
+        it does not contain exactly four players.
       </p>
+
     `;
   }
 
@@ -2783,10 +2950,8 @@ function renderAdminCompletedEdit(
     </h3>
 
     <div class="notice">
-
       Saving will replace all four original game results
       and recalculate the leaderboard.
-
     </div>
 
   `;
@@ -2875,7 +3040,15 @@ function renderAdminCompletedEdit(
             id="edit-base-${match.id}-${n}"
             type="number"
             min="1"
-            value="${game && !game.is_wall_game ? Number(game.base_hand_value || 0) : ""}">
+            value="${
+              game &&
+              !game.is_wall_game
+                ? Number(
+                    game.base_hand_value ||
+                    0
+                  )
+                : ""
+            }">
 
           <div class="checkrow">
 
@@ -3109,262 +3282,11 @@ async function adminSaveCompletedResults(
 
   await loadPlayedMatches();
   await loadLeaderboard();
-  await loadHallOfFame();
 
 }
 
 
-/* UPCOMING MATCH EDIT/CANCEL */
-
-function toggleEdit(id){
-
-  document
-    .getElementById(
-      `edit-${id}`
-    )
-    .classList.toggle("hidden");
-
-}
-
-
-function toggleCancel(id){
-
-  document
-    .getElementById(
-      `cancel-${id}`
-    )
-    .classList.toggle("hidden");
-
-}
-
-
-async function updateMatch(
-  id,
-  status,
-  originalScheduledAt
-){
-
-  const location =
-    document.getElementById(
-      `edit-location-${id}`
-    ).value.trim();
-
-  const message =
-    document.getElementById(
-      `edit-message-${id}`
-    );
-
-  if(!location){
-
-    message.textContent =
-      "Location is required.";
-
-    return;
-  }
-
-  if(status === "confirmed"){
-
-    const scheduled =
-      new Date(
-        originalScheduledAt
-      );
-
-    if(
-      new Date() >=
-      new Date(
-        scheduled.getTime() -
-        21600000
-      )
-    ){
-
-      message.textContent =
-        "Location cannot be changed within 6 hours of the match.";
-
-      return;
-    }
-
-    const {error} =
-      await supabaseClient
-        .from("matches")
-        .update({
-          location:location
-        })
-        .eq("id",id)
-        .eq(
-          "proposer_id",
-          currentUser.id
-        );
-
-    if(error){
-
-      message.textContent =
-        error.message;
-
-      return;
-    }
-
-    await loadUpcomingMatches();
-
-    return;
-  }
-
-  const date =
-    document.getElementById(
-      `edit-date-${id}`
-    ).value;
-
-  const time =
-    document.getElementById(
-      `edit-time-${id}`
-    ).value;
-
-  const type =
-    document.getElementById(
-      `edit-type-${id}`
-    ).value;
-
-  const scheduled =
-    new Date(
-      `${date}T${time}:00`
-    );
-
-  if(
-    scheduled <=
-    new Date()
-  ){
-
-    message.textContent =
-      "The match must be in the future.";
-
-    return;
-  }
-
-  const {error} =
-    await supabaseClient
-      .from("matches")
-      .update({
-
-        scheduled_at:
-          scheduled.toISOString(),
-
-        location:
-          location,
-
-        match_type:
-          type
-
-      })
-      .eq("id",id)
-      .eq(
-        "proposer_id",
-        currentUser.id
-      );
-
-  if(error){
-
-    message.textContent =
-      error.message;
-
-    return;
-  }
-
-  await loadUpcomingMatches();
-  await loadHomeMatches();
-
-}
-
-
-async function leaveMatch(id){
-
-  if(
-    !confirm(
-      "Leave this match?"
-    )
-  ){
-    return;
-  }
-
-  const {error} =
-    await supabaseClient
-      .from("match_players")
-      .delete()
-      .eq(
-        "match_id",
-        id
-      )
-      .eq(
-        "player_id",
-        currentUser.id
-      );
-
-  if(error){
-
-    alert(error.message);
-    return;
-  }
-
-  await loadUpcomingMatches();
-
-}
-
-
-async function cancelMatch(id){
-
-  const reason =
-    document.getElementById(
-      `cancel-reason-${id}`
-    ).value.trim();
-
-  if(!reason){
-
-    alert(
-      "Please enter a cancellation reason."
-    );
-
-    return;
-  }
-
-  if(
-    !confirm(
-      "Cancel this match?"
-    )
-  ){
-    return;
-  }
-
-  const {error} =
-    await supabaseClient
-      .from("matches")
-      .update({
-
-        status:"cancelled",
-
-        cancelled_at:
-          new Date().toISOString(),
-
-        cancellation_reason:
-          reason
-
-      })
-      .eq("id",id)
-      .eq(
-        "proposer_id",
-        currentUser.id
-      );
-
-  if(error){
-
-    alert(error.message);
-    return;
-  }
-
-  await loadMatchesPage();
-  await loadHomeMatches();
-
-}
-
-
-/* SCORE ENTRY FOR CONFIRMED MATCHES */
+/* SCORE ENTRY */
 
 async function loadScoreEntry(
   targetId,
@@ -3393,23 +3315,24 @@ async function loadScoreEntry(
   const {
     data:matches,
     error
-  } = await supabaseClient
-    .from("matches")
-    .select(
-      "id,scheduled_at,location,status,match_type"
-    )
-    .eq(
-      "scramble_id",
-      currentScramble.id
-    )
-    .eq(
-      "status",
-      "confirmed"
-    )
-    .order(
-      "scheduled_at",
-      {ascending:true}
-    );
+  } =
+    await supabaseClient
+      .from("matches")
+      .select(
+        "id,scheduled_at,location,status,match_type"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "status",
+        "confirmed"
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
 
   if(error){
 
@@ -3445,7 +3368,10 @@ async function loadScoreEntry(
       .select(
         "match_id,player_id,joined_at"
       )
-      .in("match_id",ids),
+      .in(
+        "match_id",
+        ids
+      ),
 
     supabaseClient
       .from("players")
@@ -3522,15 +3448,14 @@ async function loadScoreEntry(
           );
 
         if(
-          matchSeats.length !== 4
+          matchSeats.length !==
+          4
         ){
 
           return `
 
             <div class="notice">
-
               This match does not currently contain exactly four players.
-
             </div>
 
           `;
@@ -3585,13 +3510,17 @@ function renderNewScoreForm(
       <h2>
 
         ${escapeHtml(
-          dateText(match.scheduled_at)
+          dateText(
+            match.scheduled_at
+          )
         )}
 
         ·
 
         ${escapeHtml(
-          timeText(match.scheduled_at)
+          timeText(
+            match.scheduled_at
+          )
         )}
 
       </h2>
@@ -3614,10 +3543,8 @@ function renderNewScoreForm(
       </div>
 
       <div class="notice">
-
         Enter all four games.
         Each player is East once.
-
       </div>
 
       ${
@@ -3928,7 +3855,8 @@ async function submitMatchResults(
   await loadHomeMatches();
 
   setTimeout(
-    () => show("matches"),
+    () =>
+      show("matches"),
     700
   );
 
@@ -4041,13 +3969,17 @@ function homeMatchHtml(
     <h2>
 
       ${escapeHtml(
-        dateText(match.scheduled_at)
+        dateText(
+          match.scheduled_at
+        )
       )}
 
       ·
 
       ${escapeHtml(
-        timeText(match.scheduled_at)
+        timeText(
+          match.scheduled_at
+        )
       )}
 
     </h2>
@@ -4119,7 +4051,8 @@ async function calculateScrambleStandings(
     (matchesResult.data || [])
     .filter(
       match =>
-        match.status === "completed"
+        match.status ===
+          "completed"
         ||
         !!match.completed_at
     );
@@ -4127,7 +4060,8 @@ async function calculateScrambleStandings(
   const completedIds =
     new Set(
       completed.map(
-        match => match.id
+        match =>
+          match.id
       )
     );
 
@@ -4262,7 +4196,8 @@ async function calculateScrambleStandings(
   )
   .filter(
     player =>
-      player.matches_played > 0
+      player.matches_played >
+      0
   );
 
 }
@@ -4344,7 +4279,10 @@ async function loadLeaderboard(){
             </div>
 
             <div class="muted">
-              ${player.matches_played} match${player.matches_played === 1 ? "" : "es"}
+
+              ${player.matches_played}
+              match${player.matches_played === 1 ? "" : "es"}
+
             </div>
 
           </div>
@@ -4403,7 +4341,8 @@ function updateMyStanding(
   const index =
     rows.findIndex(
       row =>
-        row.id === user.id
+        row.id ===
+        user.id
     );
 
   if(index < 0){
@@ -4578,19 +4517,20 @@ async function loadHallOfFame(){
   const {
     data:scrambles,
     error
-  } = await supabaseClient
-    .from("scrambles")
-    .select(
-      "id,name,start_date,end_date,closed_at,status"
-    )
-    .eq(
-      "status",
-      "closed"
-    )
-    .order(
-      "closed_at",
-      {ascending:false}
-    );
+  } =
+    await supabaseClient
+      .from("scrambles")
+      .select(
+        "id,name,start_date,end_date,closed_at,status"
+      )
+      .eq(
+        "status",
+        "closed"
+      )
+      .order(
+        "closed_at",
+        {ascending:false}
+      );
 
   if(error){
 
@@ -4739,8 +4679,7 @@ async function loadHallOfFame(){
 
   }
 
-  box.innerHTML =
-    html;
+  box.innerHTML = html;
 
 }
 
@@ -4848,15 +4787,16 @@ async function loadAdminScrambleHistory(){
   const {
     data:scrambles,
     error
-  } = await supabaseClient
-    .from("scrambles")
-    .select(
-      "id,name,start_date,end_date,status,closed_at,payment_instructions"
-    )
-    .order(
-      "start_date",
-      {ascending:false}
-    );
+  } =
+    await supabaseClient
+      .from("scrambles")
+      .select(
+        "id,name,start_date,end_date,status,closed_at,payment_instructions"
+      )
+      .order(
+        "start_date",
+        {ascending:false}
+      );
 
   if(error){
 
@@ -4874,7 +4814,8 @@ async function loadAdminScrambleHistory(){
         <div class="scramble-admin-row">
 
           <span class="pill ${
-            scramble.status === "active"
+            scramble.status ===
+            "active"
               ? ""
               : "inactive"
           }">
@@ -4906,7 +4847,8 @@ async function loadAdminScrambleHistory(){
           </button>
 
           ${
-            scramble.status === "active"
+            scramble.status ===
+            "active"
               ? `
 
                 <button
@@ -4979,8 +4921,7 @@ async function loadAdminScrambleHistory(){
         </div>
 
       `
-    )
-    .join("");
+    ).join("");
 
   createBox.classList.toggle(
     "hidden",
@@ -5042,7 +4983,6 @@ async function adminSaveScrambleEdit(id){
   }
 
   await getActiveScramble();
-
   await loadAdminScrambleHistory();
   await loadCurrentScrambleDisplay();
 
@@ -5289,7 +5229,8 @@ async function loadAdminPlayers(){
           payment?.notified_at;
 
         const active =
-          membership?.active === true;
+          membership?.active ===
+          true;
 
         const self =
           player.id ===
@@ -5361,9 +5302,7 @@ async function loadAdminPlayers(){
                 <button
                   class="btn secondary"
                   onclick="togglePlayerEdit('${player.id}')">
-
                   Edit Profile
-
                 </button>
 
                 ${
@@ -5373,9 +5312,7 @@ async function loadAdminPlayers(){
                       <button
                         class="btn"
                         onclick="adminConfirmPayment('${player.id}')">
-
                         Confirm Payment
-
                       </button>
 
                     `
@@ -5383,7 +5320,8 @@ async function loadAdminPlayers(){
                 }
 
                 ${
-                  !self && active
+                  !self &&
+                  active
                     ? `
 
                       <button
@@ -5392,9 +5330,7 @@ async function loadAdminPlayers(){
                           '${player.id}',
                           false
                         )">
-
                         Hide from Roster
-
                       </button>
 
                     `
@@ -5413,9 +5349,7 @@ async function loadAdminPlayers(){
                           '${player.id}',
                           true
                         )">
-
                         Reactivate
-
                       </button>
 
                     `
@@ -5432,9 +5366,7 @@ async function loadAdminPlayers(){
                           '${player.id}',
                           '${escapeHtml(player.nickname)}'
                         )">
-
                         Delete Player
-
                       </button>
 
                     `
@@ -5476,9 +5408,7 @@ async function loadAdminPlayers(){
               <button
                 class="btn"
                 onclick="adminSavePlayerProfile('${player.id}')">
-
                 Save Profile
-
               </button>
 
             </div>
@@ -5488,8 +5418,7 @@ async function loadAdminPlayers(){
         `;
 
       }
-    )
-    .join("");
+    ).join("");
 
 }
 
@@ -5762,14 +5691,18 @@ async function loadAdminMatchManagement(){
 
               <b>
                 ${escapeHtml(
-                  dateText(match.scheduled_at)
+                  dateText(
+                    match.scheduled_at
+                  )
                 )}
               </b>
 
               ·
 
               ${escapeHtml(
-                timeText(match.scheduled_at)
+                timeText(
+                  match.scheduled_at
+                )
               )}
 
               <br>
@@ -5778,21 +5711,36 @@ async function loadAdminMatchManagement(){
 
             </p>
 
+            <p class="muted">
+
+              Proposer:
+              <b>
+                ${escapeHtml(
+                  playerMap.get(
+                    match.proposer_id
+                  ) ||
+                  "Player"
+                )}
+              </b>
+
+            </p>
+
             <div class="players">
               ${names.map(escapeHtml).join(" · ")}
             </div>
 
             ${
-              match.status === "confirmed" &&
-              scramble?.status === "active"
+              match.status ===
+                "confirmed"
+              &&
+              scramble?.status ===
+                "active"
                 ? `
 
                   <button
                     class="btn alt"
                     onclick="show('results')">
-
                     Enter Results
-
                   </button>
 
                 `
@@ -5802,9 +5750,7 @@ async function loadAdminMatchManagement(){
             <button
               class="btn danger"
               onclick="toggleAdminMatchDelete('${match.id}')">
-
               Delete Match
-
             </button>
 
             <div
@@ -5825,9 +5771,7 @@ async function loadAdminMatchManagement(){
                   '${match.id}',
                   '${match.status}'
                 )">
-
                 Permanently Delete
-
               </button>
 
             </div>
@@ -5837,8 +5781,7 @@ async function loadAdminMatchManagement(){
         `;
 
       }
-    )
-    .join("");
+    ).join("");
 
 }
 
@@ -6128,7 +6071,8 @@ async function showLoggedInPlayer(user){
     )
     .classList.toggle(
       "hidden",
-      player.role !== "admin"
+      player.role !==
+      "admin"
     );
 
 }
@@ -6179,7 +6123,7 @@ async function signOutPlayer(){
 }
 
 
-/* SESSION RESTORE */
+/* SESSION */
 
 supabaseClient
 .auth
@@ -6224,7 +6168,8 @@ supabaseClient
     }
 
     if(
-      event === "SIGNED_OUT"
+      event ===
+      "SIGNED_OUT"
     ){
 
       currentUser = null;
