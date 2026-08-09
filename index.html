@@ -35,6 +35,7 @@ header{
   gap:20px;
   position:sticky;
   top:0;
+  z-index:10;
 }
 
 .brand{
@@ -42,7 +43,9 @@ header{
   letter-spacing:2px;
 }
 
-.brand span{color:#d3b36b}
+.brand span{
+  color:#d3b36b;
+}
 
 nav button{
   background:none;
@@ -65,7 +68,9 @@ main{
   padding:35px 20px;
 }
 
-.hidden{display:none!important}
+.hidden{
+  display:none!important;
+}
 
 .hero{
   display:grid;
@@ -80,7 +85,9 @@ h1{
   margin:0 0 10px;
 }
 
-h2{margin:8px 0}
+h2{
+  margin:8px 0;
+}
 
 .eyebrow{
   text-transform:uppercase;
@@ -104,7 +111,9 @@ h2{margin:8px 0}
   gap:18px;
 }
 
-.muted{color:var(--muted)}
+.muted{
+  color:var(--muted);
+}
 
 .leader{
   display:grid;
@@ -139,7 +148,9 @@ h2{margin:8px 0}
   text-transform:uppercase;
 }
 
-.pending{background:#f0e9d7}
+.pending{
+  background:#f0e9d7;
+}
 
 .btn{
   border:0;
@@ -150,9 +161,12 @@ h2{margin:8px 0}
   cursor:pointer;
 }
 
-.alt{background:var(--gold)}
+.alt{
+  background:var(--gold);
+}
 
-input,select{
+input,
+select{
   width:100%;
   padding:10px;
   border:1px solid #cfc7b8;
@@ -195,10 +209,24 @@ label{
 }
 
 @media(max-width:760px){
-  .hero,.grid,.formgrid{grid-template-columns:1fr}
-  h1{font-size:38px}
-  .leader{grid-template-columns:35px 1fr auto}
-  .avg{display:none}
+  .hero,
+  .grid,
+  .formgrid{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:38px;
+  }
+
+  .leader{
+    grid-template-columns:35px 1fr auto;
+  }
+
+  .avg{
+    display:none;
+  }
+
   header{
     flex-direction:column;
     align-items:flex-start;
@@ -227,6 +255,7 @@ label{
 <section id="home">
 
   <div class="hero">
+
     <div>
       <div class="eyebrow">American Mahjong · Friendly Competition</div>
       <h1>The Dragon Scramble</h1>
@@ -239,6 +268,7 @@ label{
       <b>Dragon Lady</b>
       <div class="muted">286 points · 15.9 average</div>
     </div>
+
   </div>
 
   <div class="card">
@@ -265,16 +295,20 @@ label{
         📍 Coral Gables<br>
         Dragon Lady · Mahjong Mia · 2 seats open
       </p>
-      <button class="btn" onclick="show('matches')">Join a match</button>
+      <button class="btn" onclick="show('matches')">
+        Join a match
+      </button>
     </div>
 
   </div>
+
 </section>
 
 
 <section id="matches" class="hidden">
 
   <div class="hero">
+
     <div>
       <div class="eyebrow">Tables</div>
       <h1>Matches</h1>
@@ -288,6 +322,7 @@ label{
       onclick="document.getElementById('proposal').classList.toggle('hidden')">
       + Propose a match
     </button>
+
   </div>
 
   <div id="proposal" class="card hidden">
@@ -295,6 +330,7 @@ label{
     <h2>Propose a Match</h2>
 
     <div class="formgrid">
+
       <div>
         <label>Date</label>
         <input type="date" value="2026-09-12">
@@ -304,6 +340,7 @@ label{
         <label>Time</label>
         <input type="time" value="14:00">
       </div>
+
     </div>
 
     <label>Location</label>
@@ -311,8 +348,7 @@ label{
 
     <div class="notice">
       Edit date, time and location until player #4 confirms.
-      After confirmation, location may be changed until 6 hours
-      before the match.
+      After confirmation, location may be changed until 6 hours before the match.
     </div>
 
     <button class="btn" onclick="alert('Demo: match posted.')">
@@ -324,8 +360,11 @@ label{
   <div class="grid">
 
     <div class="card">
+
       <span class="pill">3 / 4 Open</span>
+
       <h2>September 12 · 2:00 PM</h2>
+
       <p>📍 Ana's House, Coconut Grove</p>
 
       <div class="players">
@@ -336,11 +375,15 @@ label{
       <button class="btn" onclick="alert('Demo: joined.')">
         Join Match
       </button>
+
     </div>
 
     <div class="card">
+
       <span class="pill">1 / 4 Open</span>
+
       <h2>September 15 · 11:00 AM</h2>
+
       <p>📍 Coral Gables</p>
 
       <div class="players">
@@ -351,20 +394,22 @@ label{
       <button class="btn" onclick="alert('Demo: joined.')">
         Join Match
       </button>
+
     </div>
 
   </div>
+
 </section>
 
 
 <section id="roster" class="hidden">
 
   <div class="eyebrow">Active players</div>
+
   <h1>Player Roster</h1>
 
   <p class="muted">
-    Phone numbers are visible to active players for coordinating
-    games and substitutions.
+    Phone numbers are visible to active players for coordinating games and substitutions.
   </p>
 
   <div class="card" id="rosterlist"></div>
@@ -375,6 +420,7 @@ label{
 <section id="rules" class="hidden">
 
   <div class="eyebrow">Play fair · Have fun</div>
+
   <h1>Dragon Scramble Rules</h1>
 
   <div class="card">
@@ -391,16 +437,12 @@ label{
 
     <div class="rule">
       <b>Charleston passing</b><br>
-      During all Charleston passes, all four players must have
-      placed their tiles on the mat before any player picks up
-      the tiles being passed to them. No player may pick up
-      incoming tiles early.
+      During all Charleston passes, all four players must have placed their tiles on the mat before any player picks up the tiles being passed to them. No player may pick up incoming tiles early.
     </div>
 
     <div class="rule">
       <b>Phones</b><br>
-      No phone above table height during play. No photos of tiles,
-      racks, hands or the table. No AI or electronic assistance.
+      No phone above table height during play. No photos of tiles, racks, hands or the table. No AI or electronic assistance.
     </div>
 
     <div class="rule">
@@ -410,9 +452,7 @@ label{
 
     <div class="rule">
       <b>Scoring</b><br>
-      Winner receives NMJL hand value. Self-picked last tile +10.
-      Jokerless Mahjong +20. Wall Game = +10 to each player and no
-      other points for that game.
+      Winner receives NMJL hand value. Self-picked last tile +10. Jokerless Mahjong +20. Wall Game = +10 to each player and no other points for that game.
     </div>
 
     <div class="rule">
@@ -422,43 +462,50 @@ label{
 
     <div class="rule">
       <b>Withdrawal</b><br>
-      Leaving less than 24 hours before the match: −20 if no
-      replacement joins and the match is cancelled.
+      Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.
     </div>
 
     <div class="rule">
       <b>Late</b><br>
-      More than 20 minutes late: match cancelled; late player −20,
-      other three +25 each.
+      More than 20 minutes late: match cancelled; late player −20, other three +25 each.
     </div>
 
     <div class="rule">
       <b>Emergency</b><br>
-      If an emergency occurs after play begins, every unfinished
-      game becomes a Wall Game, +10 to each player.
+      If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.
     </div>
 
   </div>
+
 </section>
 
 
 <section id="account" class="hidden">
 
   <div class="eyebrow">Player Account</div>
+
   <h1>Join Dragon Scramble</h1>
 
-  <!-- LOGGED-IN VIEW: ONLY ONE COPY -->
   <div id="logged-in-player" class="card hidden">
+
     <div class="eyebrow">Your Account</div>
-    <h2>Welcome, <span id="player-nickname"></span></h2>
+
+    <h2>
+      Welcome, <span id="player-nickname"></span>
+    </h2>
+
     <p id="player-name" class="muted"></p>
-    <button class="btn alt" onclick="signOutPlayer()">Sign Out</button>
+
+    <button class="btn alt" onclick="signOutPlayer()">
+      Sign Out
+    </button>
+
   </div>
 
-  <!-- SIGN-UP VIEW -->
   <div id="signup-card" class="card">
 
     <div class="eyebrow">New Player</div>
+
     <h2>Create Account</h2>
 
     <label>Full Name</label>
@@ -474,10 +521,7 @@ label{
     <input id="signup-email" type="email" placeholder="Email address">
 
     <label>Password</label>
-    <input
-      id="signup-password"
-      type="password"
-      placeholder="Create a password">
+    <input id="signup-password" type="password" placeholder="Create a password">
 
     <button class="btn" onclick="signUpPlayer()">
       Create Account
@@ -487,10 +531,10 @@ label{
 
   </div>
 
-  <!-- SIGN-IN VIEW -->
   <div id="login-card" class="card">
 
     <div class="eyebrow">Returning Player</div>
+
     <h2>Sign In</h2>
 
     <label>Email</label>
@@ -513,10 +557,13 @@ label{
 <section id="admin" class="hidden">
 
   <div class="eyebrow">Administration</div>
+
   <h1>Admin Dashboard</h1>
 
   <div class="card">
+
     <div class="eyebrow">Payment confirmation</div>
+
     <h2>Payment is handled separately</h2>
 
     <p class="muted">
@@ -525,10 +572,13 @@ label{
     </p>
 
     <div id="payments"></div>
+
   </div>
 
   <div class="card">
+
     <div class="eyebrow">Score entry</div>
+
     <h2>Completed Match</h2>
 
     <p>
@@ -542,199 +592,12 @@ label{
       onclick="alert('Demo: scores validated and leaderboard updated.')">
       Submit Match Results
     </button>
+
   </div>
 
 </section>
 
 </main>
-
-
-<script>
-
-/* Temporary prototype data.
-   We will replace this with Supabase data next. */
-
-const players = [
-  ['Dragon Lady','Ana Knoll','(305) 555-1234',428,24,true],
-  ['Mahjong Mia','Maria Smith','(305) 555-5678',397,24,true],
-  ['Lucky Dragon','Susan Jones','(786) 555-2222',381,24,true],
-  ['Suzy Q','Lisa Brown','(305) 555-9999',354,24,true],
-  ['Bamboo Belle','Carol White','(786) 555-7777',244,20,false]
-];
-
-function show(id) {
-
-  document
-    .querySelectorAll('main>section')
-    .forEach(section => section.classList.add('hidden'));
-
-  document.getElementById(id).classList.remove('hidden');
-
-  window.scrollTo(0,0);
-
-  if(id === 'home') render();
-  if(id === 'roster') roster();
-  if(id === 'admin') admin();
-}
-
-
-function render() {
-
-  const activePlayers = players
-    .filter(player => player[5])
-    .sort((a,b) => b[3] - a[3]);
-
-  document.getElementById('board').innerHTML =
-    activePlayers.map((player,index) => `
-      <div class="leader">
-
-        <div class="rank">${index + 1}</div>
-
-        <div>
-          <div class="nick">${player[0]}</div>
-          <div class="muted">${player[4]} games</div>
-        </div>
-
-        <div class="score">${player[3]} pts</div>
-
-        <div class="avg">
-          ${(player[3] / player[4]).toFixed(1)} avg
-        </div>
-
-      </div>
-    `).join('');
-}
-
-
-async function roster() {
-  const rosterList = document.getElementById("rosterlist");
-
-  rosterList.innerHTML = '<p class="muted">Loading players...</p>';
-
-  const { data: rosterPlayers, error } = await supabaseClient
-    .from("players")
-    .select("nickname, full_name, phone")
-    .order("nickname", { ascending: true });
-
-  if (error) {
-    console.error("Could not load roster:", error);
-    rosterList.innerHTML =
-      '<p class="muted">Unable to load the player roster.</p>';
-    return;
-  }
-
-  if (!rosterPlayers || rosterPlayers.length === 0) {
-    rosterList.innerHTML =
-      '<p class="muted">No players yet.</p>';
-    return;
-  }
-
-  rosterList.innerHTML = rosterPlayers.map(player => `
-    <div class="leader">
-      <div></div>
-
-      <div>
-        <div class="nick">${player.nickname || "Player"}</div>
-        <div class="muted">${player.full_name || ""}</div>
-      </div>
-
-      <div>${player.phone || ""}</div>
-
-      <span class="pill">Player</span>
-    </div>
-  `).join('');
-}
-
-          <div></div>
-
-          <div>
-            <div class="nick">${player[0]}</div>
-            <div class="muted">${player[1]}</div>
-          </div>
-
-          <div>${player[2]}</div>
-
-          <span class="pill">Active</span>
-
-        </div>
-      `).join('');
-}
-
-
-function admin() {
-
-  document.getElementById('payments').innerHTML =
-    players.map((player,index) => `
-      <div class="leader">
-
-        <div></div>
-
-        <div>
-          <div class="nick">${player[0]}</div>
-          <div class="muted">
-            ${player[1]} · ${player[2]}
-          </div>
-        </div>
-
-        <div>
-          ${player[5] ? '✓ Paid' : 'Pending'}
-        </div>
-
-        <div>
-          ${
-            player[5]
-              ? ''
-              : `<button class="btn" onclick="pay(${index})">
-                   Confirm Payment
-                 </button>`
-          }
-        </div>
-
-      </div>
-    `).join('');
-
-  const names = players.slice(0,4).map(player => player[0]);
-
-  document.getElementById('score').innerHTML =
-    names.map((name,index) => `
-      <div style="border-top:1px solid var(--line);padding:15px 0">
-
-        <b>Game ${index + 1} · East: ${name}</b>
-
-        <label>Result</label>
-
-        <select>
-          <option>Select winner</option>
-
-          ${names.map(n => `<option>${n}</option>`).join('')}
-
-          <option>Wall Game</option>
-        </select>
-
-        <label>NMJL hand value</label>
-
-        <input type="number" placeholder="e.g. 25">
-
-        <div class="muted">
-          ☐ Self-picked +10 &nbsp; ☐ Jokerless +20
-        </div>
-
-      </div>
-    `).join('');
-}
-
-
-function pay(index) {
-  players[index][5] = true;
-  admin();
-  render();
-  alert(players[index][0] + ' is now active.');
-}
-
-
-render();
-
-</script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -751,6 +614,252 @@ const supabaseClient = supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+
+
+/* TEMPORARY PROTOTYPE DATA
+   Leaderboard and Admin still use this for now.
+*/
+
+const players = [
+  ['Dragon Lady','Ana Knoll','(305) 555-1234',428,24,true],
+  ['Mahjong Mia','Maria Smith','(305) 555-5678',397,24,true],
+  ['Lucky Dragon','Susan Jones','(786) 555-2222',381,24,true],
+  ['Suzy Q','Lisa Brown','(305) 555-9999',354,24,true],
+  ['Bamboo Belle','Carol White','(786) 555-7777',244,20,false]
+];
+
+
+function show(id) {
+
+  document
+    .querySelectorAll('main > section')
+    .forEach(section => section.classList.add('hidden'));
+
+  document
+    .getElementById(id)
+    .classList.remove('hidden');
+
+  window.scrollTo(0,0);
+
+  if(id === 'home'){
+    render();
+  }
+
+  if(id === 'roster'){
+    roster();
+  }
+
+  if(id === 'admin'){
+    admin();
+  }
+}
+
+
+/* LEADERBOARD — TEMPORARY PROTOTYPE */
+
+function render() {
+
+  const activePlayers = players
+    .filter(player => player[5])
+    .sort((a,b) => b[3] - a[3]);
+
+  document.getElementById('board').innerHTML =
+    activePlayers.map((player,index) => `
+
+      <div class="leader">
+
+        <div class="rank">
+          ${index + 1}
+        </div>
+
+        <div>
+          <div class="nick">${player[0]}</div>
+          <div class="muted">${player[4]} games</div>
+        </div>
+
+        <div class="score">
+          ${player[3]} pts
+        </div>
+
+        <div class="avg">
+          ${(player[3] / player[4]).toFixed(1)} avg
+        </div>
+
+      </div>
+
+    `).join('');
+}
+
+
+/* REAL SUPABASE ROSTER */
+
+async function roster() {
+
+  const rosterList =
+    document.getElementById("rosterlist");
+
+  rosterList.innerHTML =
+    '<p class="muted">Loading players...</p>';
+
+  const {
+    data: rosterPlayers,
+    error
+  } = await supabaseClient
+    .from("players")
+    .select("nickname, full_name, phone")
+    .order("nickname", { ascending: true });
+
+  if(error) {
+
+    console.error(
+      "Could not load roster:",
+      error
+    );
+
+    rosterList.innerHTML =
+      '<p class="muted">Unable to load the player roster.</p>';
+
+    return;
+  }
+
+  if(!rosterPlayers || rosterPlayers.length === 0) {
+
+    rosterList.innerHTML =
+      '<p class="muted">No players yet.</p>';
+
+    return;
+  }
+
+  rosterList.innerHTML =
+    rosterPlayers.map(player => `
+
+      <div class="leader">
+
+        <div></div>
+
+        <div>
+
+          <div class="nick">
+            ${escapeHtml(player.nickname || "Player")}
+          </div>
+
+          <div class="muted">
+            ${escapeHtml(player.full_name || "")}
+          </div>
+
+        </div>
+
+        <div>
+          ${escapeHtml(player.phone || "")}
+        </div>
+
+        <span class="pill">
+          Player
+        </span>
+
+      </div>
+
+    `).join('');
+}
+
+
+/* ADMIN — TEMPORARY PROTOTYPE */
+
+function admin() {
+
+  document.getElementById('payments').innerHTML =
+    players.map((player,index) => `
+
+      <div class="leader">
+
+        <div></div>
+
+        <div>
+
+          <div class="nick">
+            ${player[0]}
+          </div>
+
+          <div class="muted">
+            ${player[1]} · ${player[2]}
+          </div>
+
+        </div>
+
+        <div>
+          ${player[5] ? '✓ Paid' : 'Pending'}
+        </div>
+
+        <div>
+
+          ${
+            player[5]
+              ? ''
+              : `<button
+                   class="btn"
+                   onclick="pay(${index})">
+                   Confirm Payment
+                 </button>`
+          }
+
+        </div>
+
+      </div>
+
+    `).join('');
+
+  const names =
+    players.slice(0,4).map(player => player[0]);
+
+  document.getElementById('score').innerHTML =
+    names.map((name,index) => `
+
+      <div style="border-top:1px solid var(--line);padding:15px 0">
+
+        <b>
+          Game ${index + 1} · East: ${name}
+        </b>
+
+        <label>Result</label>
+
+        <select>
+
+          <option>Select winner</option>
+
+          ${names.map(n => `<option>${n}</option>`).join('')}
+
+          <option>Wall Game</option>
+
+        </select>
+
+        <label>NMJL hand value</label>
+
+        <input
+          type="number"
+          placeholder="e.g. 25">
+
+        <div class="muted">
+          ☐ Self-picked +10 &nbsp;
+          ☐ Jokerless +20
+        </div>
+
+      </div>
+
+    `).join('');
+}
+
+
+function pay(index) {
+
+  players[index][5] = true;
+
+  admin();
+  render();
+
+  alert(
+    players[index][0] + ' is now active.'
+  );
+}
 
 
 /* CREATE ACCOUNT */
@@ -776,38 +885,65 @@ async function signUpPlayer() {
     document.getElementById("signup-message");
 
 
-  message.textContent = "Creating account...";
+  if(
+    !fullName ||
+    !nickname ||
+    !phone ||
+    !email ||
+    !password
+  ){
+    message.textContent =
+      "Please complete all fields.";
+
+    return;
+  }
 
 
-  const { data, error } =
-    await supabaseClient.auth.signUp({
-
-      email: email,
-
-      password: password,
-
-      options: {
-
-        data: {
-          full_name: fullName,
-          nickname: nickname,
-          phone: phone
-        },
-
-        emailRedirectTo:
-          "https://dragonscramble.github.io/dragon-scramble/"
-
-      }
-
-    });
+  message.textContent =
+    "Creating account...";
 
 
-  if(error) {
+  const {
+    data,
+    error
+  } = await supabaseClient.auth.signUp({
+
+    email:email,
+
+    password:password,
+
+    options:{
+
+      data:{
+        full_name:fullName,
+        nickname:nickname,
+        phone:phone
+      },
+
+      emailRedirectTo:
+        "https://dragonscramble.github.io/dragon-scramble/"
+
+    }
+
+  });
+
+
+  if(error){
 
     console.error(error);
 
-    message.textContent =
-      "Account could not be created: " + error.message;
+    if(
+      error.message &&
+      error.message.toLowerCase().includes("database error")
+    ){
+      message.textContent =
+        "Account could not be created. The nickname may already be in use. Please try another nickname.";
+    }
+    else{
+      message.textContent =
+        "Account could not be created: " +
+        error.message;
+    }
 
     return;
   }
@@ -832,52 +968,67 @@ async function signInPlayer() {
     document.getElementById("login-message");
 
 
-  message.textContent = "Signing in...";
+  message.textContent =
+    "Signing in...";
 
 
-  const { data, error } =
-    await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
+  const {
+    data,
+    error
+  } = await supabaseClient.auth.signInWithPassword({
+
+    email:email,
+    password:password
+
+  });
 
 
-  if(error) {
+  if(error){
 
     console.error(error);
 
     message.textContent =
-      "Sign in failed: " + error.message;
+      "Sign in failed: " +
+      error.message;
 
     return;
   }
 
 
-  message.textContent = "Signed in successfully.";
+  message.textContent =
+    "Signed in successfully.";
 
 
-  if(data?.user) {
-    await showLoggedInPlayer(data.user);
+  if(data?.user){
+
+    await showLoggedInPlayer(
+      data.user
+    );
+
   }
 }
 
 
-/* SHOW LOGGED-IN PLAYER */
+/* LOGGED-IN ACCOUNT */
 
 async function showLoggedInPlayer(user) {
 
-  if(!user) return;
+  if(!user){
+    return;
+  }
 
 
-  const { data: player, error } =
-    await supabaseClient
-      .from("players")
-      .select("full_name, nickname")
-      .eq("id", user.id)
-      .single();
+  const {
+    data:player,
+    error
+  } = await supabaseClient
+    .from("players")
+    .select("full_name, nickname")
+    .eq("id", user.id)
+    .single();
 
 
-  if(error) {
+  if(error){
 
     console.error(
       "Could not load player profile:",
@@ -888,11 +1039,16 @@ async function showLoggedInPlayer(user) {
   }
 
 
-  document.getElementById("player-nickname").textContent =
-    player.nickname || "Player";
+  document
+    .getElementById("player-nickname")
+    .textContent =
+      player.nickname || "Player";
 
-  document.getElementById("player-name").textContent =
-    player.full_name || "";
+
+  document
+    .getElementById("player-name")
+    .textContent =
+      player.full_name || "";
 
 
   document
@@ -915,11 +1071,12 @@ async function showLoggedInPlayer(user) {
 
 async function signOutPlayer() {
 
-  const { error } =
-    await supabaseClient.auth.signOut();
+  const {
+    error
+  } = await supabaseClient.auth.signOut();
 
 
-  if(error) {
+  if(error){
 
     console.error(
       "Sign out failed:",
@@ -945,47 +1102,73 @@ async function signOutPlayer() {
     .classList.remove("hidden");
 
 
-  document.getElementById("login-message").textContent =
-    "Signed out successfully.";
+  document
+    .getElementById("login-message")
+    .textContent =
+      "Signed out successfully.";
 }
 
 
-/* RESTORE SESSION AFTER REFRESH */
+/* RESTORE LOGIN SESSION */
 
 supabaseClient.auth.onAuthStateChange(
-  (event, session) => {
+  (event,session) => {
 
     if(
-      (event === "INITIAL_SESSION" ||
-       event === "SIGNED_IN") &&
+      (
+        event === "INITIAL_SESSION" ||
+        event === "SIGNED_IN"
+      ) &&
       session?.user
-    ) {
+    ){
 
       setTimeout(
         () => showLoggedInPlayer(session.user),
         0
       );
+
     }
 
 
-    if(event === "SIGNED_OUT") {
+    if(event === "SIGNED_OUT"){
 
       document
         .getElementById("logged-in-player")
         .classList.add("hidden");
 
+
       document
         .getElementById("signup-card")
         .classList.remove("hidden");
 
+
       document
         .getElementById("login-card")
         .classList.remove("hidden");
+
     }
 
   }
 );
 
+
+/* BASIC HTML ESCAPING FOR DATABASE TEXT */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* INITIAL PAGE */
+
+render();
 
 console.log(
   "Dragon Scramble connected to Supabase"
