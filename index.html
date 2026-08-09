@@ -3,13 +3,55 @@
 :root{--ink:#24312b;--forest:#26352e;--paper:#f7f2e8;--card:#fffdf8;--gold:#b28a42;--muted:#68736c;--line:#ddd5c6}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 Georgia,serif}header{background:var(--forest);color:#f8f1df;padding:20px 6%;display:flex;justify-content:space-between;align-items:center;gap:20px;position:sticky;top:0}.brand{font-size:24px;letter-spacing:2px}.brand span{color:#d3b36b}nav button{background:none;border:0;color:#fff;margin:5px;cursor:pointer;font:inherit}.admin{border:1px solid #d3b36b!important;border-radius:8px;padding:7px 10px}main{max-width:1120px;margin:auto;padding:35px 20px}.hidden{display:none!important}.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;margin-bottom:25px}h1{font-size:48px;line-height:1;margin:0 0 10px}h2{margin:8px 0}.eyebrow{text-transform:uppercase;letter-spacing:3px;color:var(--gold);font-size:11px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 5px 18px #2b342c10}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.muted{color:var(--muted)}.leader{display:grid;grid-template-columns:48px 1fr auto auto;gap:14px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.rank{font-size:24px;color:var(--gold)}.nick{font-weight:bold;font-size:18px}.score{font-size:20px;font-weight:bold}.pill{display:inline-block;padding:4px 9px;border-radius:99px;background:#e5eee7;font-size:11px;text-transform:uppercase}.pending{background:#f0e9d7}.btn{border:0;border-radius:8px;padding:11px 16px;background:var(--ink);color:white;cursor:pointer}.alt{background:var(--gold)}input,select{width:100%;padding:10px;border:1px solid #cfc7b8;border-radius:7px;background:white;margin:5px 0 12px;font:inherit}label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.players{padding:11px;background:#f3eee3;border-radius:9px;margin:12px 0}.rule{padding:13px 0;border-bottom:1px solid var(--line)}.notice{padding:12px;background:#e5eee7;border-radius:9px;margin:12px 0}@media(max-width:760px){.hero,.grid,.formgrid{grid-template-columns:1fr}h1{font-size:38px}.leader{grid-template-columns:35px 1fr auto}.avg{display:none}header{flex-direction:column;align-items:flex-start}}
 </style></head><body>
-<header><div class="brand">🐉 DRAGON <span>SCRAMBLE</span></div><nav><button onclick="show('home')">Leaderboard</button><button onclick="show('matches')">Matches</button><button onclick="show('roster')">Roster</button><button onclick="show('rules')">Rules</button><button class="admin" onclick="show('admin')">Admin</button></nav></header>
+<header><div class="brand">🐉 DRAGON <span>SCRAMBLE</span></div><nav><button onclick="show('home')">Leaderboard</button><button onclick="show('matches')">Matches</button><button onclick="show('roster')">Roster</button><button onclick="show('rules')">Rules</button><button onclick="show('account')">Account</button><button class="admin" onclick="show('admin')">Admin</button></nav></header>
 <main>
 <section id="home"><div class="hero"><div><div class="eyebrow">American Mahjong · Friendly Competition</div><h1>The Dragon Scramble</h1><p class="muted">Play four. Climb the board. Keep it social.</p></div><div class="card"><div class="eyebrow">Your standing</div><div style="font-size:34px">#4</div><b>Dragon Lady</b><div class="muted">286 points · 15.9 average</div></div></div><div class="card"><div class="eyebrow">Current leaderboard</div><div id="board"></div></div><div class="grid"><div class="card"><div class="eyebrow">Next confirmed match</div><h2>Saturday · 2:00 PM</h2><p>📍 Coconut Grove<br>Dragon Lady · Mahjong Mia · Lucky Dragon · Suzy Q</p><span class="pill">Confirmed</span></div><div class="card"><div class="eyebrow">Open table</div><h2>Sunday · 11:00 AM</h2><p>📍 Coral Gables<br>Dragon Lady · Mahjong Mia · 2 seats open</p><button class="btn" onclick="show('matches')">Join a match</button></div></div></section>
 <section id="matches" class="hidden"><div class="hero"><div><div class="eyebrow">Tables</div><h1>Matches</h1><p class="muted">Only active, payment-confirmed players can join.</p></div><button class="btn alt" onclick="document.getElementById('proposal').classList.toggle('hidden')">+ Propose a match</button></div><div id="proposal" class="card hidden"><h2>Propose a Match</h2><div class="formgrid"><div><label>Date</label><input type="date" value="2026-09-12"></div><div><label>Time</label><input type="time" value="14:00"></div></div><label>Location</label><input value="Ana's House, Coconut Grove"><div class="notice">Edit date, time and location until player #4 confirms. After confirmation, location may be changed until 6 hours before the match.</div><button class="btn" onclick="alert('Demo: match posted.')">Post Match</button></div><div class="grid"><div class="card"><span class="pill">3 / 4 Open</span><h2>September 12 · 2:00 PM</h2><p>📍 Ana's House, Coconut Grove</p><div class="players">Dragon Lady · Mahjong Mia · Lucky Dragon<br><span class="muted">1 seat open</span></div><button class="btn" onclick="alert('Demo: joined. Fourth player would confirm the match.')">Join Match</button></div><div class="card"><span class="pill">1 / 4 Open</span><h2>September 15 · 11:00 AM</h2><p>📍 Coral Gables</p><div class="players">Suzy Q<br><span class="muted">3 seats open</span></div><button class="btn" onclick="alert('Demo: joined.')">Join Match</button></div></div></section>
 <section id="roster" class="hidden"><div class="eyebrow">Active players</div><h1>Player Roster</h1><p class="muted">Phone numbers are visible to active players for coordinating games and substitutions.</p><div class="card" id="rosterlist"></div></section>
 <section id="rules" class="hidden"><div class="eyebrow">Play fair · Have fun</div><h1>Dragon Scramble Rules</h1><div class="card"><div class="rule"><b>NMJL</b><br>All American Mah Jongg League (NMJL) rules apply.</div><div class="rule"><b>Four games</b><br>Every match has four games, with each player East once.</div><div class="rule"><b>Charleston passing</b><br>During all Charleston passes, all four players must have placed their tiles on the mat before any player picks up the tiles being passed to them. No player may pick up incoming tiles early.</div><div class="rule"><b>Phones</b><br>No phone above table height during play. No photos of tiles, racks, hands or the table. No AI or electronic assistance.</div><div class="rule"><b>Notifications</b><br>All phone notification sounds must be off for the entire match.</div><div class="rule"><b>Scoring</b><br>Winner receives NMJL hand value. Self-picked last tile +10. Jokerless Mahjong +20. Wall Game = +10 to each player and no other points for that game.</div><div class="rule"><b>Proposer</b><br>+5 points once for every completed four-game match proposed.</div><div class="rule"><b>Withdrawal</b><br>Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.</div><div class="rule"><b>Late</b><br>More than 20 minutes late: match cancelled; late player −20, other three +25 each.</div><div class="rule"><b>Emergency</b><br>If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.</div></div></section>
-<section id="admin" class="hidden"><div class="eyebrow">Administration</div><h1>Admin Dashboard</h1><div class="card"><div class="eyebrow">Payment confirmation</div><h2>Payment is handled separately</h2><p class="muted">Admin simply confirms payment after receiving it externally. No payment processing occurs on this site.</p><div id="payments"></div></div><div class="card"><div class="eyebrow">Score entry</div><h2>Completed Match</h2><p>Each game uses a dropdown with the four players plus Wall Game.</p><div id="score"></div><button class="btn alt" onclick="alert('Demo: scores validated and leaderboard updated.')">Submit Match Results</button></div></section>
+<section id="account" class="hidden">
+  <div class="eyebrow">Player Account</div>
+  <h1>Join Dragon Scramble</h1>
+
+  <div class="card">
+    <div class="eyebrow">New Player</div>
+    <h2>Create Account</h2>
+
+    <label>Full Name</label>
+    <input id="signup-name" type="text" placeholder="Full name">
+
+    <label>Mahjong Nickname</label>
+    <input id="signup-nickname" type="text" placeholder="Nickname">
+
+    <label>Phone</label>
+    <input id="signup-phone" type="tel" placeholder="Phone number">
+
+    <label>Email</label>
+    <input id="signup-email" type="email" placeholder="Email address">
+
+    <label>Password</label>
+    <input id="signup-password" type="password" placeholder="Create a password">
+
+    <button class="btn" onclick="signUpPlayer()">Create Account</button>
+
+    <p id="signup-message" class="muted"></p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Returning Player</div>
+    <h2>Sign In</h2>
+
+    <label>Email</label>
+    <input id="login-email" type="email" placeholder="Email address">
+
+    <label>Password</label>
+    <input id="login-password" type="password" placeholder="Password">
+
+    <button class="btn alt" onclick="signInPlayer()">Sign In</button>
+
+    <p id="login-message" class="muted"></p>
+  </div>
+</section><section id="admin" class="hidden"><div class="eyebrow">Administration</div><h1>Admin Dashboard</h1><div class="card"><div class="eyebrow">Payment confirmation</div><h2>Payment is handled separately</h2><p class="muted">Admin simply confirms payment after receiving it externally. No payment processing occurs on this site.</p><div id="payments"></div></div><div class="card"><div class="eyebrow">Score entry</div><h2>Completed Match</h2><p>Each game uses a dropdown with the four players plus Wall Game.</p><div id="score"></div><button class="btn alt" onclick="alert('Demo: scores validated and leaderboard updated.')">Submit Match Results</button></div></section>
 </main>
 <script>
 const players=[['Dragon Lady','Ana Knoll','(305) 555-1234',428,24,true],['Mahjong Mia','Maria Smith','(305) 555-5678',397,24,true],['Lucky Dragon','Susan Jones','(786) 555-2222',381,24,true],['Suzy Q','Lisa Brown','(305) 555-9999',354,24,true],['Bamboo Belle','Carol White','(786) 555-7777',244,20,false]];
@@ -30,5 +72,57 @@ render();
     SUPABASE_KEY
   );
 
-  console.log("Dragon Scramble connected to Supabase");
+  async function signUpPlayer() {
+  const fullName = document.getElementById("signup-name").value.trim();
+  const nickname = document.getElementById("signup-nickname").value.trim();
+  const phone = document.getElementById("signup-phone").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const message = document.getElementById("signup-message");
+
+  message.textContent = "Creating account...";
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: {
+        full_name: fullName,
+        nickname: nickname,
+        phone: phone
+      },
+      emailRedirectTo: "https://dragonscramble.github.io/dragon-scramble/"
+    }
+  });
+
+  if (error) {
+    console.error(error);
+    message.textContent = "Account could not be created: " + error.message;
+    return;
+  }
+
+  message.textContent =
+    "Account created. Please check your email to confirm your account.";
+}
+
+async function signInPlayer() {
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const message = document.getElementById("login-message");
+
+  message.textContent = "Signing in...";
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    console.error(error);
+    message.textContent = "Sign in failed: " + error.message;
+    return;
+  }
+
+  message.textContent = "Signed in successfully.";
+}console.log("Dragon Scramble connected to Supabase");
 </script></body></html>
