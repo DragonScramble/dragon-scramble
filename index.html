@@ -82,7 +82,6 @@ h1{
 }
 
 h2{margin:8px 0}
-
 h3{margin:8px 0}
 
 .eyebrow{
@@ -118,6 +117,22 @@ h3{margin:8px 0}
   border-bottom:1px solid var(--line);
 }
 
+.admin-player{
+  display:grid;
+  grid-template-columns:1.4fr auto;
+  gap:14px;
+  align-items:center;
+  padding:16px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.admin-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px;
+}
+
 .rank{
   font-size:24px;
   color:var(--gold);
@@ -142,6 +157,14 @@ h3{margin:8px 0}
   text-transform:uppercase;
 }
 
+.pending{
+  background:#f0e9d7;
+}
+
+.inactive{
+  background:#ececec;
+}
+
 .btn{
   border:0;
   border-radius:8px;
@@ -149,7 +172,7 @@ h3{margin:8px 0}
   background:var(--ink);
   color:white;
   cursor:pointer;
-  margin-right:6px;
+  margin-right:4px;
   margin-top:5px;
 }
 
@@ -160,6 +183,7 @@ h3{margin:8px 0}
 
 .alt{background:var(--gold)}
 .danger{background:#8b3030}
+.secondary{background:#68736c}
 
 input,
 select,
@@ -247,6 +271,8 @@ label{
   .hero,.grid,.formgrid{grid-template-columns:1fr}
   h1{font-size:38px}
   .leader{grid-template-columns:35px 1fr auto}
+  .admin-player{grid-template-columns:1fr}
+  .admin-actions{justify-content:flex-start}
   .avg{display:none}
   header{
     flex-direction:column;
@@ -270,7 +296,13 @@ label{
 <button onclick="show('roster')">Roster</button>
 <button onclick="show('rules')">Rules</button>
 <button onclick="show('account')">Account</button>
-<button class="admin" onclick="show('admin')">Admin</button>
+
+<button
+id="admin-nav"
+class="admin hidden"
+onclick="show('admin')">
+Admin
+</button>
 </nav>
 
 </header>
@@ -331,6 +363,7 @@ label{
 <div>
 <div class="eyebrow">Tables</div>
 <h1>Matches</h1>
+
 <p class="muted">
 Only active, payment-confirmed players can propose or join.
 </p>
@@ -426,7 +459,8 @@ Post Match
 <h1>Player Roster</h1>
 
 <p class="muted">
-Phone numbers are visible to authenticated players for coordinating games and substitutions.
+Only currently active Dragon Scramble players appear here.
+Historical players remain in match and leaderboard records.
 </p>
 
 <div class="card" id="rosterlist">
@@ -439,7 +473,6 @@ Phone numbers are visible to authenticated players for coordinating games and su
 <section id="rules" class="hidden">
 
 <div class="eyebrow">Play fair · Have fun</div>
-
 <h1>Dragon Scramble Rules</h1>
 
 <div class="card">
@@ -512,7 +545,6 @@ If an emergency occurs after play begins, every unfinished game becomes a Wall G
 <section id="account" class="hidden">
 
 <div class="eyebrow">Player Account</div>
-
 <h1>Join Dragon Scramble</h1>
 
 <div
@@ -540,12 +572,9 @@ Sign Out
 </div>
 
 
-<div
-id="signup-card"
-class="card">
+<div id="signup-card" class="card">
 
 <div class="eyebrow">New Player</div>
-
 <h2>Create Account</h2>
 
 <label>Full Name</label>
@@ -574,12 +603,9 @@ Create Account
 </div>
 
 
-<div
-id="login-card"
-class="card">
+<div id="login-card" class="card">
 
 <div class="eyebrow">Returning Player</div>
-
 <h2>Sign In</h2>
 
 <label>Email</label>
@@ -604,16 +630,35 @@ Sign In
 <section id="admin" class="hidden">
 
 <div class="eyebrow">Administration</div>
+<h1>Admin Dashboard</h1>
 
-<h1>Score Entry</h1>
+<div class="card">
+
+<div class="eyebrow">Player Management</div>
+<h2>Players & Payments</h2>
 
 <p class="muted">
-Confirmed matches you proposed will appear here for result entry.
+Edit player information, confirm payment, hide inactive players from the roster,
+reactivate returning players, or delete unused test accounts.
+</p>
+
+<div id="admin-player-list">
+<p class="muted">Loading players...</p>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="eyebrow">Score Entry</div>
+<h2>Confirmed Matches</h2>
+
+<p class="muted">
+Confirmed matches you proposed appear here for four-game result entry.
 </p>
 
 <div id="admin-score-list">
-
-<div class="card">
 <p class="muted">Loading confirmed matches...</p>
 </div>
 
@@ -641,6 +686,7 @@ SUPABASE_KEY
 );
 
 let currentUser = null;
+let currentPlayerProfile = null;
 let currentScramble = null;
 
 let currentEligibility = {
@@ -690,7 +736,7 @@ roster();
 }
 
 if(id === "admin"){
-loadAdminScores();
+loadAdminDashboard();
 }
 
 }
@@ -701,7 +747,9 @@ async function getActiveScramble(){
 const {data,error} =
 await supabaseClient
 .from("scrambles")
-.select("id,name,start_date,end_date,status")
+.select(
+"id,name,start_date,end_date,status"
+)
 .eq("status","active")
 .order("start_date",{ascending:false})
 .limit(1)
@@ -717,7 +765,8 @@ error
 return null;
 }
 
-currentScramble = data || null;
+currentScramble =
+data || null;
 
 return currentScramble;
 
@@ -778,8 +827,10 @@ return currentEligibility;
 function toggleProposal(){
 
 if(!currentUser){
+
 show("account");
 return;
+
 }
 
 if(!currentEligibility.eligible){
@@ -795,6 +846,7 @@ message.textContent =
 message.classList.remove("hidden");
 
 return;
+
 }
 
 document
@@ -807,7 +859,9 @@ document
 async function loadMatchesPage(){
 
 const list =
-document.getElementById("match-list");
+document.getElementById(
+"match-list"
+);
 
 list.innerHTML =
 '<div class="card"><p class="muted">Loading matches...</p></div>';
@@ -818,6 +872,7 @@ list.innerHTML =
 '<div class="card"><h2>Sign in to view matches</h2><button class="btn" onclick="show(\'account\')">Sign In</button></div>';
 
 return;
+
 }
 
 await getActiveScramble();
@@ -828,9 +883,31 @@ list.innerHTML =
 '<div class="card"><p class="muted">There is no active Scramble.</p></div>';
 
 return;
+
 }
 
 await checkEligibility();
+
+const eligibilityMessage =
+document.getElementById(
+"match-eligibility-message"
+);
+
+if(!currentEligibility.eligible){
+
+eligibilityMessage.textContent =
+currentEligibility.active
+? "Your Scramble membership is active, but payment has not been confirmed."
+: "Your account is not currently active in this Scramble.";
+
+eligibilityMessage.classList.remove("hidden");
+
+}
+else{
+
+eligibilityMessage.classList.add("hidden");
+
+}
 
 await loadMatches();
 
@@ -853,19 +930,28 @@ message.textContent =
 "You must be an active, paid player.";
 
 return;
+
 }
 
 const date =
-document.getElementById("match-date").value;
+document.getElementById(
+"match-date"
+).value;
 
 const time =
-document.getElementById("match-time").value;
+document.getElementById(
+"match-time"
+).value;
 
 const location =
-document.getElementById("match-location").value.trim();
+document.getElementById(
+"match-location"
+).value.trim();
 
 const matchType =
-document.getElementById("match-type").value;
+document.getElementById(
+"match-type"
+).value;
 
 if(!date || !time || !location){
 
@@ -873,10 +959,13 @@ message.textContent =
 "Please enter date, time and location.";
 
 return;
+
 }
 
 const localDate =
-new Date(`${date}T${time}:00`);
+new Date(
+`${date}T${time}:00`
+);
 
 if(localDate <= new Date()){
 
@@ -884,6 +973,7 @@ message.textContent =
 "The match must be in the future.";
 
 return;
+
 }
 
 const {error} =
@@ -918,6 +1008,7 @@ message.textContent =
 error.message;
 
 return;
+
 }
 
 message.textContent =
@@ -977,7 +1068,9 @@ message.textContent =
 "Location is required.";
 
 return;
+
 }
+
 
 if(status === "confirmed"){
 
@@ -996,6 +1089,7 @@ message.textContent =
 "Location can no longer be changed because the match begins within 6 hours.";
 
 return;
+
 }
 
 const {error} =
@@ -1005,7 +1099,10 @@ await supabaseClient
 location:location
 })
 .eq("id",id)
-.eq("proposer_id",currentUser.id);
+.eq(
+"proposer_id",
+currentUser.id
+);
 
 if(error){
 
@@ -1014,12 +1111,14 @@ message.textContent =
 error.message;
 
 return;
+
 }
 
 await loadMatches();
 await loadHomeMatches();
 
 return;
+
 }
 
 
@@ -1044,17 +1143,21 @@ message.textContent =
 "Date and time are required.";
 
 return;
+
 }
 
 const scheduled =
-new Date(`${date}T${time}:00`);
+new Date(
+`${date}T${time}:00`
+);
 
 if(scheduled <= new Date()){
 
 message.textContent =
-"The match must be in the future.";
+"The match must be scheduled in the future.";
 
 return;
+
 }
 
 const {error} =
@@ -1073,7 +1176,10 @@ type
 
 })
 .eq("id",id)
-.eq("proposer_id",currentUser.id);
+.eq(
+"proposer_id",
+currentUser.id
+);
 
 if(error){
 
@@ -1082,6 +1188,7 @@ message.textContent =
 error.message;
 
 return;
+
 }
 
 await loadMatches();
@@ -1108,13 +1215,10 @@ message.textContent =
 "Please enter a cancellation reason.";
 
 return;
+
 }
 
-if(
-!confirm(
-"Cancel this match?"
-)
-){
+if(!confirm("Cancel this match?")){
 return;
 }
 
@@ -1124,6 +1228,7 @@ await supabaseClient
 .update({
 
 status:"cancelled",
+
 cancelled_at:
 new Date().toISOString(),
 
@@ -1132,7 +1237,10 @@ reason
 
 })
 .eq("id",id)
-.eq("proposer_id",currentUser.id);
+.eq(
+"proposer_id",
+currentUser.id
+);
 
 if(error){
 
@@ -1141,6 +1249,7 @@ message.textContent =
 error.message;
 
 return;
+
 }
 
 await loadMatches();
@@ -1153,7 +1262,7 @@ async function leaveMatch(id){
 
 if(
 !confirm(
-"Leave this match? Your seat will become available."
+"Leave this match? Your seat will become available for another player."
 )
 ){
 return;
@@ -1174,6 +1283,7 @@ error.message
 );
 
 return;
+
 }
 
 await loadMatches();
@@ -1190,10 +1300,11 @@ await checkEligibility();
 if(!currentEligibility.eligible){
 
 alert(
-"Only active, paid players can join."
+"Only active, paid Dragon Scramble players can join matches."
 );
 
 return;
+
 }
 
 const {error} =
@@ -1216,6 +1327,7 @@ error.message
 );
 
 return;
+
 }
 
 await loadMatches();
@@ -1237,9 +1349,18 @@ await supabaseClient
 .select(
 "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at"
 )
-.eq("scramble_id",currentScramble.id)
-.in("status",["open","confirmed"])
-.order("scheduled_at",{ascending:true});
+.eq(
+"scramble_id",
+currentScramble.id
+)
+.in(
+"status",
+["open","confirmed"]
+)
+.order(
+"scheduled_at",
+{ascending:true}
+);
 
 if(error){
 
@@ -1247,6 +1368,7 @@ list.innerHTML =
 '<div class="card"><p class="error">Unable to load matches.</p></div>';
 
 return;
+
 }
 
 if(!matches || !matches.length){
@@ -1255,10 +1377,13 @@ list.innerHTML =
 '<div class="card"><h2>No upcoming matches yet</h2></div>';
 
 return;
+
 }
 
 const ids =
-matches.map(match => match.id);
+matches.map(match =>
+match.id
+);
 
 const [
 seatsResult,
@@ -1267,12 +1392,16 @@ playersResult
 
 supabaseClient
 .from("match_players")
-.select("match_id,player_id,joined_at")
+.select(
+"match_id,player_id,joined_at"
+)
 .in("match_id",ids),
 
 supabaseClient
 .from("players")
-.select("id,nickname,full_name")
+.select(
+"id,nickname,full_name"
+)
 
 ]);
 
@@ -1306,17 +1435,23 @@ matchSeats.length;
 
 const joined =
 matchSeats.some(seat =>
-seat.player_id === currentUser.id
+seat.player_id ===
+currentUser.id
 );
 
 const isProposer =
-currentUser.id === match.proposer_id;
+currentUser.id ===
+match.proposer_id;
 
 const proposer =
-playerMap.get(match.proposer_id);
+playerMap.get(
+match.proposer_id
+);
 
 const scheduled =
-new Date(match.scheduled_at);
+new Date(
+match.scheduled_at
+);
 
 const dateText =
 scheduled.toLocaleDateString(
@@ -1354,7 +1489,10 @@ seat.player_id
 );
 
 const empty =
-Math.max(0,4-count);
+Math.max(
+0,
+4-count
+);
 
 const sixHoursBefore =
 new Date(
@@ -1363,8 +1501,10 @@ scheduled.getTime() -
 );
 
 const locationEditable =
-match.status === "confirmed" &&
-new Date() < sixHoursBefore;
+match.status ===
+"confirmed" &&
+new Date() <
+sixHoursBefore;
 
 let actions = "";
 
@@ -1414,6 +1554,7 @@ actions +=
 
 }
 
+
 const localDate =
 `${scheduled.getFullYear()}-${String(
 scheduled.getMonth()+1
@@ -1428,13 +1569,19 @@ scheduled.getHours()
 scheduled.getMinutes()
 ).padStart(2,"0")}`;
 
+
 let edit = "";
 
-if(isProposer && match.status === "open"){
+if(
+isProposer &&
+match.status === "open"
+){
 
 edit = `
 
-<div id="edit-${match.id}" class="edit-box hidden">
+<div
+id="edit-${match.id}"
+class="edit-box hidden">
 
 <h3>Edit Match</h3>
 
@@ -1442,6 +1589,7 @@ edit = `
 
 <div>
 <label>Date</label>
+
 <input
 id="edit-date-${match.id}"
 type="date"
@@ -1450,6 +1598,7 @@ value="${localDate}">
 
 <div>
 <label>Time</label>
+
 <input
 id="edit-time-${match.id}"
 type="time"
@@ -1468,12 +1617,14 @@ value="${escapeHtml(match.location)}">
 
 <select id="edit-type-${match.id}">
 
-<option value="social"
+<option
+value="social"
 ${match.match_type === "social" ? "selected" : ""}>
 Social
 </option>
 
-<option value="focused"
+<option
+value="focused"
 ${match.match_type === "focused" ? "selected" : ""}>
 Focused
 </option>
@@ -1490,18 +1641,26 @@ onclick="updateMatch(
 Save Changes
 </button>
 
-<p id="edit-message-${match.id}" class="muted"></p>
+<p
+id="edit-message-${match.id}"
+class="muted">
+</p>
 
 </div>
 
 `;
 
 }
-else if(isProposer && locationEditable){
+else if(
+isProposer &&
+locationEditable
+){
 
 edit = `
 
-<div id="edit-${match.id}" class="edit-box hidden">
+<div
+id="edit-${match.id}"
+class="edit-box hidden">
 
 <h3>Update Location</h3>
 
@@ -1525,7 +1684,10 @@ onclick="updateMatch(
 Save Location
 </button>
 
-<p id="edit-message-${match.id}" class="muted"></p>
+<p
+id="edit-message-${match.id}"
+class="muted">
+</p>
 
 </div>
 
@@ -1533,11 +1695,14 @@ Save Location
 
 }
 
+
 const cancel =
 isProposer
 ? `
 
-<div id="cancel-${match.id}" class="edit-box hidden">
+<div
+id="cancel-${match.id}"
+class="edit-box hidden">
 
 <h3>Cancel Match</h3>
 
@@ -1553,25 +1718,38 @@ onclick="cancelMatch('${match.id}')">
 Confirm Cancellation
 </button>
 
-<p id="cancel-message-${match.id}" class="muted"></p>
+<p
+id="cancel-message-${match.id}"
+class="muted">
+</p>
 
 </div>
 
 `
 : "";
 
+
 return `
 
 <div class="card">
 
 <div>
-<span class="pill">${count} / 4</span>
+
+<span class="pill">
+${count} / 4
+</span>
+
 &nbsp;
-<span class="pill">${typeLabel}</span>
+
+<span class="pill">
+${typeLabel}
+</span>
+
 </div>
 
 <h2>
-${escapeHtml(dateText)} ·
+${escapeHtml(dateText)}
+·
 ${escapeHtml(timeText)}
 </h2>
 
@@ -1580,6 +1758,7 @@ ${escapeHtml(timeText)}
 </p>
 
 <p class="muted">
+
 Proposed by
 <b>
 ${escapeHtml(
@@ -1587,6 +1766,7 @@ proposer?.nickname ||
 "Player"
 )}
 </b>
+
 </p>
 
 <div class="players">
@@ -1616,8 +1796,1348 @@ ${cancel}
 }
 
 
-/* ---------- SCORE ENTRY ---------- */
+async function loadHomeMatches(){
 
+const confirmedBox =
+document.getElementById(
+"next-confirmed-home"
+);
+
+const openBox =
+document.getElementById(
+"next-open-home"
+);
+
+if(!currentUser){
+
+confirmedBox.innerHTML =
+'<p class="muted">Sign in to view your matches.</p>';
+
+openBox.innerHTML =
+'<p class="muted">Sign in to view open tables.</p>';
+
+return;
+
+}
+
+await getActiveScramble();
+
+if(!currentScramble){
+
+confirmedBox.innerHTML =
+'<p class="muted">No active Scramble.</p>';
+
+openBox.innerHTML =
+'<p class="muted">No active Scramble.</p>';
+
+return;
+
+}
+
+const {data,error} =
+await supabaseClient
+.from("matches")
+.select(
+"id,scheduled_at,location,status,match_type"
+)
+.eq(
+"scramble_id",
+currentScramble.id
+)
+.in(
+"status",
+["open","confirmed"]
+)
+.order(
+"scheduled_at",
+{ascending:true}
+);
+
+if(error){
+
+confirmedBox.innerHTML =
+'<p class="muted">Unable to load matches.</p>';
+
+openBox.innerHTML =
+'<p class="muted">Unable to load matches.</p>';
+
+return;
+
+}
+
+const upcoming =
+(data || [])
+.filter(match =>
+new Date(match.scheduled_at) >=
+new Date()
+);
+
+const confirmed =
+upcoming.find(match =>
+match.status === "confirmed"
+);
+
+const openMatch =
+upcoming.find(match =>
+match.status === "open"
+);
+
+confirmedBox.innerHTML =
+confirmed
+? homeMatchHtml(
+confirmed,
+"Confirmed"
+)
+: '<p class="muted">No confirmed upcoming match yet.</p>';
+
+openBox.innerHTML =
+openMatch
+? homeMatchHtml(
+openMatch,
+"View Match",
+true
+)
+: '<p class="muted">No open tables right now.</p>';
+
+}
+
+
+function homeMatchHtml(
+match,
+label,
+button=false
+){
+
+const date =
+new Date(
+match.scheduled_at
+);
+
+return `
+
+<h2>
+
+${escapeHtml(
+date.toLocaleDateString()
+)}
+
+·
+
+${escapeHtml(
+date.toLocaleTimeString(
+undefined,
+{
+hour:"numeric",
+minute:"2-digit"
+}
+)
+)}
+
+</h2>
+
+<p>
+📍 ${escapeHtml(match.location)}
+</p>
+
+${
+button
+? '<button class="btn" onclick="show(\'matches\')">View Match</button>'
+: `<span class="pill">${label}</span>`
+}
+
+`;
+
+}
+
+
+async function loadLeaderboard(){
+
+const board =
+document.getElementById(
+"board"
+);
+
+if(!currentUser){
+
+board.innerHTML =
+'<p class="muted">Sign in to view the leaderboard.</p>';
+
+updateMyStanding([],null);
+
+return;
+
+}
+
+board.innerHTML =
+'<p class="muted">Loading leaderboard...</p>';
+
+const [
+playersResult,
+scoresResult,
+gamesResult,
+matchesResult,
+matchPlayersResult
+] = await Promise.all([
+
+supabaseClient
+.from("players")
+.select(
+"id,nickname,full_name"
+),
+
+supabaseClient
+.from("scores")
+.select(
+"player_id,game_id,points"
+),
+
+supabaseClient
+.from("games")
+.select(
+"id,match_id"
+),
+
+supabaseClient
+.from("matches")
+.select(
+"id,proposer_id,status,completed_at"
+),
+
+supabaseClient
+.from("match_players")
+.select(
+"match_id,player_id"
+)
+
+]);
+
+const error =
+playersResult.error ||
+scoresResult.error ||
+gamesResult.error ||
+matchesResult.error ||
+matchPlayersResult.error;
+
+if(error){
+
+board.innerHTML =
+'<p class="muted">Unable to load leaderboard.</p>';
+
+return;
+
+}
+
+const completed =
+(matchesResult.data || [])
+.filter(match =>
+match.status === "completed" ||
+!!match.completed_at
+);
+
+const completedIds =
+new Set(
+completed.map(match =>
+match.id
+)
+);
+
+const gameToMatch =
+new Map(
+(gamesResult.data || [])
+.map(game => [
+game.id,
+game.match_id
+])
+);
+
+const leaderboard =
+new Map();
+
+for(
+const player of
+playersResult.data || []
+){
+
+leaderboard.set(
+player.id,
+{
+id:player.id,
+nickname:
+player.nickname ||
+"Player",
+total_points:0,
+matches:new Set()
+}
+);
+
+}
+
+
+for(
+const membership of
+matchPlayersResult.data || []
+){
+
+if(
+!completedIds.has(
+membership.match_id
+)
+){
+continue;
+}
+
+const player =
+leaderboard.get(
+membership.player_id
+);
+
+if(player){
+
+player.matches.add(
+membership.match_id
+);
+
+}
+
+}
+
+
+for(
+const score of
+scoresResult.data || []
+){
+
+const player =
+leaderboard.get(
+score.player_id
+);
+
+const matchId =
+gameToMatch.get(
+score.game_id
+);
+
+if(
+!player ||
+!matchId ||
+!completedIds.has(
+matchId
+)
+){
+continue;
+}
+
+player.total_points +=
+Number(
+score.points || 0
+);
+
+}
+
+
+for(
+const match of
+completed
+){
+
+const proposer =
+leaderboard.get(
+match.proposer_id
+);
+
+if(proposer){
+
+proposer.total_points +=
+5;
+
+}
+
+}
+
+
+const rows =
+Array.from(
+leaderboard.values()
+)
+.map(player => ({
+
+...player,
+
+matches_played:
+player.matches.size,
+
+average:
+player.matches.size
+? player.total_points /
+player.matches.size
+: 0
+
+}))
+.filter(player =>
+player.matches_played > 0
+)
+.sort((a,b) => {
+
+if(
+b.total_points !==
+a.total_points
+){
+
+return (
+b.total_points -
+a.total_points
+);
+
+}
+
+return (
+b.average -
+a.average
+);
+
+});
+
+
+if(!rows.length){
+
+board.innerHTML =
+'<p class="muted">No completed matches yet.</p>';
+
+updateMyStanding(
+[],
+currentUser
+);
+
+return;
+
+}
+
+
+board.innerHTML =
+rows.map(
+(player,index) => `
+
+<div class="leader">
+
+<div class="rank">
+${index+1}
+</div>
+
+<div>
+
+<div class="nick">
+${escapeHtml(player.nickname)}
+</div>
+
+<div class="muted">
+
+${player.matches_played}
+
+${player.matches_played === 1
+? "match"
+: "matches"}
+
+</div>
+
+</div>
+
+<div class="score">
+${player.total_points} pts
+</div>
+
+<div class="avg">
+${player.average.toFixed(1)} avg
+</div>
+
+</div>
+
+`
+).join("");
+
+updateMyStanding(
+rows,
+currentUser
+);
+
+}
+
+
+function updateMyStanding(
+rows,
+user
+){
+
+const rank =
+document.getElementById(
+"my-rank"
+);
+
+const nickname =
+document.getElementById(
+"my-nickname"
+);
+
+const stats =
+document.getElementById(
+"my-stats"
+);
+
+if(!user){
+
+rank.textContent =
+"—";
+
+nickname.textContent =
+"Sign in to view";
+
+stats.textContent =
+"";
+
+return;
+
+}
+
+const index =
+rows.findIndex(row =>
+row.id === user.id
+);
+
+if(index < 0){
+
+rank.textContent =
+"—";
+
+nickname.textContent =
+"No completed matches yet";
+
+stats.textContent =
+"";
+
+return;
+
+}
+
+const player =
+rows[index];
+
+rank.textContent =
+`#${index+1}`;
+
+nickname.textContent =
+player.nickname;
+
+stats.textContent =
+`${player.total_points} points · ${player.average.toFixed(1)} average`;
+
+}
+
+
+/* ACTIVE ROSTER ONLY */
+
+async function roster(){
+
+const list =
+document.getElementById(
+"rosterlist"
+);
+
+if(!currentUser){
+
+list.innerHTML =
+'<p class="muted">Sign in to view the roster.</p>';
+
+return;
+
+}
+
+await getActiveScramble();
+
+if(!currentScramble){
+
+list.innerHTML =
+'<p class="muted">No active Scramble.</p>';
+
+return;
+
+}
+
+const [
+membershipResult,
+playersResult
+] = await Promise.all([
+
+supabaseClient
+.from("scramble_players")
+.select(
+"player_id,active"
+)
+.eq(
+"scramble_id",
+currentScramble.id
+)
+.eq(
+"active",
+true
+),
+
+supabaseClient
+.from("players")
+.select(
+"id,nickname,full_name,phone"
+)
+
+]);
+
+if(
+membershipResult.error ||
+playersResult.error
+){
+
+list.innerHTML =
+'<p class="muted">Unable to load roster.</p>';
+
+return;
+
+}
+
+const activeIds =
+new Set(
+(membershipResult.data || [])
+.map(row =>
+row.player_id
+)
+);
+
+const activePlayers =
+(playersResult.data || [])
+.filter(player =>
+activeIds.has(
+player.id
+)
+)
+.sort((a,b) =>
+(a.nickname || "")
+.localeCompare(
+b.nickname || ""
+)
+);
+
+if(!activePlayers.length){
+
+list.innerHTML =
+'<p class="muted">No active players.</p>';
+
+return;
+
+}
+
+list.innerHTML =
+activePlayers
+.map(player => `
+
+<div class="leader">
+
+<div></div>
+
+<div>
+
+<div class="nick">
+${escapeHtml(
+player.nickname ||
+"Player"
+)}
+</div>
+
+<div class="muted">
+${escapeHtml(
+player.full_name ||
+""
+)}
+</div>
+
+</div>
+
+<div>
+${escapeHtml(
+player.phone ||
+""
+)}
+</div>
+
+<span class="pill">
+Active
+</span>
+
+</div>
+
+`)
+.join("");
+
+}
+
+
+/* ADMIN */
+
+async function loadAdminDashboard(){
+
+if(
+!currentUser ||
+currentPlayerProfile?.role !==
+"admin"
+){
+
+document
+.getElementById(
+"admin-player-list"
+).innerHTML =
+'<p class="error">Admin access required.</p>';
+
+return;
+
+}
+
+await getActiveScramble();
+
+await Promise.all([
+loadAdminPlayers(),
+loadAdminScores()
+]);
+
+}
+
+
+async function loadAdminPlayers(){
+
+const list =
+document.getElementById(
+"admin-player-list"
+);
+
+list.innerHTML =
+'<p class="muted">Loading players...</p>';
+
+if(!currentScramble){
+
+list.innerHTML =
+'<p class="error">No active Scramble found.</p>';
+
+return;
+
+}
+
+const [
+playersResult,
+paymentsResult,
+membershipResult
+] = await Promise.all([
+
+supabaseClient
+.from("players")
+.select(
+"id,full_name,nickname,phone,role,created_at"
+)
+.order(
+"created_at",
+{ascending:true}
+),
+
+supabaseClient
+.from("payment_status")
+.select(
+"player_id,status,confirmed_at"
+)
+.eq(
+"scramble_id",
+currentScramble.id
+),
+
+supabaseClient
+.from("scramble_players")
+.select(
+"player_id,active"
+)
+.eq(
+"scramble_id",
+currentScramble.id
+)
+
+]);
+
+const error =
+playersResult.error ||
+paymentsResult.error ||
+membershipResult.error;
+
+if(error){
+
+list.innerHTML =
+'<p class="error">Unable to load player management.</p>';
+
+return;
+
+}
+
+const payments =
+new Map(
+(paymentsResult.data || [])
+.map(row => [
+row.player_id,
+row
+])
+);
+
+const memberships =
+new Map(
+(membershipResult.data || [])
+.map(row => [
+row.player_id,
+row
+])
+);
+
+const players =
+playersResult.data || [];
+
+list.innerHTML =
+players.map(player => {
+
+const payment =
+payments.get(
+player.id
+);
+
+const membership =
+memberships.get(
+player.id
+);
+
+const isPaid =
+payment?.status ===
+"paid";
+
+const isActive =
+membership?.active ===
+true;
+
+const isCurrentAdmin =
+player.id ===
+currentUser.id;
+
+
+const statusPills = `
+
+<span class="pill ${
+isActive ? "" : "inactive"
+}">
+${isActive ? "Active" : "Hidden"}
+</span>
+
+&nbsp;
+
+<span class="pill ${
+isPaid ? "" : "pending"
+}">
+${isPaid ? "Paid" : "Pending"}
+</span>
+
+`;
+
+
+let actions = `
+
+<button
+class="btn secondary"
+onclick="togglePlayerEdit('${player.id}')">
+
+Edit Profile
+
+</button>
+
+`;
+
+
+if(!isPaid){
+
+actions += `
+
+<button
+class="btn"
+onclick="adminConfirmPayment('${player.id}')">
+
+Confirm Payment
+
+</button>
+
+`;
+
+}
+
+
+if(!isCurrentAdmin){
+
+if(isActive){
+
+actions += `
+
+<button
+class="btn alt"
+onclick="adminSetPlayerActive(
+'${player.id}',
+false
+)">
+
+Hide from Roster
+
+</button>
+
+`;
+
+}
+else{
+
+actions += `
+
+<button
+class="btn alt"
+onclick="adminSetPlayerActive(
+'${player.id}',
+true
+)">
+
+Reactivate
+
+</button>
+
+`;
+
+}
+
+
+actions += `
+
+<button
+class="btn danger"
+onclick="adminDeletePlayer(
+'${player.id}',
+'${escapeHtml(
+player.nickname ||
+player.full_name ||
+"Player"
+)}'
+)">
+
+Delete Player
+
+</button>
+
+`;
+
+}
+
+
+const editForm = `
+
+<div
+id="player-edit-${player.id}"
+class="edit-box hidden">
+
+<h3>Edit Player Profile</h3>
+
+<label>
+Full Name
+</label>
+
+<input
+id="admin-name-${player.id}"
+value="${escapeHtml(
+player.full_name ||
+""
+)}">
+
+<label>
+Mahjong Nickname
+</label>
+
+<input
+id="admin-nickname-${player.id}"
+value="${escapeHtml(
+player.nickname ||
+""
+)}">
+
+<label>
+Phone
+</label>
+
+<input
+id="admin-phone-${player.id}"
+value="${escapeHtml(
+player.phone ||
+""
+)}">
+
+<button
+class="btn"
+onclick="adminSavePlayerProfile(
+'${player.id}'
+)">
+
+Save Profile
+
+</button>
+
+<button
+class="btn secondary"
+onclick="togglePlayerEdit('${player.id}')">
+
+Cancel
+
+</button>
+
+<p
+id="admin-edit-message-${player.id}"
+class="muted">
+</p>
+
+</div>
+
+`;
+
+
+return `
+
+<div>
+
+<div class="admin-player">
+
+<div>
+
+<div class="nick">
+${escapeHtml(
+player.nickname ||
+"Player"
+)}
+</div>
+
+<div class="muted">
+${escapeHtml(
+player.full_name ||
+""
+)}
+${
+player.phone
+? ` · ${escapeHtml(player.phone)}`
+: ""
+}
+</div>
+
+<div style="margin-top:6px">
+${statusPills}
+</div>
+
+</div>
+
+<div class="admin-actions">
+${actions}
+</div>
+
+</div>
+
+${editForm}
+
+</div>
+
+`;
+
+}).join("");
+
+}
+
+
+function togglePlayerEdit(
+playerId
+){
+
+document
+.getElementById(
+`player-edit-${playerId}`
+)
+.classList.toggle(
+"hidden"
+);
+
+}
+
+
+async function adminSavePlayerProfile(
+playerId
+){
+
+const fullName =
+document
+.getElementById(
+`admin-name-${playerId}`
+)
+.value.trim();
+
+const nickname =
+document
+.getElementById(
+`admin-nickname-${playerId}`
+)
+.value.trim();
+
+const phone =
+document
+.getElementById(
+`admin-phone-${playerId}`
+)
+.value.trim();
+
+const message =
+document
+.getElementById(
+`admin-edit-message-${playerId}`
+);
+
+
+if(!fullName || !nickname){
+
+message.textContent =
+"Full name and nickname are required.";
+
+message.className =
+"error";
+
+return;
+
+}
+
+
+const {error} =
+await supabaseClient
+.rpc(
+"admin_update_player_profile",
+{
+
+p_player_id:
+playerId,
+
+p_full_name:
+fullName,
+
+p_nickname:
+nickname,
+
+p_phone:
+phone
+
+}
+);
+
+
+if(error){
+
+console.error(
+"Could not update player:",
+error
+);
+
+message.textContent =
+"Could not update player: " +
+error.message;
+
+message.className =
+"error";
+
+return;
+
+}
+
+
+message.textContent =
+"Profile updated.";
+
+message.className =
+"success";
+
+
+if(
+playerId ===
+currentUser.id
+){
+
+await showLoggedInPlayer(
+currentUser
+);
+
+}
+
+
+await loadAdminPlayers();
+
+}
+
+
+async function adminSetPlayerActive(
+playerId,
+active
+){
+
+const wording =
+active
+? "Reactivate this player and show them in the roster?"
+: "Hide this player from the current roster? Their historical results will remain unchanged.";
+
+
+if(!confirm(wording)){
+return;
+}
+
+
+const {error} =
+await supabaseClient
+.rpc(
+"admin_set_player_active",
+{
+
+p_player_id:
+playerId,
+
+p_active:
+active
+
+}
+);
+
+
+if(error){
+
+alert(
+"Could not update player status: " +
+error.message
+);
+
+return;
+
+}
+
+
+await loadAdminPlayers();
+
+
+if(
+document.getElementById(
+"roster"
+) &&
+!document.getElementById(
+"roster"
+).classList.contains(
+"hidden"
+)
+){
+
+await roster();
+
+}
+
+}
+
+
+async function adminConfirmPayment(
+playerId
+){
+
+if(
+!confirm(
+"Confirm this player's payment and activate them for the current Scramble?"
+)
+){
+return;
+}
+
+const {error} =
+await supabaseClient
+.rpc(
+"admin_confirm_player_payment",
+{
+p_player_id:
+playerId
+}
+);
+
+if(error){
+
+alert(
+"Could not confirm payment: " +
+error.message
+);
+
+return;
+
+}
+
+await loadAdminPlayers();
+
+alert(
+"Payment confirmed. The player is active."
+);
+
+}
+
+
+async function adminDeletePlayer(
+playerId,
+nickname
+){
+
+if(
+!confirm(
+`Delete ${nickname}? This is intended for unused or test accounts.`
+)
+){
+return;
+}
+
+if(
+!confirm(
+"This action cannot be undone. Continue?"
+)
+){
+return;
+}
+
+const {error} =
+await supabaseClient
+.rpc(
+"admin_delete_player",
+{
+p_player_id:
+playerId
+}
+);
+
+if(error){
+
+alert(
+"Could not delete player: " +
+error.message
+);
+
+return;
+
+}
+
+await loadAdminPlayers();
+
+alert(
+"Player deleted."
+);
+
+}
+
+
+/* SCORE ENTRY */
 
 async function loadAdminScores(){
 
@@ -1629,13 +3149,11 @@ document.getElementById(
 if(!currentUser){
 
 list.innerHTML =
-'<div class="card"><p class="muted">Sign in first.</p></div>';
+'<p class="muted">Sign in first.</p>';
 
 return;
-}
 
-list.innerHTML =
-'<div class="card"><p class="muted">Loading confirmed matches...</p></div>';
+}
 
 const {data:matches,error} =
 await supabaseClient
@@ -1643,24 +3161,35 @@ await supabaseClient
 .select(
 "id,scheduled_at,location,match_type,status"
 )
-.eq("proposer_id",currentUser.id)
-.eq("status","confirmed")
-.order("scheduled_at",{ascending:true});
+.eq(
+"proposer_id",
+currentUser.id
+)
+.eq(
+"status",
+"confirmed"
+)
+.order(
+"scheduled_at",
+{ascending:true}
+);
 
 if(error){
 
 list.innerHTML =
-'<div class="card"><p class="error">Could not load confirmed matches.</p></div>';
+'<p class="error">Could not load confirmed matches.</p>';
 
 return;
+
 }
 
 if(!matches || !matches.length){
 
 list.innerHTML =
-'<div class="card"><p class="muted">No confirmed matches are waiting for scores.</p></div>';
+'<p class="muted">No confirmed matches are waiting for scores.</p>';
 
 return;
+
 }
 
 const ids =
@@ -1675,22 +3204,21 @@ playersResult
 
 supabaseClient
 .from("match_players")
-.select("match_id,player_id,joined_at")
-.in("match_id",ids),
+.select(
+"match_id,player_id,joined_at"
+)
+.in(
+"match_id",
+ids
+),
 
 supabaseClient
 .from("players")
-.select("id,nickname,full_name")
+.select(
+"id,nickname,full_name"
+)
 
 ]);
-
-if(seatsResult.error || playersResult.error){
-
-list.innerHTML =
-'<div class="card"><p class="error">Could not load match players.</p></div>';
-
-return;
-}
 
 const seats =
 seatsResult.data || [];
@@ -1717,7 +3245,9 @@ new Date(a.joined_at) -
 new Date(b.joined_at)
 );
 
-if(matchPlayers.length !== 4){
+if(
+matchPlayers.length !== 4
+){
 
 return `
 
@@ -1728,7 +3258,7 @@ ${escapeHtml(match.location)}
 </h2>
 
 <p class="error">
-This confirmed match does not currently have exactly four players.
+This confirmed match does not have exactly four players.
 </p>
 
 </div>
@@ -1740,7 +3270,8 @@ This confirmed match does not currently have exactly four players.
 const players =
 matchPlayers.map(seat => ({
 
-id:seat.player_id,
+id:
+seat.player_id,
 
 nickname:
 playerMap.get(
@@ -1764,10 +3295,13 @@ Confirmed Match
 </div>
 
 <h2>
+
 ${escapeHtml(
 scheduled.toLocaleDateString()
 )}
+
 ·
+
 ${escapeHtml(
 scheduled.toLocaleTimeString(
 undefined,
@@ -1777,6 +3311,7 @@ minute:"2-digit"
 }
 )
 )}
+
 </h2>
 
 <p>
@@ -1784,16 +3319,20 @@ minute:"2-digit"
 </p>
 
 <div class="players">
-${players.map(player =>
+${players
+.map(player =>
 escapeHtml(player.nickname)
-).join(" · ")}
+)
+.join(" · ")}
 </div>
 
 <div class="notice">
 Enter all four games before submitting. Each player is East once.
 </div>
 
-${players.map((eastPlayer,index) => {
+
+${players.map(
+(eastPlayer,index) => {
 
 const gameNumber =
 index + 1;
@@ -1806,10 +3345,14 @@ return `
 Game ${gameNumber}
 ·
 East:
-${escapeHtml(eastPlayer.nickname)}
+${escapeHtml(
+eastPlayer.nickname
+)}
 </h3>
 
-<label>Result</label>
+<label>
+Result
+</label>
 
 <select
 id="result-${match.id}-${gameNumber}"
@@ -1836,6 +3379,7 @@ Wall Game
 
 </select>
 
+
 <div
 id="winner-options-${match.id}-${gameNumber}">
 
@@ -1848,6 +3392,7 @@ id="base-${match.id}-${gameNumber}"
 type="number"
 min="1"
 placeholder="e.g. 25">
+
 
 <div class="checkrow">
 
@@ -1875,6 +3420,7 @@ Jokerless +20
 
 }).join("")}
 
+
 <button
 id="submit-results-${match.id}"
 class="btn alt"
@@ -1882,7 +3428,9 @@ onclick='submitMatchResults(
 "${match.id}",
 ${JSON.stringify(players)}
 )'>
+
 Submit Match Results
+
 </button>
 
 <p
@@ -1969,6 +3517,7 @@ message.className =
 "error";
 
 return;
+
 }
 
 const eastPlayer =
@@ -2026,6 +3575,7 @@ message.className =
 "error";
 
 return;
+
 }
 
 games.push({
@@ -2062,13 +3612,11 @@ document.getElementById(
 
 if(
 !confirm(
-"Submit these four games? Once submitted, the match will be marked completed."
+"Submit these four games? The match will be marked completed."
 )
 ){
-
 return;
 }
-
 
 button.disabled =
 true;
@@ -2076,13 +3624,8 @@ true;
 message.textContent =
 "Submitting match results...";
 
-message.className =
-"muted";
-
-
-const {
-error
-} = await supabaseClient
+const {error} =
+await supabaseClient
 .rpc(
 "complete_dragon_match",
 {
@@ -2096,28 +3639,21 @@ games
 }
 );
 
-
 button.disabled =
 false;
 
-
 if(error){
 
-console.error(
-"Could not complete match:",
-error
-);
-
 message.textContent =
-"Could not submit match results: " +
+"Could not submit results: " +
 error.message;
 
 message.className =
 "error";
 
 return;
-}
 
+}
 
 message.textContent =
 "Match completed successfully.";
@@ -2125,634 +3661,14 @@ message.textContent =
 message.className =
 "success";
 
-
 await loadAdminScores();
-
 await loadLeaderboard();
-
 await loadHomeMatches();
 
 }
 
 
-/* ---------- HOME MATCHES ---------- */
-
-
-async function loadHomeMatches(){
-
-const confirmedBox =
-document.getElementById(
-"next-confirmed-home"
-);
-
-const openBox =
-document.getElementById(
-"next-open-home"
-);
-
-if(!currentUser){
-
-confirmedBox.innerHTML =
-'<p class="muted">Sign in to view your matches.</p>';
-
-openBox.innerHTML =
-'<p class="muted">Sign in to view open tables.</p>';
-
-return;
-}
-
-await getActiveScramble();
-
-if(!currentScramble){
-
-confirmedBox.innerHTML =
-'<p class="muted">No active Scramble.</p>';
-
-openBox.innerHTML =
-'<p class="muted">No active Scramble.</p>';
-
-return;
-}
-
-const {data,error} =
-await supabaseClient
-.from("matches")
-.select(
-"id,scheduled_at,location,status,match_type"
-)
-.eq("scramble_id",currentScramble.id)
-.in("status",["open","confirmed"])
-.order("scheduled_at",{ascending:true});
-
-if(error){
-
-confirmedBox.innerHTML =
-'<p class="muted">Unable to load matches.</p>';
-
-openBox.innerHTML =
-'<p class="muted">Unable to load matches.</p>';
-
-return;
-}
-
-const upcoming =
-(data || [])
-.filter(match =>
-new Date(match.scheduled_at) >=
-new Date()
-);
-
-const confirmed =
-upcoming.find(match =>
-match.status ===
-"confirmed"
-);
-
-const openMatch =
-upcoming.find(match =>
-match.status ===
-"open"
-);
-
-confirmedBox.innerHTML =
-confirmed
-? homeMatchHtml(
-confirmed,
-"Confirmed"
-)
-: '<p class="muted">No confirmed upcoming match yet.</p>';
-
-openBox.innerHTML =
-openMatch
-? homeMatchHtml(
-openMatch,
-"View Match",
-true
-)
-: '<p class="muted">No open tables right now.</p>';
-
-}
-
-
-function homeMatchHtml(
-match,
-label,
-button=false
-){
-
-const date =
-new Date(
-match.scheduled_at
-);
-
-return `
-
-<h2>
-
-${escapeHtml(
-date.toLocaleDateString()
-)}
-
-·
-
-${escapeHtml(
-date.toLocaleTimeString(
-undefined,
-{
-hour:"numeric",
-minute:"2-digit"
-}
-)
-)}
-
-</h2>
-
-<p>
-📍 ${escapeHtml(match.location)}
-</p>
-
-${
-button
-? '<button class="btn" onclick="show(\'matches\')">View Match</button>'
-: `<span class="pill">${label}</span>`
-}
-
-`;
-
-}
-
-
-/* ---------- LEADERBOARD ---------- */
-
-
-async function loadLeaderboard(){
-
-const board =
-document.getElementById(
-"board"
-);
-
-if(!currentUser){
-
-board.innerHTML =
-'<p class="muted">Sign in to view the leaderboard.</p>';
-
-updateMyStanding(
-[],
-null
-);
-
-return;
-}
-
-board.innerHTML =
-'<p class="muted">Loading leaderboard...</p>';
-
-const [
-playersResult,
-scoresResult,
-gamesResult,
-matchesResult,
-matchPlayersResult
-] = await Promise.all([
-
-supabaseClient
-.from("players")
-.select(
-"id,nickname,full_name"
-),
-
-supabaseClient
-.from("scores")
-.select(
-"player_id,game_id,points"
-),
-
-supabaseClient
-.from("games")
-.select(
-"id,match_id"
-),
-
-supabaseClient
-.from("matches")
-.select(
-"id,proposer_id,status,completed_at"
-),
-
-supabaseClient
-.from("match_players")
-.select(
-"match_id,player_id"
-)
-
-]);
-
-const error =
-playersResult.error ||
-scoresResult.error ||
-gamesResult.error ||
-matchesResult.error ||
-matchPlayersResult.error;
-
-if(error){
-
-console.error(
-"Could not load leaderboard:",
-error
-);
-
-board.innerHTML =
-'<p class="muted">Unable to load leaderboard.</p>';
-
-return;
-}
-
-const completed =
-(matchesResult.data || [])
-.filter(match =>
-match.status === "completed" ||
-!!match.completed_at
-);
-
-const completedIds =
-new Set(
-completed.map(match =>
-match.id
-)
-);
-
-const gameToMatch =
-new Map(
-(gamesResult.data || [])
-.map(game => [
-game.id,
-game.match_id
-])
-);
-
-const leaderboard =
-new Map();
-
-for(
-const player of
-playersResult.data || []
-){
-
-leaderboard.set(
-player.id,
-{
-id:player.id,
-nickname:
-player.nickname ||
-"Player",
-total_points:0,
-matches:new Set()
-}
-);
-
-}
-
-
-/* Count every completed match for every participant */
-
-for(
-const membership of
-matchPlayersResult.data || []
-){
-
-if(
-!completedIds.has(
-membership.match_id
-)
-){
-continue;
-}
-
-const player =
-leaderboard.get(
-membership.player_id
-);
-
-if(player){
-
-player.matches.add(
-membership.match_id
-);
-
-}
-
-}
-
-
-/* Add actual score rows */
-
-for(
-const score of
-scoresResult.data || []
-){
-
-const player =
-leaderboard.get(
-score.player_id
-);
-
-const matchId =
-gameToMatch.get(
-score.game_id
-);
-
-if(
-!player ||
-!matchId ||
-!completedIds.has(
-matchId
-)
-){
-continue;
-}
-
-player.total_points +=
-Number(
-score.points || 0
-);
-
-}
-
-
-/* Proposer +5 */
-
-for(
-const match of
-completed
-){
-
-const proposer =
-leaderboard.get(
-match.proposer_id
-);
-
-if(proposer){
-
-proposer.total_points +=
-5;
-
-}
-
-}
-
-
-const rows =
-Array.from(
-leaderboard.values()
-)
-.map(player => ({
-
-...player,
-
-matches_played:
-player.matches.size,
-
-average:
-player.matches.size
-? player.total_points /
-player.matches.size
-: 0
-
-}))
-.filter(player =>
-player.matches_played > 0
-)
-.sort((a,b) => {
-
-if(
-b.total_points !==
-a.total_points
-){
-
-return (
-b.total_points -
-a.total_points
-);
-
-}
-
-return (
-b.average -
-a.average
-);
-
-});
-
-
-if(!rows.length){
-
-board.innerHTML =
-'<p class="muted">No completed matches yet.</p>';
-
-updateMyStanding(
-[],
-currentUser
-);
-
-return;
-}
-
-
-board.innerHTML =
-rows.map(
-(player,index) => `
-
-<div class="leader">
-
-<div class="rank">
-${index+1}
-</div>
-
-<div>
-
-<div class="nick">
-${escapeHtml(player.nickname)}
-</div>
-
-<div class="muted">
-
-${player.matches_played}
-
-${player.matches_played === 1
-? "match"
-: "matches"}
-
-</div>
-
-</div>
-
-<div class="score">
-${player.total_points} pts
-</div>
-
-<div class="avg">
-${player.average.toFixed(1)} avg
-</div>
-
-</div>
-
-`
-).join("");
-
-
-updateMyStanding(
-rows,
-currentUser
-);
-
-}
-
-
-function updateMyStanding(
-rows,
-user
-){
-
-const rank =
-document.getElementById(
-"my-rank"
-);
-
-const nickname =
-document.getElementById(
-"my-nickname"
-);
-
-const stats =
-document.getElementById(
-"my-stats"
-);
-
-if(!user){
-
-rank.textContent =
-"—";
-
-nickname.textContent =
-"Sign in to view";
-
-stats.textContent =
-"";
-
-return;
-}
-
-const index =
-rows.findIndex(row =>
-row.id ===
-user.id
-);
-
-if(index < 0){
-
-rank.textContent =
-"—";
-
-nickname.textContent =
-"No completed matches yet";
-
-stats.textContent =
-"";
-
-return;
-}
-
-const player =
-rows[index];
-
-rank.textContent =
-`#${index+1}`;
-
-nickname.textContent =
-player.nickname;
-
-stats.textContent =
-`${player.total_points} points · ${player.average.toFixed(1)} average`;
-
-}
-
-
-/* ---------- ROSTER ---------- */
-
-
-async function roster(){
-
-const list =
-document.getElementById(
-"rosterlist"
-);
-
-if(!currentUser){
-
-list.innerHTML =
-'<p class="muted">Sign in to view the roster.</p>';
-
-return;
-}
-
-const {data,error} =
-await supabaseClient
-.from("players")
-.select(
-"nickname,full_name,phone"
-)
-.order(
-"nickname",
-{ascending:true}
-);
-
-if(error){
-
-list.innerHTML =
-'<p class="muted">Unable to load roster.</p>';
-
-return;
-}
-
-list.innerHTML =
-(data || [])
-.map(player => `
-
-<div class="leader">
-
-<div></div>
-
-<div>
-
-<div class="nick">
-${escapeHtml(player.nickname)}
-</div>
-
-<div class="muted">
-${escapeHtml(player.full_name)}
-</div>
-
-</div>
-
-<div>
-${escapeHtml(player.phone)}
-</div>
-
-<span class="pill">
-Player
-</span>
-
-</div>
-
-`)
-.join("");
-
-}
-
-
-/* ---------- AUTH ---------- */
-
+/* AUTH */
 
 async function signUpPlayer(){
 
@@ -2786,20 +3702,41 @@ document.getElementById(
 "signup-message"
 );
 
+if(
+!full_name ||
+!nickname ||
+!phone ||
+!email ||
+!password
+){
+
+message.textContent =
+"Please complete all fields.";
+
+return;
+
+}
+
 const {error} =
 await supabaseClient
 .auth
 .signUp({
 
 email:email,
+
 password:password,
 
 options:{
 
 data:{
-full_name:full_name,
-nickname:nickname,
-phone:phone
+full_name:
+full_name,
+
+nickname:
+nickname,
+
+phone:
+phone
 },
 
 emailRedirectTo:
@@ -2852,6 +3789,7 @@ message.textContent =
 error.message;
 
 return;
+
 }
 
 message.textContent =
@@ -2867,11 +3805,8 @@ data.user
 );
 
 await getActiveScramble();
-
 await checkEligibility();
-
 await loadLeaderboard();
-
 await loadHomeMatches();
 
 }
@@ -2887,7 +3822,7 @@ const {data:player,error} =
 await supabaseClient
 .from("players")
 .select(
-"full_name,nickname"
+"full_name,nickname,role"
 )
 .eq("id",user.id)
 .single();
@@ -2895,6 +3830,9 @@ await supabaseClient
 if(error){
 return;
 }
+
+currentPlayerProfile =
+player;
 
 document
 .getElementById(
@@ -2929,6 +3867,31 @@ document
 "hidden"
 );
 
+
+if(
+player.role ===
+"admin"
+){
+
+document
+.getElementById(
+"admin-nav"
+).classList.remove(
+"hidden"
+);
+
+}
+else{
+
+document
+.getElementById(
+"admin-nav"
+).classList.add(
+"hidden"
+);
+
+}
+
 }
 
 
@@ -2939,7 +3902,15 @@ await supabaseClient
 .signOut();
 
 currentUser = null;
+currentPlayerProfile = null;
 currentScramble = null;
+
+document
+.getElementById(
+"admin-nav"
+).classList.add(
+"hidden"
+);
 
 document
 .getElementById(
@@ -2993,11 +3964,8 @@ session.user
 );
 
 await getActiveScramble();
-
 await checkEligibility();
-
 await loadLeaderboard();
-
 await loadHomeMatches();
 
 },
@@ -3010,19 +3978,22 @@ if(
 event === "SIGNED_OUT"
 ){
 
-currentUser =
-null;
+currentUser = null;
+currentPlayerProfile = null;
+currentScramble = null;
 
-currentScramble =
-null;
+document
+.getElementById(
+"admin-nav"
+).classList.add(
+"hidden"
+);
 
 }
 
 }
 );
 
-
-/* ---------- START ---------- */
 
 loadLeaderboard();
 loadHomeMatches();
