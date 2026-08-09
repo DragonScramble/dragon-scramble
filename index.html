@@ -130,6 +130,61 @@ async function signInPlayer() {
     return;
   }
 
-  message.textContent = "Signed in successfully.";
-}console.log("Dragon Scramble connected to Supabase");
+message.textContent = "Signed in successfully.";
+
+if (data?.user) {
+  await showLoggedInPlayer(data.user);
+}
+}
+
+async function showLoggedInPlayer(user) {
+  if (!user) return;
+
+  const { data: player, error } = await supabaseClient
+    .from("players")
+    .select("full_name, nickname")
+    .eq("id", user.id)
+    .single();
+
+  if (error) {
+    console.error("Could not load player profile:", error);
+    return;
+  }
+
+  document.getElementById("player-nickname").textContent =
+    player.nickname || "Player";
+
+  document.getElementById("player-name").textContent =
+    player.full_name || "";
+
+  document.getElementById("logged-in-player").classList.remove("hidden");
+}
+
+async function signOutPlayer() {
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    console.error("Sign out failed:", error);
+    return;
+  }
+
+  document.getElementById("logged-in-player").classList.add("hidden");
+  document.getElementById("login-message").textContent =
+    "Signed out successfully.";
+}
+
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (
+    (event === "INITIAL_SESSION" || event === "SIGNED_IN") &&
+    session?.user
+  ) {
+    setTimeout(() => showLoggedInPlayer(session.user), 0);
+  }
+
+  if (event === "SIGNED_OUT") {
+    document.getElementById("logged-in-player").classList.add("hidden");
+  }
+});
+
+console.log("Dragon Scramble connected to Supabase");
 </script></body></html>
