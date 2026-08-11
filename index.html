@@ -691,20 +691,50 @@ Welcome,
 </h2>
 
 <p id="player-name" class="muted"></p>
-<div class="edit-box">
+<div class="nickname-summary">
 
-<label>Mahjong Nickname</label>
+  <div>
+    <span class="muted">Mahjong Nickname:</span>
+    <strong id="account-current-nickname"></strong>
+  </div>
+
+  <button
+    class="btn alt"
+    type="button"
+    onclick="toggleNicknameEditor(true)">
+    Change Nickname
+  </button>
+
+</div>
+
+<div
+id="nickname-editor"
+class="edit-box hidden">
+
+<label>New Mahjong Nickname</label>
 
 <input
 id="account-nickname-input"
 type="text"
 placeholder="Enter your nickname">
 
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+
 <button
 class="btn"
+type="button"
 onclick="saveMyNickname()">
-Save Nickname
+Save
 </button>
+
+<button
+class="btn alt"
+type="button"
+onclick="toggleNicknameEditor(false)">
+Cancel
+</button>
+
+</div>
 
 <p
 id="account-nickname-message"
@@ -6089,6 +6119,12 @@ document
   .value =
     player.nickname;
   document
+  .getElementById(
+    "account-current-nickname"
+  )
+  .textContent =
+    player.nickname;
+  document
     .getElementById(
       "player-name"
     )
@@ -6229,7 +6265,32 @@ supabaseClient
   }
 );
 
+function toggleNicknameEditor(show){
 
+  const editor =
+    document.getElementById("nickname-editor");
+
+  const message =
+    document.getElementById("account-nickname-message");
+
+  if(show){
+
+    editor.classList.remove("hidden");
+
+    document.getElementById(
+      "account-nickname-input"
+    ).value =
+      currentPlayerProfile?.nickname || "";
+
+  } else {
+
+    editor.classList.add("hidden");
+
+    message.textContent = "";
+
+  }
+
+}
 async function saveMyNickname(){
 
   const input =
@@ -6270,11 +6331,13 @@ async function saveMyNickname(){
   document
     .getElementById("player-nickname")
     .textContent = newNickname;
+document
+  .getElementById("account-current-nickname")
+  .textContent = newNickname;
 
+toggleNicknameEditor(false);
   input.value = newNickname;
 
-  message.textContent =
-    "Nickname updated successfully!";
 
   await loadLeaderboard();
   await loadHomeMatches();
