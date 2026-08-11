@@ -1085,11 +1085,33 @@ async function getActiveScramble(){
 
 }
 
+function applyScrambleDateLimits(){
 
+  const dateInput =
+    document.getElementById("match-date");
+
+  if(
+    !dateInput ||
+    !currentScramble
+  ){
+    return;
+  }
+
+  if(currentScramble.start_date){
+    dateInput.min =
+      currentScramble.start_date;
+  }
+
+  if(currentScramble.end_date){
+    dateInput.max =
+      currentScramble.end_date;
+  }
+
+}
 async function loadCurrentScrambleDisplay(){
 
   await getActiveScramble();
-
+applyScrambleDateLimits();
   document
     .getElementById(
       "current-scramble-title"
@@ -2055,8 +2077,9 @@ async function loadUpcomingMatches(){
                               <input
                                 id="edit-date-${match.id}"
                                 type="date"
-                                value="${localDate}">
-
+                     value="${localDate}"
+min="${currentScramble?.start_date || ''}"
+max="${currentScramble?.end_date || ''}">
                             </div>
 
                             <div>
