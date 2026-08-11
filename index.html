@@ -691,7 +691,27 @@ Welcome,
 </h2>
 
 <p id="player-name" class="muted"></p>
+<div class="edit-box">
 
+<label>Mahjong Nickname</label>
+
+<input
+id="account-nickname-input"
+type="text"
+placeholder="Enter your nickname">
+
+<button
+class="btn"
+onclick="saveMyNickname()">
+Save Nickname
+</button>
+
+<p
+id="account-nickname-message"
+class="muted">
+</p>
+
+</div>
 <div
 id="account-payment-section"
 class="hidden">
@@ -6062,7 +6082,12 @@ async function showLoggedInPlayer(user){
     )
     .textContent =
       player.nickname;
-
+document
+  .getElementById(
+    "account-nickname-input"
+  )
+  .value =
+    player.nickname;
   document
     .getElementById(
       "player-name"
@@ -6205,7 +6230,56 @@ supabaseClient
 );
 
 
-/* START */
+async function saveMyNickname(){
+
+  const input =
+    document.getElementById("account-nickname-input");
+
+  const message =
+    document.getElementById("account-nickname-message");
+
+  const newNickname = input.value.trim();
+
+  if(!currentUser || !currentPlayerProfile){
+    message.textContent = "Please sign in first.";
+    return;
+  }
+
+  if(!newNickname){
+    message.textContent = "Please enter a nickname.";
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("players")
+      .update({
+        nickname: newNickname
+      })
+      .eq("id", currentUser.id);
+
+  if(error){
+    console.error("Nickname update failed:", error);
+    message.textContent =
+      "We couldn't update your nickname. Please try again.";
+    return;
+  }
+
+  currentPlayerProfile.nickname = newNickname;
+
+  document
+    .getElementById("player-nickname")
+    .textContent = newNickname;
+
+  input.value = newNickname;
+
+  message.textContent =
+    "Nickname updated successfully!";
+
+  await loadLeaderboard();
+  await loadHomeMatches();
+}
+  /* START */
 
 loadCurrentScrambleDisplay();
 loadLeaderboard();
