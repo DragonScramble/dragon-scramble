@@ -451,7 +451,12 @@ class="notice hidden">
 </div>
 
 </div>
+<label>City</label>
 
+<select id="match-city">
+  <option value="">Select a city</option>
+</select>
+  
 <label>Location</label>
 
 <input
@@ -932,7 +937,47 @@ Save Payment Instructions
 <p id="admin-payment-message" class="muted"></p>
 
 </div>
+<div id="admin-city-card" class="card">
 
+  <div class="eyebrow">Location Settings</div>
+  <h2>Manage Cities</h2>
+
+  <p class="muted">
+    Cities listed here will be available when players propose matches.
+  </p>
+
+  <div class="edit-box">
+
+    <label>Add City</label>
+
+    <input
+      id="admin-new-city"
+      type="text"
+      placeholder="e.g. New York">
+
+    <button
+      class="btn"
+      type="button"
+      onclick="adminAddCity()">
+      Add City
+    </button>
+
+    <p
+      id="admin-city-message"
+      class="muted">
+    </p>
+
+  </div>
+
+  <div id="admin-city-list">
+
+    <p class="muted">
+      Loading cities...
+    </p>
+
+  </div>
+
+</div>
 
 <div id="admin-player-card" class="card">
 
@@ -1616,7 +1661,12 @@ async function createMatch(){
     document.getElementById(
       "match-time"
     ).value;
-
+  
+const city =
+  document.getElementById(
+    "match-city"
+  ).value;
+  
   const location =
     document.getElementById(
       "match-location"
@@ -1627,14 +1677,15 @@ async function createMatch(){
       "match-type"
     ).value;
 
-  if(
-    !date ||
-    !time ||
-    !location
-  ){
+ if(
+  !date ||
+  !time ||
+  !city ||
+  !location
+){
 
     message.textContent =
-      "Please enter date, time and location.";
+       "Please enter date, time, city and location.";
 
     return;
   }
@@ -1665,7 +1716,8 @@ async function createMatch(){
 
           p_scheduled_at:
             scheduled.toISOString(),
-
+p_city_id:
+  city,
           p_location:
             location,
 
@@ -6342,12 +6394,47 @@ toggleNicknameEditor(false);
   await loadLeaderboard();
   await loadHomeMatches();
 }
+ async function loadCities(){
+
+  const select =
+    document.getElementById("match-city");
+
+  if(!select) return;
+
+  const { data, error } =
+    await supabaseClient
+      .from("cities")
+      .select("id, name")
+      .eq("active", true)
+      .order("name");
+
+  if(error){
+    console.error("Could not load cities:", error);
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Select a city</option>';
+
+  (data || []).forEach(city => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = city.id;
+    option.textContent = city.name;
+
+    select.appendChild(option);
+
+  });
+}
   /* START */
 
 loadCurrentScrambleDisplay();
 loadLeaderboard();
 loadHomeMatches();
-
+loadCities();
+  
 console.log(
   "Dragon Scramble connected to Supabase"
 );
