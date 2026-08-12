@@ -2307,70 +2307,7 @@ max="${currentScramble?.end_date || ''}">
 
       }
     ).join("");
-const cards =
-  Array.from(
-    list.querySelectorAll(".card[data-city-id]")
-  );
 
-const groups =
-  new Map();
-
-cards.forEach(card => {
-
-  const cityId =
-    card.dataset.cityId || "";
-
-  if(!groups.has(cityId)){
-    groups.set(cityId, []);
-  }
-
-  groups.get(cityId).push(card);
-
-});
-
-list.innerHTML = "";
-
-let groupIndex = 0;
-
-groups.forEach((cityCards, cityId) => {
-
-  const section =
-    document.createElement("section");
-
-  section.className = "city-match-group";
-
-  section.style.padding = "28px";
-  section.style.marginBottom = "28px";
-  section.style.borderRadius = "22px";
-
-  section.style.background =
-    groupIndex % 2 === 0
-      ? "rgba(223, 231, 224, 0.38)"
-      : "rgba(240, 233, 216, 0.45)";
-
-  const heading =
-    document.createElement("h2");
-
-  heading.textContent =
-    cityMap.get(cityId) || "Other";
-
-  heading.style.marginTop = "0";
-  heading.style.marginBottom = "20px";
-  heading.style.textTransform = "uppercase";
-  heading.style.letterSpacing = "0.08em";
-
-  section.appendChild(heading);
-
-  cityCards.forEach(card =>
-    section.appendChild(card)
-  );
-
-  list.appendChild(section);
-
-  groupIndex++;
-
-});
-  
 }
 
 
