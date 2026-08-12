@@ -1860,6 +1860,27 @@ const cityMap =
       city.name
     ])
   );
+  matches.sort((a, b) => {
+
+  const cityA =
+    cityMap.get(a.city_id) || "";
+
+  const cityB =
+    cityMap.get(b.city_id) || "";
+
+  const cityCompare =
+    cityB.localeCompare(cityA);
+
+  if(cityCompare !== 0){
+    return cityCompare;
+  }
+
+  return (
+    new Date(a.scheduled_at) -
+    new Date(b.scheduled_at)
+  );
+
+});
   const ids =
     matches.map(
       match => match.id
