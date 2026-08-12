@@ -4986,13 +4986,15 @@ async function loadAdminDashboard(){
 
   await getActiveScramble();
 
-  await Promise.all([
+await Promise.all([
 
-    loadAdminScrambleHistory(),
+  loadAdminScrambleHistory(),
 
-    loadAdminMatchManagement()
+  loadAdminMatchManagement(),
 
-  ]);
+  loadAdminCities()
+
+]);
 
   if(currentScramble){
 
@@ -5424,7 +5426,55 @@ async function adminSavePaymentInstructions(){
   await getActiveScramble();
 
 }
+async function loadAdminCities(){
 
+  const list =
+    document.getElementById(
+      "admin-city-list"
+    );
+
+  if(!list) return;
+
+  const { data:cities, error } =
+    await supabaseClient
+      .from("cities")
+      .select("id,name,active")
+      .order("name");
+
+  if(error){
+
+    list.innerHTML =
+      '<p class="error">Unable to load cities.</p>';
+
+    return;
+  }
+
+  if(!cities || !cities.length){
+
+    list.innerHTML =
+      '<p class="muted">No cities added yet.</p>';
+
+    return;
+  }
+
+  list.innerHTML =
+    cities.map(city => `
+
+      <div class="admin-player">
+
+        <div>
+          <b>${escapeHtml(city.name)}</b>
+          <br>
+          <span class="muted">
+            ${city.active ? "Active" : "Hidden"}
+          </span>
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
 
 /* ADMIN PLAYERS */
 
