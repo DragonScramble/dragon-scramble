@@ -5460,22 +5460,60 @@ async function loadAdminCities(){
   list.innerHTML =
     cities.map(city => `
 
-      <div class="admin-player">
+   <div class="admin-player">
 
-        <div>
-          <b>${escapeHtml(city.name)}</b>
-          <br>
-          <span class="muted">
-            ${city.active ? "Active" : "Hidden"}
-          </span>
-        </div>
+  <div>
+    <b>${escapeHtml(city.name)}</b>
+    <br>
+    <span class="muted">
+      ${city.active ? "Active" : "Hidden"}
+    </span>
+  </div>
 
-      </div>
+  <div class="admin-actions">
+
+    <button
+      class="btn ${city.active ? "secondary" : "alt"}"
+      onclick="adminToggleCity(
+        '${city.id}',
+        ${city.active}
+      )">
+
+      ${city.active ? "Hide" : "Show"}
+
+    </button>
+
+  </div>
+
+</div>
 
     `).join("");
 
 }
+async function adminToggleCity(id, isActive){
 
+  const { error } =
+    await supabaseClient
+      .from("cities")
+      .update({
+        active: !isActive
+      })
+      .eq("id", id);
+
+  if(error){
+
+    alert(
+      "Could not update city: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadAdminCities();
+  await loadCities();
+
+}
 /* ADMIN PLAYERS */
 
 async function loadAdminPlayers(){
