@@ -5492,13 +5492,15 @@ async function loadAdminCities(){
 }
 async function adminToggleCity(id, isActive){
 
-  const { error } =
-    await supabaseClient
-      .from("cities")
-      .update({
-        active: !isActive
-      })
-      .eq("id", id);
+ const { error } =
+  await supabaseClient
+    .rpc(
+      "admin_toggle_city",
+      {
+        p_city_id: id,
+        p_active: !isActive
+      }
+    );
 
   if(error){
 
