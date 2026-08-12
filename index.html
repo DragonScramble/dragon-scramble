@@ -1812,7 +1812,7 @@ async function loadUpcomingMatches(){
       .select(
   "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at,city_id"
 )
-      )
+    
       .eq(
         "scramble_id",
         currentScramble.id
