@@ -1939,7 +1939,61 @@ const cityMap =
         ]
       )
     );
+const myUpcomingList =
+  document.getElementById(
+    "my-upcoming-match-list"
+  );
 
+const myMatches =
+  matches.filter(match =>
+    seats.some(seat =>
+      seat.match_id === match.id &&
+      seat.player_id === currentUser.id
+    )
+  );
+
+if(myUpcomingList){
+
+  if(!myMatches.length){
+
+    myUpcomingList.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+  }else{
+
+    myUpcomingList.innerHTML =
+      myMatches.map(match => {
+
+        const cityName =
+          cityMap.get(match.city_id) || "";
+
+        return `
+
+          <div class="card">
+
+            <span class="pill">
+              ${escapeHtml(cityName)}
+            </span>
+
+            <h3>
+              ${escapeHtml(dateText(match.scheduled_at))}
+              ·
+              ${escapeHtml(timeText(match.scheduled_at))}
+            </h3>
+
+            <p>
+              📍 ${escapeHtml(match.location)}
+            </p>
+
+          </div>
+
+        `;
+
+      }).join("");
+
+  }
+
+}
   list.innerHTML =
     matches.map(
       match => {
