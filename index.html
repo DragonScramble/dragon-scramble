@@ -1994,9 +1994,39 @@ if(myUpcomingList){
   }
 
 }
-  list.innerHTML =
-    matches.map(
-      match => {
+  const matchesByCity =
+  new Map();
+
+matches.forEach(match => {
+
+  const cityName =
+    cityMap.get(match.city_id) || "Other";
+
+  if(!matchesByCity.has(cityName)){
+    matchesByCity.set(cityName, []);
+  }
+
+  matchesByCity
+    .get(cityName)
+    .push(match);
+
+});
+
+list.innerHTML =
+  Array.from(matchesByCity.entries())
+    .map(([cityName, cityMatches]) => {
+
+      return `
+
+        <div class="city-group">
+
+          <h2>
+            ${escapeHtml(cityName.toUpperCase())}
+          </h2>
+
+          ${
+            cityMatches.map(
+              match => {
 
         const matchSeats =
           seats
@@ -2396,8 +2426,16 @@ max="${currentScramble?.end_date || ''}">
 
         `;
 
-      }
-    ).join("");
+                  }
+            ).join("")
+          }
+
+        </div>
+
+      `;
+
+    })
+    .join("");
 
 }
 
