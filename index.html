@@ -406,6 +406,31 @@ label{
   }
 
 }
+  .qa-admin-item{
+  padding:18px;
+  margin-bottom:14px;
+}
+
+.qa-admin-item label{
+  margin-top:8px;
+  margin-bottom:5px;
+}
+
+.qa-admin-item input{
+  margin-bottom:10px;
+}
+
+.qa-answer-input{
+  min-height:80px;
+  height:80px;
+  resize:vertical;
+  margin-bottom:12px;
+}
+
+.qa-admin-item button{
+  margin-right:6px;
+  margin-top:0;
+}
 @media(max-width:760px){
   .hero,.grid,.formgrid{grid-template-columns:1fr}
   h1{font-size:38px}
@@ -5673,7 +5698,7 @@ async function loadAdminQA(){
   list.innerHTML =
     (data || []).map(item => `
 
-      <div class="edit-box">
+     <div class="edit-box qa-admin-item">
 
         <label>Question</label>
 
@@ -5683,15 +5708,10 @@ async function loadAdminQA(){
 
         <label>Answer</label>
 
-        <textarea
-          id="qa-answer-${item.id}">${escapeHtml(item.answer)}</textarea>
-
-        <label>Order</label>
-
-        <input
-          id="qa-order-${item.id}"
-          type="number"
-          value="${item.display_order}">
+       <textarea
+  id="qa-answer-${item.id}"
+  class="qa-answer-input">${escapeHtml(item.answer)}</textarea>
+      
 
         <button
   class="btn"
