@@ -531,11 +531,13 @@ Admin
 </div>
 
 <div class="card">
-<div class="eyebrow">Current Leaderboard</div>
+<div class="eyebrow">Overall Player Ranking</div>
 <div id="board">
 <p class="muted">Loading leaderboard...</p>
 </div>
 </div>
+
+<div id="city-leaders"></div>
 
 <div class="grid">
 
@@ -4755,7 +4757,229 @@ async function calculateScrambleStandings(
 
 }
 
+async function loadCityLeaders(scrambleId){
 
+  const container =
+    document.getElementById("city-leaders");
+
+  if(!container) return;
+
+  const [
+    citiesResult,
+    matchesResult,
+    gamesResult,
+    scoresResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("cities")
+      .select("id,name"),
+
+    supabaseClient
+      .from("matches")
+      .select("id,proposer_id,status,completed_at,city_id")
+      .eq("scramble_id",scrambleId),
+
+    supabaseClient
+      .from("games")
+      .select("id,match_id"),
+
+    supabaseClient
+      .from("scores")
+      .select("player_id,game_id,points")
+
+  ]);
+
+  const completed =
+    (matchesResult.data || [])
+      .filter(match =>
+        (
+          match.status === "completed" ||
+          !!match.completed_at
+        ) &&
+        match.city_id
+      );
+
+  if(!completed.length){
+    container.innerHTML = "";
+    return;
+  }
+
+  const cityMap =
+    new Map(
+      (citiesResult.data || [])
+        .map(city => [
+          city.id,
+          city.name
+        ])
+    );
+
+  const gameToMatch =
+    new Map(
+      (gamesResult.data || [])
+        .map(game => [
+          game.id,
+          game.match_id
+        ])
+    );
+
+  const matchMap =
+    new Map(
+      completed.map(match => [
+        match.id,
+        match
+      ])
+    );
+
+  const cityPlayers =
+    new Map();
+
+  for(const score of scoresResult.data || []){
+
+    const matchId =
+      gameToMatch.get(score.game_id);
+
+    const match =
+      matchMap.get(matchId);
+
+    if(!match) continue;
+
+    if(!cityPlayers.has(match.city_id)){
+      cityPlayers.set(
+        match.city_id,
+        new Map()
+      );
+    }
+
+    const players =
+      cityPlayers.get(match.city_id);
+
+    players.set(
+      score.player_id,
+      (players.get(score.player_id) || 0) +
+      Number(score.points || 0)
+    );
+
+  }
+
+  for(const match of completed){
+
+    if(!cityPlayers.has(match.city_id)){
+      cityPlayers.set(
+        match.city_id,
+        new Map()
+      );
+    }
+
+    const players =
+      cityPlayers.get(match.city_id);
+
+    players.set(
+      match.proposer_id,
+      (players.get(match.proposer_id) || 0) + 5
+    );
+
+  }
+
+  const playerIds =
+    new Set();
+
+  cityPlayers.forEach(players => {
+    players.forEach((points,id) => {
+      playerIds.add(id);
+    });
+  });
+
+  const {data:players} =
+    await supabaseClient
+      .from("players")
+      .select("id,nickname")
+      .in(
+        "id",
+        Array.from(playerIds)
+      );
+
+  const nicknameMap =
+    new Map(
+      (players || []).map(player => [
+        player.id,
+        player.nickname || "Player"
+      ])
+    );
+
+  const citySections = [];
+
+  cityPlayers.forEach(
+    (players,cityId) => {
+
+      const leaders =
+        Array.from(players.entries())
+          .map(([id,points]) => ({
+            id,
+            nickname:
+              nicknameMap.get(id) ||
+              "Player",
+            points
+          }))
+          .sort(
+            (a,b) =>
+              b.points - a.points
+          )
+          .slice(0,3);
+
+      if(!leaders.length) return;
+
+      citySections.push({
+        city:
+          cityMap.get(cityId) ||
+          "Other",
+        leaders
+      });
+
+    }
+  );
+
+  citySections.sort(
+    (a,b) =>
+      a.city.localeCompare(b.city)
+  );
+
+  container.innerHTML =
+    citySections.map(section => `
+
+      <div class="card">
+
+        <div class="eyebrow">
+          ${escapeHtml(section.city)} Leaders
+        </div>
+
+        ${section.leaders.map(
+          (player,index) => `
+
+            <div class="leader">
+
+              <div class="rank">
+                ${index+1}
+              </div>
+
+              <div class="nick">
+                ${escapeHtml(player.nickname)}
+              </div>
+
+              <div class="score">
+                ${player.points} pts
+              </div>
+
+            </div>
+
+          `
+        ).join("")}
+
+      </div>
+
+    `).join("");
+
+}
 async function loadLeaderboard(){
 
   const board =
@@ -4792,7 +5016,9 @@ async function loadLeaderboard(){
     await calculateScrambleStandings(
       currentScramble.id
     );
-
+await loadCityLeaders(
+  currentScramble.id
+);
   rows.sort(
     (a,b) =>
       b.points -
