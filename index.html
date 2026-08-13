@@ -2525,9 +2525,10 @@ max="${currentScramble?.end_date || ''}">
                       Location
                     </label>
 
-                    <input›
-                      id="edit-location-${match.id}"
-                      value="${escapeHtml(match.location)}">
+                 <input
+  id="edit-location-${match.id}"
+  type="text"
+  value="${escapeHtml(match.location)}">
 
                     ${
                       confirmedEdit
