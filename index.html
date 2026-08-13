@@ -899,7 +899,7 @@ No phone above table height. No photos of tiles, racks, hands or the table. No A
 
 <div class="rule">
 <b>Notifications</b><br>
-All phone notification sounds must be off.
+All phone notification sounds must be turned off during play, as a courtesy to other players and to encourage everyone to stay present and focused on the game.
 </div>
 
 <div class="rule">
@@ -929,7 +929,18 @@ If an emergency occurs after play begins, every unfinished game becomes a Wall G
 </div>
 
 </div>
+<div class="section-divider">
 
+  <div class="eyebrow">Questions & Clarifications</div>
+  <h2>Q&A</h2>
+
+  <div id="rules-qa-list">
+    <div class="card">
+      <p class="muted">Loading Q&A...</p>
+    </div>
+  </div>
+
+</div>
 </section>
 
 
@@ -1403,8 +1414,9 @@ if(activeButton){
   }
 
   if(id === "rules"){
-    loadCurrentScrambleDisplay();
-  }
+  loadCurrentScrambleDisplay();
+  loadRulesQA();
+}
 
   if(id === "account"){
     loadAccountPaymentStatus();
@@ -1512,7 +1524,55 @@ applyScrambleDateLimits();
         : "Registration and payment are currently closed.";
 
 }
+async function loadRulesQA(){
 
+  const list =
+    document.getElementById(
+      "rules-qa-list"
+    );
+
+  if(!list) return;
+
+  const {data, error} =
+    await supabaseClient
+      .from("rules_qa")
+      .select(
+        "id,question,answer,display_order"
+      )
+      .eq("active",true)
+      .order(
+        "display_order",
+        {ascending:true}
+      );
+
+  if(error){
+
+    list.innerHTML =
+      '<div class="card"><p class="error">Unable to load Q&A.</p></div>';
+
+    return;
+  }
+
+  list.innerHTML =
+    (data || [])
+      .map(item => `
+
+        <div class="card">
+
+          <h3>
+            ${escapeHtml(item.question)}
+          </h3>
+
+          <p>
+            ${escapeHtml(item.answer)}
+          </p>
+
+        </div>
+
+      `)
+      .join("");
+
+}
 
 /* ELIGIBILITY */
 
