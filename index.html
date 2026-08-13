@@ -208,11 +208,33 @@ h3{margin:8px 0}
   cursor:not-allowed;
 }
 
-.alt.propose-match-btn{
-  font-size:20px;
+.propose-callout{
+  background:#b88d43;
+  border:1px solid #9d742f;
+  border-radius:14px;
+  padding:28px 34px;
+  margin:0 0 34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:30px;
+}
+
+.propose-callout h2{
+  font-size:34px;
+  margin:4px 0 8px;
+}
+
+.propose-callout p{
+  font-size:17px;
+  margin:0;
+}
+
+.propose-match-btn{
+  font-size:19px;
   font-weight:bold;
-  padding:16px 26px;
-  border-radius:10px;
+  padding:17px 28px;
+  white-space:nowrap;
 }
 .alt{background:var(--gold)}
 .danger{background:var(--danger)}
@@ -479,11 +501,25 @@ Only active, payment-confirmed players can propose or join.
 </p>
 </div>
 
-<button
-class="btn alt propose-match-btn"
-onclick="toggleProposal()">
-+ Propose a Match
-</button>
+</div>
+
+<div class="propose-callout">
+
+  <div>
+    <div class="eyebrow">New Match</div>
+    <h2>Propose a Match</h2>
+
+    <p>
+      Create a new match and invite players to join.<br>
+      Choose the city, date, time and match type.
+    </p>
+  </div>
+
+  <button
+    class="btn propose-match-btn"
+    onclick="toggleProposal()">
+    + Propose a Match
+  </button>
 
 </div>
 
