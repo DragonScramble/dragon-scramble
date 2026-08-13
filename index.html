@@ -5694,23 +5694,45 @@ async function loadAdminQA(){
           value="${item.display_order}">
 
         <button
-          class="btn"
-          type="button"
-          onclick="adminSaveQA('${item.id}')">
-          Save
-        </button>
+  class="btn"
+  type="button"
+  onclick="adminSaveQA('${item.id}')">
+  Save
+</button>
 
-        <button
-          class="btn secondary"
-          type="button"
-          onclick="adminToggleQA(
-            '${item.id}',
-            ${item.active}
-          )">
+<button
+  class="btn secondary"
+  type="button"
+  onclick="adminMoveQA(
+    '${item.id}',
+    ${item.display_order},
+    -1
+  )">
+  ↑ Up
+</button>
 
-          ${item.active ? "Hide" : "Show"}
+<button
+  class="btn secondary"
+  type="button"
+  onclick="adminMoveQA(
+    '${item.id}',
+    ${item.display_order},
+    1
+  )">
+  ↓ Down
+</button>
 
-        </button>
+<button
+  class="btn secondary"
+  type="button"
+  onclick="adminToggleQA(
+    '${item.id}',
+    ${item.active}
+  )">
+
+  ${item.active ? "Hide" : "Show"}
+
+</button>
 
       </div>
 
@@ -5864,6 +5886,103 @@ async function adminToggleQA(
     alert(
       "Could not update Q&A: " +
       error.message
+    );
+    return;
+  }
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+  async function adminMoveQA(
+  id,
+  currentOrder,
+  direction
+){
+
+  const {data, error} =
+    await supabaseClient
+      .from("rules_qa")
+      .select(
+        "id,display_order"
+      )
+      .order(
+        "display_order",
+        {ascending:true}
+      );
+
+  if(error){
+    alert(
+      "Could not reorder Q&A: " +
+      error.message
+    );
+    return;
+  }
+
+  const items = data || [];
+
+  const currentIndex =
+    items.findIndex(
+      item => item.id === id
+    );
+
+  const targetIndex =
+    currentIndex + direction;
+
+  if(
+    currentIndex < 0 ||
+    targetIndex < 0 ||
+    targetIndex >= items.length
+  ){
+    return;
+  }
+
+  const currentItem =
+    items[currentIndex];
+
+  const targetItem =
+    items[targetIndex];
+
+  const currentValue =
+    currentItem.display_order;
+
+  const targetValue =
+    targetItem.display_order;
+
+  const {error:firstError} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        display_order:targetValue
+      })
+      .eq(
+        "id",
+        currentItem.id
+      );
+
+  if(firstError){
+    alert(
+      "Could not reorder Q&A: " +
+      firstError.message
+    );
+    return;
+  }
+
+  const {error:secondError} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        display_order:currentValue
+      })
+      .eq(
+        "id",
+        targetItem.id
+      );
+
+  if(secondError){
+    alert(
+      "Could not reorder Q&A: " +
+      secondError.message
     );
     return;
   }
