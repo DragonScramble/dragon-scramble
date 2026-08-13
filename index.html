@@ -6003,6 +6003,54 @@ async function adminSavePaymentInstructions(){
   await getActiveScramble();
 
 }
+  async function adminAddCity(){
+
+  const input =
+    document.getElementById(
+      "admin-new-city"
+    );
+
+  const message =
+    document.getElementById(
+      "admin-city-message"
+    );
+
+  const name =
+    input.value.trim();
+
+  if(!name){
+    message.textContent =
+      "Enter a city name.";
+    return;
+  }
+
+  message.textContent =
+    "Adding city...";
+
+  const { error } =
+    await supabaseClient
+      .from("cities")
+      .insert({
+        name:name,
+        active:true
+      });
+
+  if(error){
+    message.textContent =
+      "Could not add city: " +
+      error.message;
+    return;
+  }
+
+  input.value = "";
+
+  message.textContent =
+    "City added.";
+
+  await loadAdminCities();
+  await loadCities();
+
+}
 async function loadAdminCities(){
 
   const list =
