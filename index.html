@@ -365,7 +365,31 @@ label{
   border-bottom:1px solid var(--line);
   padding:18px 0;
 }
+@media(min-width:761px){
 
+  .upcoming-match-card{
+    display:grid;
+    grid-template-columns: 1.5fr 1fr 1.5fr 1.2fr auto;
+    align-items:center;
+    gap:20px;
+  }
+.upcoming-match-card .match-date-time{
+  margin:0;
+  font-size:18px;
+}
+  .upcoming-match-card .match-location{
+  margin:0;
+}
+  .upcoming-match-card .match-players{
+  margin:0;
+  padding:0;
+  background:none;
+}
+  .upcoming-match-card .match-actions{
+  margin:0;
+  white-space:nowrap;
+}
+}
 @media(max-width:760px){
   .hero,.grid,.formgrid{grid-template-columns:1fr}
   h1{font-size:38px}
@@ -2350,8 +2374,7 @@ list.innerHTML =
 
         return `
 
-         <div class="card" data-city-id="${match.city_id || ""}">
-
+<div class="card upcoming-match-card" data-city-id="${match.city_id || ""}">
             <span class="pill">
               ${count} / 4
             </span>
@@ -2367,31 +2390,30 @@ list.innerHTML =
               }
             </span>
 
-            <h2>
+          <h2 class="match-date-time">
 
-              ${escapeHtml(
-                dateText(
-                  match.scheduled_at
-                )
-              )}
+  ${escapeHtml(
+    dateText(
+      match.scheduled_at
+    )
+  )}
 
-              ·
+  ·
 
-              ${escapeHtml(
-                timeText(
-                  match.scheduled_at
-                )
-              )}
+  ${escapeHtml(
+    timeText(
+      match.scheduled_at
+    )
+  )}
 
-            </h2>
+</h2>
 
-            <p>
-              📍 ${escapeHtml(match.location)}
-            </p>
-
+<p class="match-location">
+  📍 ${escapeHtml(match.location)}
+</p>
            
 
-            <div class="players">
+           <div class="players match-players">
 
               ${names.join(" · ")}
 
@@ -2403,7 +2425,9 @@ list.innerHTML =
 
             </div>
 
-            ${actions}
+         <div class="match-actions">
+  ${actions}
+</div>
 
             ${
               isProposer
