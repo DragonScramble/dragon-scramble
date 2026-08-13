@@ -6027,13 +6027,14 @@ async function adminSavePaymentInstructions(){
   message.textContent =
     "Adding city...";
 
-  const { error } =
-    await supabaseClient
-      .from("cities")
-      .insert({
-        name:name,
-        active:true
-      });
+ const { error } =
+  await supabaseClient
+    .rpc(
+      "admin_add_city",
+      {
+        p_name: name
+      }
+    );
 
   if(error){
     message.textContent =
