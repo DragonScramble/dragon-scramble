@@ -368,27 +368,43 @@ label{
 @media(min-width:761px){
 
   .upcoming-match-card{
-    display:grid;
-    grid-template-columns: 1.5fr 1fr 1.5fr 1.2fr auto;
-    align-items:center;
-    gap:20px;
+    padding:14px 18px;
+    margin-bottom:10px;
   }
-.upcoming-match-card .match-date-time{
-  margin:0;
-  font-size:18px;
-}
-  .upcoming-match-card .match-location{
-  margin:0;
-}
-  .upcoming-match-card .match-players{
-  margin:0;
-  padding:0;
-  background:none;
-}
-  .upcoming-match-card .match-actions{
-  margin:0;
-  white-space:nowrap;
-}
+
+  .match-summary-row{
+    display:grid;
+    grid-template-columns:
+      1.35fr
+      .8fr
+      .9fr
+      1.8fr
+      1fr
+      auto;
+    align-items:center;
+    gap:18px;
+  }
+
+  .match-date,
+  .match-time,
+  .match-type,
+  .match-location,
+  .match-count{
+    margin:0;
+  }
+
+  .match-player-line{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid var(--line);
+    font-size:14px;
+  }
+
+  .match-actions{
+    white-space:nowrap;
+    text-align:right;
+  }
+
 }
 @media(max-width:760px){
   .hero,.grid,.formgrid{grid-template-columns:1fr}
@@ -416,6 +432,23 @@ label{
 
 .propose-callout h2{
   font-size:28px;
+}
+  .match-summary-row{
+  display:block;
+}
+
+.match-summary-row > div{
+  margin-bottom:8px;
+}
+
+.match-actions{
+  margin-top:10px;
+}
+
+.match-player-line{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
 }
 }
 </style>
@@ -2375,59 +2408,54 @@ list.innerHTML =
         return `
 
 <div class="card upcoming-match-card" data-city-id="${match.city_id || ""}">
-            <span class="pill">
-              ${count} / 4
-            </span>
 
-            &nbsp;
+  <div class="match-summary-row">
 
-            <span class="pill">
-              ${
-                match.match_type ===
-                "focused"
-                  ? "Focused"
-                  : "Social"
-              }
-            </span>
+    <div class="match-date">
+      ${escapeHtml(
+        dateText(match.scheduled_at)
+      )}
+    </div>
 
-          <h2 class="match-date-time">
+    <div class="match-time">
+      ${escapeHtml(
+        timeText(match.scheduled_at)
+      )}
+    </div>
 
-  ${escapeHtml(
-    dateText(
-      match.scheduled_at
-    )
-  )}
+    <div class="match-type">
+      ${
+        match.match_type === "focused"
+          ? "Focused"
+          : "Social"
+      }
+    </div>
 
-  ·
+    <div class="match-location">
+      📍 ${escapeHtml(match.location)}
+    </div>
 
-  ${escapeHtml(
-    timeText(
-      match.scheduled_at
-    )
-  )}
+    <div class="match-count">
+      ${count} / 4 players
+    </div>
 
-</h2>
+    <div class="match-actions">
+      ${actions}
+    </div>
 
-<p class="match-location">
-  📍 ${escapeHtml(match.location)}
-</p>
-           
+  </div>
 
-           <div class="players match-players">
+  <div class="match-player-line">
 
-              ${names.join(" · ")}
+    ${names.join(" · ")}
 
-              ${
-                count < 4
-                  ? `<br><span class="muted">${4-count} seat${4-count === 1 ? "" : "s"} open</span>`
-                  : ""
-              }
+    ${
+      count < 4
+        ? `<span class="muted"> · ${4-count} seat${4-count === 1 ? "" : "s"} open</span>`
+        : ""
+    }
 
-            </div>
-
-         <div class="match-actions">
-  ${actions}
-</div>
+  </div>
 
             ${
               isProposer
