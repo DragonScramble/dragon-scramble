@@ -2190,16 +2190,27 @@ list.innerHTML =
           )?.nickname ||
           "Player";
 
-        const names =
-          matchSeats.map(
-            seat =>
-              escapeHtml(
-                playerMap.get(
-                  seat.player_id
-                )?.nickname ||
-                "Player"
-              )
-          );
+       const names =
+  matchSeats.map(seat => {
+
+    const nickname =
+      escapeHtml(
+        playerMap.get(
+          seat.player_id
+        )?.nickname ||
+        "Player"
+      );
+
+    if(
+      seat.player_id ===
+      match.proposer_id
+    ){
+      return `<span style="color:var(--gold);font-weight:bold;">${nickname}</span>`;
+    }
+
+    return nickname;
+
+  });
 
         let actions = "";
 
