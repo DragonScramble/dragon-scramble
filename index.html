@@ -1245,7 +1245,41 @@ Save Payment Instructions
   </div>
 
 </div>
+<div id="admin-rules-qa-card" class="card">
 
+  <div class="eyebrow">Rules</div>
+  <h2>Manage Q&A</h2>
+
+  <div class="edit-box">
+
+    <label>Question</label>
+    <input
+      id="admin-qa-question"
+      type="text">
+
+    <label>Answer</label>
+    <textarea
+      id="admin-qa-answer"></textarea>
+
+    <button
+      class="btn"
+      type="button"
+      onclick="adminAddQA()">
+      Add Q&A
+    </button>
+
+    <p
+      id="admin-qa-message"
+      class="muted">
+    </p>
+
+  </div>
+
+  <div id="admin-qa-list">
+    <p class="muted">Loading Q&A...</p>
+  </div>
+
+</div>
 <div id="admin-player-card" class="card">
 
 <div class="eyebrow">Player Management</div>
@@ -5610,7 +5644,234 @@ async function adminDownloadPlayers(){
 
 }
 /* ADMIN */
+async function loadAdminQA(){
 
+  const list =
+    document.getElementById(
+      "admin-qa-list"
+    );
+
+  if(!list) return;
+
+  const {data, error} =
+    await supabaseClient
+      .from("rules_qa")
+      .select(
+        "id,question,answer,display_order,active"
+      )
+      .order(
+        "display_order",
+        {ascending:true}
+      );
+
+  if(error){
+    list.innerHTML =
+      '<p class="error">Unable to load Q&A.</p>';
+    return;
+  }
+
+  list.innerHTML =
+    (data || []).map(item => `
+
+      <div class="edit-box">
+
+        <label>Question</label>
+
+        <input
+          id="qa-question-${item.id}"
+          value="${escapeHtml(item.question)}">
+
+        <label>Answer</label>
+
+        <textarea
+          id="qa-answer-${item.id}">${escapeHtml(item.answer)}</textarea>
+
+        <label>Order</label>
+
+        <input
+          id="qa-order-${item.id}"
+          type="number"
+          value="${item.display_order}">
+
+        <button
+          class="btn"
+          type="button"
+          onclick="adminSaveQA('${item.id}')">
+          Save
+        </button>
+
+        <button
+          class="btn secondary"
+          type="button"
+          onclick="adminToggleQA(
+            '${item.id}',
+            ${item.active}
+          )">
+
+          ${item.active ? "Hide" : "Show"}
+
+        </button>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+async function adminAddQA(){
+
+  const question =
+    document
+      .getElementById(
+        "admin-qa-question"
+      )
+      .value.trim();
+
+  const answer =
+    document
+      .getElementById(
+        "admin-qa-answer"
+      )
+      .value.trim();
+
+  const message =
+    document.getElementById(
+      "admin-qa-message"
+    );
+
+  if(!question || !answer){
+    message.textContent =
+      "Question and answer are required.";
+    return;
+  }
+
+  const {data:lastItem} =
+    await supabaseClient
+      .from("rules_qa")
+      .select("display_order")
+      .order(
+        "display_order",
+        {ascending:false}
+      )
+      .limit(1)
+      .maybeSingle();
+
+  const {error} =
+    await supabaseClient
+      .from("rules_qa")
+      .insert({
+        question,
+        answer,
+        display_order:
+          Number(
+            lastItem?.display_order || 0
+          ) + 1,
+        active:true
+      });
+
+  if(error){
+    message.textContent =
+      "Could not add Q&A: " +
+      error.message;
+    return;
+  }
+
+  document
+    .getElementById(
+      "admin-qa-question"
+    )
+    .value = "";
+
+  document
+    .getElementById(
+      "admin-qa-answer"
+    )
+    .value = "";
+
+  message.textContent =
+    "Q&A added.";
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+
+
+async function adminSaveQA(id){
+
+  const question =
+    document
+      .getElementById(
+        `qa-question-${id}`
+      )
+      .value.trim();
+
+  const answer =
+    document
+      .getElementById(
+        `qa-answer-${id}`
+      )
+      .value.trim();
+
+  const order =
+    Number(
+      document
+        .getElementById(
+          `qa-order-${id}`
+        )
+        .value
+    );
+
+  const {error} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        question,
+        answer,
+        display_order:order
+      })
+      .eq("id",id);
+
+  if(error){
+    alert(
+      "Could not save Q&A: " +
+      error.message
+    );
+    return;
+  }
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+
+
+async function adminToggleQA(
+  id,
+  isActive
+){
+
+  const {error} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        active:!isActive
+      })
+      .eq("id",id);
+
+  if(error){
+    alert(
+      "Could not update Q&A: " +
+      error.message
+    );
+    return;
+  }
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
 async function loadAdminDashboard(){
 
   if(
@@ -5629,7 +5890,9 @@ await Promise.all([
 
   loadAdminMatchManagement(),
 
-  loadAdminCities()
+  loadAdminCities(),
+
+  loadAdminQA()
 
 ]);
 
