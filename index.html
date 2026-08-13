@@ -53,8 +53,19 @@ nav button{
   margin:5px;
   cursor:pointer;
   font:inherit;
+  position:relative;
+padding-bottom:8px;
 }
-
+nav button.active-tab::after{
+  content:"";
+  position:absolute;
+  left:15%;
+  right:15%;
+  bottom:0;
+  height:2px;
+  background:var(--gold);
+  border-radius:2px;
+}
 .admin-nav{
   border:1px solid #d3b36b!important;
   border-radius:8px;
@@ -1168,7 +1179,20 @@ function show(id){
     .classList.remove("hidden");
 
   window.scrollTo(0,0);
+document
+  .querySelectorAll("nav button")
+  .forEach(button =>
+    button.classList.remove("active-tab")
+  );
 
+const activeButton =
+  document.querySelector(
+    `nav button[onclick="show('${id}')"]`
+  );
+
+if(activeButton){
+  activeButton.classList.add("active-tab");
+}
   if(id === "home"){
     loadLeaderboard();
     loadHomeMatches();
