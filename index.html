@@ -1158,7 +1158,38 @@ Create Account
 
 </div>
 
+<div id="reset-password-card" class="card hidden">
 
+  <div class="eyebrow">Account Security</div>
+  <h2>Choose New Password</h2>
+
+  <label>New Password</label>
+
+  <input
+    id="new-password"
+    type="password"
+    placeholder="Enter new password">
+
+  <label>Confirm New Password</label>
+
+  <input
+    id="confirm-new-password"
+    type="password"
+    placeholder="Enter new password again">
+
+  <button
+    class="btn"
+    type="button"
+    onclick="saveNewPassword()">
+    Save New Password
+  </button>
+
+  <p
+    id="reset-password-message"
+    class="muted">
+  </p>
+
+</div>
 
 
 </section>
