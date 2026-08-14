@@ -5779,7 +5779,20 @@ async function loadAdminQA(){
   list.innerHTML =
     (data || []).map(item => `
 
-     <div class="edit-box qa-admin-item">
+      <div
+        class="edit-box qa-admin-item"
+        draggable="true"
+        data-qa-id="${item.id}">
+
+        <div
+          class="qa-drag-handle"
+          style="
+            cursor:grab;
+            font-weight:700;
+            margin-bottom:12px;
+          ">
+          ☰ Drag to reorder
+        </div>
 
         <label>Question</label>
 
@@ -5789,55 +5802,194 @@ async function loadAdminQA(){
 
         <label>Answer</label>
 
-       <textarea
-  id="qa-answer-${item.id}"
-  class="qa-answer-input">${escapeHtml(item.answer)}</textarea>
-      
+        <textarea
+          id="qa-answer-${item.id}"
+          class="qa-answer-input">${escapeHtml(item.answer)}</textarea>
 
         <button
-  class="btn"
-  type="button"
-  onclick="adminSaveQA('${item.id}')">
-  Save
-</button>
+          class="btn"
+          type="button"
+          onclick="adminSaveQA('${item.id}')">
+          Save
+        </button>
 
-<button
-  class="btn secondary"
-  type="button"
-  onclick="adminMoveQA(
-    '${item.id}',
-    ${item.display_order},
-    -1
-  )">
-  ↑ Up
-</button>
+        <button
+          class="btn secondary"
+          type="button"
+          onclick="adminToggleQA(
+            '${item.id}',
+            ${item.active}
+          )">
+          ${item.active ? "Hide" : "Show"}
+        </button>
 
-<button
-  class="btn secondary"
-  type="button"
-  onclick="adminMoveQA(
-    '${item.id}',
-    ${item.display_order},
-    1
-  )">
-  ↓ Down
-</button>
-
-<button
-  class="btn secondary"
-  type="button"
-  onclick="adminToggleQA(
-    '${item.id}',
-    ${item.active}
-  )">
-
-  ${item.active ? "Hide" : "Show"}
-
-</button>
+        <button
+          class="btn secondary qa-delete-button"
+          type="button"
+          data-qa-id="${item.id}">
+          Delete
+        </button>
 
       </div>
 
     `).join("");
+
+
+  /* DELETE Q&A */
+
+  list
+    .querySelectorAll(".qa-delete-button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const id =
+            button.dataset.qaId;
+
+          const confirmed =
+            confirm(
+              "Delete this Q&A permanently?"
+            );
+
+          if(!confirmed) return;
+
+          const {error} =
+            await supabaseClient
+              .from("rules_qa")
+              .delete()
+              .eq("id",id);
+
+          if(error){
+            alert(
+              "Could not delete Q&A: " +
+              error.message
+            );
+            return;
+          }
+
+          await loadAdminQA();
+          await loadRulesQA();
+
+        }
+      );
+
+    });
+
+
+  /* DRAG TO REORDER */
+
+  let draggedItem = null;
+
+  list
+    .querySelectorAll(".qa-admin-item")
+    .forEach(item => {
+
+      item.addEventListener(
+        "dragstart",
+        () => {
+
+          draggedItem = item;
+
+          item.style.opacity = "0.5";
+
+        }
+      );
+
+      item.addEventListener(
+        "dragend",
+        async () => {
+
+          item.style.opacity = "";
+
+          draggedItem = null;
+
+          const orderedItems =
+            Array.from(
+              list.querySelectorAll(
+                ".qa-admin-item"
+              )
+            );
+
+          for(
+            let index = 0;
+            index < orderedItems.length;
+            index++
+          ){
+
+            const qaId =
+              orderedItems[index]
+                .dataset.qaId;
+
+            const {error} =
+              await supabaseClient
+                .from("rules_qa")
+                .update({
+                  display_order:index + 1
+                })
+                .eq("id",qaId);
+
+            if(error){
+
+              alert(
+                "Could not save Q&A order: " +
+                error.message
+              );
+
+              await loadAdminQA();
+
+              return;
+
+            }
+
+          }
+
+          await loadAdminQA();
+          await loadRulesQA();
+
+        }
+      );
+
+      item.addEventListener(
+        "dragover",
+        event => {
+
+          event.preventDefault();
+
+          if(
+            !draggedItem ||
+            draggedItem === item
+          ){
+            return;
+          }
+
+          const rect =
+            item.getBoundingClientRect();
+
+          const after =
+            event.clientY >
+            rect.top +
+            rect.height / 2;
+
+          if(after){
+
+            item.after(
+              draggedItem
+            );
+
+          }else{
+
+            item.before(
+              draggedItem
+            );
+
+          }
+
+        }
+      );
+
+    });
 
 }
 
