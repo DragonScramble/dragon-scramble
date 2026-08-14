@@ -7592,7 +7592,67 @@ async function resetPassword(){
     "Password reset email sent. Check your inbox.";
 
 }
+async function saveNewPassword(){
 
+  const password =
+    document.getElementById(
+      "new-password"
+    ).value;
+
+  const confirmPassword =
+    document.getElementById(
+      "confirm-new-password"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "reset-password-message"
+    );
+
+  if(!password || !confirmPassword){
+
+    message.textContent =
+      "Please complete both password fields.";
+
+    return;
+  }
+
+  if(password !== confirmPassword){
+
+    message.textContent =
+      "Passwords do not match.";
+
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .auth
+      .updateUser({
+        password:password
+      });
+
+  if(error){
+
+    message.textContent =
+      "Could not update password: " +
+      error.message;
+
+    return;
+  }
+
+  message.textContent =
+    "Password updated successfully.";
+
+  document
+    .getElementById(
+      "reset-password-card"
+    )
+    .classList.add("hidden");
+
+  show("account");
+
+}
 async function showLoggedInPlayer(user){
 
   const {
