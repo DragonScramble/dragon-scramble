@@ -7882,7 +7882,18 @@ show("matches");
 
   }
 );
+function toggleAdminQA(){
 
+  const content =
+    document.getElementById(
+      "admin-qa-content"
+    );
+
+  if(!content) return;
+
+  content.classList.toggle("hidden");
+
+}
 function toggleNicknameEditor(show){
 
   const editor =
