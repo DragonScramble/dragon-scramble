@@ -1092,11 +1092,56 @@ Loading payment instructions...
 <div id="account-payment-status"></div>
 
 </div>
+<div class="edit-box">
+
+  <h3>Account Security</h3>
+
+  <button
+    class="btn secondary"
+    type="button"
+    onclick="toggleChangePassword()">
+    Change Password
+  </button>
+
+  <div
+    id="change-password-box"
+    class="hidden"
+    style="margin-top:14px;">
+
+    <label>New Password</label>
+
+    <input
+      id="account-new-password"
+      type="password"
+      placeholder="Enter new password">
+
+    <label>Confirm New Password</label>
+
+    <input
+      id="account-confirm-password"
+      type="password"
+      placeholder="Enter new password again">
+
+    <button
+      class="btn"
+      type="button"
+      onclick="changeMyPassword()">
+      Save New Password
+    </button>
+
+    <p
+      id="change-password-message"
+      class="muted">
+    </p>
+
+  </div>
+
+</div>
 
 <button
-class="btn alt"
-onclick="signOutPlayer()">
-Sign Out
+  class="btn alt"
+  onclick="signOutPlayer()">
+  Sign Out
 </button>
 
 </div>
@@ -7809,6 +7854,91 @@ async function saveNewPassword(){
     .classList.add("hidden");
 passwordRecoveryMode = false;
   show("account");
+
+}function toggleChangePassword(){
+
+  const box =
+    document.getElementById(
+      "change-password-box"
+    );
+
+  const message =
+    document.getElementById(
+      "change-password-message"
+    );
+
+  if(!box) return;
+
+  box.classList.toggle("hidden");
+
+  if(message){
+    message.textContent = "";
+  }
+
+}
+
+
+async function changeMyPassword(){
+
+  const password =
+    document.getElementById(
+      "account-new-password"
+    ).value;
+
+  const confirmPassword =
+    document.getElementById(
+      "account-confirm-password"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "change-password-message"
+    );
+
+  if(!password || !confirmPassword){
+
+    message.textContent =
+      "Please complete both password fields.";
+
+    return;
+  }
+
+  if(password !== confirmPassword){
+
+    message.textContent =
+      "Passwords do not match.";
+
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .auth
+      .updateUser({
+        password:password
+      });
+
+  if(error){
+
+    message.textContent =
+      "Could not update password: " +
+      error.message;
+
+    return;
+  }
+
+  document
+    .getElementById(
+      "account-new-password"
+    ).value = "";
+
+  document
+    .getElementById(
+      "account-confirm-password"
+    ).value = "";
+
+  message.textContent =
+    "Password updated successfully.";
 
 }
 async function showLoggedInPlayer(user){
