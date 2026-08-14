@@ -1450,7 +1450,9 @@ supabase.createClient(
 let currentUser = null;
 let currentPlayerProfile = null;
 let currentScramble = null;
-let passwordRecoveryMode = false;
+let passwordRecoveryMode =
+  window.location.hash.includes("type=recovery") ||
+  window.location.search.includes("type=recovery");
 let currentEligibility = {
   active:false,
   paid:false,
