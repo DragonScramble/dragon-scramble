@@ -7787,7 +7787,41 @@ supabaseClient
 .auth
 .onAuthStateChange(
   (event,session) => {
+if(
+  event === "PASSWORD_RECOVERY"
+){
 
+  currentUser =
+    session?.user || null;
+
+  show("account");
+
+  document
+    .getElementById(
+      "login-card"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "signup-card"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "logged-in-player"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "reset-password-card"
+    )
+    .classList.remove("hidden");
+
+  return;
+}
     if(
       (
         event === "INITIAL_SESSION" ||
