@@ -1450,7 +1450,7 @@ supabase.createClient(
 let currentUser = null;
 let currentPlayerProfile = null;
 let currentScramble = null;
-
+let passwordRecoveryMode = false;
 let currentEligibility = {
   active:false,
   paid:false,
@@ -7649,7 +7649,7 @@ async function saveNewPassword(){
       "reset-password-card"
     )
     .classList.add("hidden");
-
+passwordRecoveryMode = false;
   show("account");
 
 }
@@ -7790,7 +7790,7 @@ supabaseClient
 if(
   event === "PASSWORD_RECOVERY"
 ){
-
+passwordRecoveryMode = true;
   currentUser =
     session?.user || null;
 
@@ -7823,13 +7823,15 @@ if(
   return;
 }
     if(
-      (
-        event === "INITIAL_SESSION" ||
-        event === "SIGNED_IN"
-      )
-      &&
-      session?.user
-    ){
+  (
+    event === "INITIAL_SESSION" ||
+    event === "SIGNED_IN"
+  )
+  &&
+  session?.user
+  &&
+  !passwordRecoveryMode
+){
 
       currentUser =
         session.user;
