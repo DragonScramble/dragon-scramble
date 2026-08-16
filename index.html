@@ -2642,30 +2642,32 @@ list.innerHTML =
         }
 
 
-        /* EVERY PLAYER MAY LEAVE AN OPEN MATCH,
-           INCLUDING THE CURRENT PROPOSER */
+       /* EVERY PLAYER MAY LEAVE AN OPEN OR CONFIRMED MATCH,
+   INCLUDING THE CURRENT PROPOSER */
 
-        if(
-          joined &&
-          match.status === "open"
-        ){
+if(
+  joined &&
+  (
+    match.status === "open" ||
+    match.status === "confirmed"
+  )
+){
 
-          actions += `
+  actions += `
 
-            <button
-              class="btn secondary"
-              onclick="leaveMatch(
-                '${match.id}',
-                ${isProposer}
-              )">
+    <button
+      class="btn secondary"
+      onclick="leaveMatch(
+        '${match.id}',
+        ${isProposer}
+      )">
 
-              Leave Match
+      Leave Match
 
-            </button>
+    </button>
 
-          `;
-
-        }
+  `;
+}
 
 
         /* CURRENT PROPOSER ALSO HAS EDIT + CANCEL */
