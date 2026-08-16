@@ -7153,41 +7153,77 @@ async function loadAdminPlayers(){
 
             </div>
 
-            <div
-              id="player-edit-${player.id}"
-              class="edit-box hidden">
+<div
+  id="player-edit-${player.id}"
+  class="edit-box hidden">
 
-              <label>
-                Full Name
-              </label>
+  <label>
+    Full Name
+  </label>
 
-              <input
-                id="admin-name-${player.id}"
-                value="${escapeHtml(player.full_name)}">
+  <input
+    id="admin-name-${player.id}"
+    value="${escapeHtml(player.full_name)}">
 
-              <label>
-                Nickname
-              </label>
+  <label>
+    Nickname
+  </label>
 
-              <input
-                id="admin-nickname-${player.id}"
-                value="${escapeHtml(player.nickname)}">
+  <input
+    id="admin-nickname-${player.id}"
+    value="${escapeHtml(player.nickname)}">
 
-              <label>
-                Phone
-              </label>
+  <label>
+    Phone
+  </label>
 
-              <input
-                id="admin-phone-${player.id}"
-                value="${escapeHtml(player.phone || "")}">
+  <input
+    id="admin-phone-${player.id}"
+    value="${escapeHtml(player.phone || "")}">
 
-              <button
-                class="btn"
-                onclick="adminSavePlayerProfile('${player.id}')">
-                Save Profile
-              </button>
+  <button
+    class="btn"
+    onclick="adminSavePlayerProfile('${player.id}')">
+    Save Profile
+  </button>
 
-            </div>
+
+  <div class="edit-box">
+
+    <h3>Point Adjustment</h3>
+
+    <p class="muted">
+      Enter a positive number to add points or a negative number to deduct points.
+    </p>
+
+    <label>
+      Points
+    </label>
+
+    <input
+      id="admin-points-${player.id}"
+      type="number"
+      step="1"
+      placeholder="Example: -20 or 25">
+
+    <label>
+      Reason
+    </label>
+
+    <input
+      id="admin-points-reason-${player.id}"
+      type="text"
+      placeholder="Example: Late cancellation">
+
+    <button
+      class="btn"
+      onclick="adminAdjustPoints('${player.id}')">
+      Apply Point Adjustment
+    </button>
+
+  </div>
+
+</div>
 
           </div>
 
@@ -7245,6 +7281,94 @@ async function adminSavePlayerProfile(id){
   }
 
   await loadAdminPlayers();
+
+}
+
+
+async function adminAdjustPoints(id){
+
+  const pointsInput =
+    document.getElementById(
+      `admin-points-${id}`
+    );
+
+  const reasonInput =
+    document.getElementById(
+      `admin-points-reason-${id}`
+    );
+
+  const points =
+    Number(pointsInput.value);
+
+  const reason =
+    reasonInput.value.trim();
+
+
+  if(
+    !Number.isInteger(points) ||
+    points === 0
+  ){
+
+    alert(
+      "Enter a whole number other than 0. Use a negative number to deduct points."
+    );
+
+    return;
+  }
+
+
+  if(!reason){
+
+    alert(
+      "Please enter a reason for the point adjustment."
+    );
+
+    return;
+  }
+
+
+  if(
+    !confirm(
+      `Apply ${points > 0 ? "+" : ""}${points} points to this player?\n\nReason: ${reason}`
+    )
+  ){
+
+    return;
+  }
+
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_add_point_adjustment",
+        {
+
+          p_player_id:id,
+          p_points:points,
+          p_reason:reason
+
+        }
+      );
+
+
+  if(error){
+
+    alert(
+      "Could not adjust points: " +
+      error.message
+    );
+
+    return;
+  }
+
+
+  alert(
+    `Point adjustment saved: ${points > 0 ? "+" : ""}${points}`
+  );
+
+
+  await loadAdminPlayers();
+  await loadLeaderboard();
 
 }
 
