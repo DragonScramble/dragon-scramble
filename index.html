@@ -2471,23 +2471,81 @@ if(myUpcomingList){
         const cityName =
           cityMap.get(match.city_id) || "";
 
+        const matchSeats =
+          seats
+            .filter(
+              seat =>
+                seat.match_id === match.id
+            )
+            .sort(
+              (a,b) =>
+                new Date(a.joined_at) -
+                new Date(b.joined_at)
+            );
+
+        const playerNames =
+          matchSeats
+            .map(
+              seat =>
+                escapeHtml(
+                  playerMap.get(
+                    seat.player_id
+                  )?.nickname ||
+                  "Player"
+                )
+            )
+            .join(" · ");
+
+        const count =
+          matchSeats.length;
+
+        const status =
+          match.status === "confirmed"
+            ? "Confirmed"
+            : `${count}/4`;
+
         return `
 
-          <div class="card">
+          <div
+            class="card"
+            style="
+              padding:10px 14px;
+              margin-bottom:8px;
+              overflow-x:auto;
+            ">
 
-            <span class="pill">
-              ${escapeHtml(cityName)}
-            </span>
+            <div
+              style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                white-space:nowrap;
+                font-size:14px;
+              ">
 
-            <h3>
-              ${escapeHtml(dateText(match.scheduled_at))}
-              ·
-              ${escapeHtml(timeText(match.scheduled_at))}
-            </h3>
+              <span class="pill">
+                ${escapeHtml(cityName)}
+              </span>
 
-            <p>
-              📍 ${escapeHtml(match.location)}
-            </p>
+              <strong>
+                ${escapeHtml(dateText(match.scheduled_at))}
+                ·
+                ${escapeHtml(timeText(match.scheduled_at))}
+              </strong>
+
+              <span>
+                📍 ${escapeHtml(match.location)}
+              </span>
+
+              <span>
+                ${playerNames}
+              </span>
+
+              <span class="pill">
+                ${escapeHtml(status)}
+              </span>
+
+            </div>
 
           </div>
 
