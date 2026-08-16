@@ -4815,13 +4815,14 @@ async function calculateScrambleStandings(
 ){
 
   const [
-    playersResult,
-    scoresResult,
-    gamesResult,
-    matchesResult,
-    membersResult
-  ] = await Promise.all([
-
+  playersResult,
+  scoresResult,
+  gamesResult,
+  matchesResult,
+  membersResult,
+  adjustmentsResult
+] = await Promise.all([
+    
     supabaseClient
       .from("players")
       .select("id,nickname"),
@@ -4848,14 +4849,21 @@ async function calculateScrambleStandings(
         scrambleId
       ),
 
-    supabaseClient
-      .from("match_players")
-      .select(
-        "match_id,player_id"
-      )
+  supabaseClient
+  .from("match_players")
+  .select(
+    "match_id,player_id"
+  ),
 
-  ]);
+supabaseClient
+  .rpc(
+    "get_point_adjustments",
+    {
+      p_scramble_id:scrambleId
+    }
+  )
 
+]);
   const completed =
     (matchesResult.data || [])
     .filter(
@@ -4965,7 +4973,29 @@ async function calculateScrambleStandings(
     }
 
   }
+/* ADMIN MANUAL POINT ADJUSTMENTS */
 
+for(
+  const adjustment of
+  adjustmentsResult.data || []
+){
+
+  const player =
+    players.get(
+      adjustment.player_id
+    );
+
+  if(player){
+
+    player.points +=
+      Number(
+        adjustment.points ||
+        0
+      );
+
+  }
+
+}
   for(
     const match of
     completed
