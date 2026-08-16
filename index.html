@@ -2632,28 +2632,27 @@ if(myUpcomingList){
                 font-size:14px;
               ">
 
-              <span class="pill">
-                ${escapeHtml(cityName)}
-              </span>
+             <span class="pill">
+  ${escapeHtml(status)}
+</span>
 
-              <strong>
-                ${escapeHtml(dateText(match.scheduled_at))}
-                ·
-                ${escapeHtml(timeText(match.scheduled_at))}
-              </strong>
+<span class="pill">
+  ${escapeHtml(cityName)}
+</span>
 
-              <span>
-                📍 ${escapeHtml(match.location)}
-              </span>
+<strong>
+  ${escapeHtml(dateText(match.scheduled_at))}
+  ·
+  ${escapeHtml(timeText(match.scheduled_at))}
+</strong>
 
-              <span>
-                ${playerNames}
-              </span>
+<span>
+  📍 ${escapeHtml(match.location)}
+</span>
 
-              <span class="pill">
-                ${escapeHtml(status)}
-              </span>
-
+<span>
+  ${playerNames}
+</span>
             </div>
 
           </div>
