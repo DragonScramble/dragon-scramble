@@ -4473,55 +4473,78 @@ function renderNewScoreForm(
 
   const safePrefix =
     prefix.replaceAll("-","_");
+const isAdminScore =
+  prefix === "admin-score-list";
 
+const scoreContentId =
+  `${safePrefix}-match-${match.id}`;
   return `
 
-    <div class="card">
+   <div class="card">
 
-      <div class="eyebrow">
-        Confirmed Match
-      </div>
+  <div
+    onclick="${
+      isAdminScore
+        ? `toggleAdminSection('${scoreContentId}')`
+        : ""
+    }"
+    style="${
+      isAdminScore
+        ? "cursor:pointer;"
+        : ""
+    }">
 
-      <h2>
+    <div class="eyebrow">
+      Confirmed Match
+    </div>
 
-        ${escapeHtml(
-          dateText(
-            match.scheduled_at
-          )
-        )}
+    <h2>
 
-        ·
+      ${escapeHtml(
+        dateText(
+          match.scheduled_at
+        )
+      )}
 
-        ${escapeHtml(
-          timeText(
-            match.scheduled_at
-          )
-        )}
+      ·
 
-      </h2>
+      ${escapeHtml(
+        timeText(
+          match.scheduled_at
+        )
+      )}
 
-      <p>
-        📍 ${escapeHtml(match.location)}
-      </p>
+      ${isAdminScore ? " ▾" : ""}
 
-      <div class="players">
+    </h2>
 
-        ${players
-          .map(
-            player =>
-              escapeHtml(
-                player.nickname
-              )
-          )
-          .join(" · ")}
+    <p>
+      📍 ${escapeHtml(match.location)}
+    </p>
 
-      </div>
+    <div class="players">
 
-      <div class="notice">
-        Enter all four games.
-        Each player is East once.
-      </div>
+      ${players
+        .map(
+          player =>
+            escapeHtml(
+              player.nickname
+            )
+        )
+        .join(" · ")}
 
+    </div>
+
+  </div>
+
+  <div
+    id="${scoreContentId}"
+    class="${isAdminScore ? "hidden" : ""}">
+
+    <div class="notice">
+      Enter all four games.
+      Each player is East once.
+    </div>
       ${
         players.map(
           (east,index) => {
@@ -4634,16 +4657,16 @@ function renderNewScoreForm(
         Submit Match Results
 
       </button>
+<p
+  id="${safePrefix}-score-message-${match.id}"
+  class="muted">
+</p>
 
-      <p
-        id="${safePrefix}-score-message-${match.id}"
-        class="muted">
-      </p>
+  </div>
 
-    </div>
+</div>
 
-  `;
-
+`;
 }
 
 
