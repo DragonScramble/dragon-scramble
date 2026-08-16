@@ -1273,144 +1273,205 @@ Admin may submit results for any confirmed match.
 
 <div class="card">
 
-<div class="eyebrow">
-Scramble History & Management
-</div>
+  <div class="eyebrow">
+    Scramble History & Management
+  </div>
 
-<h2>Scrambles</h2>
+  <h2
+    onclick="toggleAdminSection('admin-scramble-content')"
+    style="cursor:pointer;">
+    Scrambles ▾
+  </h2>
 
-<p class="muted">
-Names and dates may be edited. Closed Scrambles remain locked for scoring.
-</p>
+  <div
+    id="admin-scramble-content"
+    class="hidden">
 
-<div id="admin-scramble-history">
-<p class="muted">Loading Scrambles...</p>
+    <p class="muted">
+      Names and dates may be edited. Closed Scrambles remain locked for scoring.
+    </p>
+
+    <div id="admin-scramble-history">
+      <p class="muted">Loading Scrambles...</p>
+    </div>
+
+    <div
+      id="admin-create-scramble"
+      class="hidden">
+
+      <div class="edit-box">
+
+        <h3>Create New Scramble</h3>
+
+        <label>Scramble Name</label>
+
+        <input
+          id="new-scramble-name"
+          placeholder="e.g. Fall 2026 Dragon Scramble">
+
+        <div class="formgrid">
+
+          <div>
+            <label>Start Date</label>
+            <input
+              id="new-scramble-start"
+              type="date">
+          </div>
+
+          <div>
+            <label>End Date</label>
+            <input
+              id="new-scramble-end"
+              type="date">
+          </div>
+
+        </div>
+
+        <button
+          class="btn"
+          onclick="adminCreateScramble()">
+          Create Active Scramble
+        </button>
+
+        <p
+          id="new-scramble-message"
+          class="muted">
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>
 
 
 <div
-id="admin-create-scramble"
-class="hidden">
+  id="admin-payment-card"
+  class="card">
 
-<div class="edit-box">
+  <div class="eyebrow">
+    Current Scramble Settings
+  </div>
 
-<h3>Create New Scramble</h3>
+  <h2
+    onclick="toggleAdminSection('admin-payment-content')"
+    style="cursor:pointer;">
+    Payment Instructions ▾
+  </h2>
 
-<label>Scramble Name</label>
+  <div
+    id="admin-payment-content"
+    class="hidden">
 
-<input
-id="new-scramble-name"
-placeholder="e.g. Fall 2026 Dragon Scramble">
+    <label>Payment Message</label>
 
-<div class="formgrid">
-
-<div>
-<label>Start Date</label>
-<input id="new-scramble-start" type="date">
-</div>
-
-<div>
-<label>End Date</label>
-<input id="new-scramble-end" type="date">
-</div>
-
-</div>
-
-<button
-class="btn"
-onclick="adminCreateScramble()">
-Create Active Scramble
-</button>
-
-<p id="new-scramble-message" class="muted"></p>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div id="admin-payment-card" class="card">
-
-<div class="eyebrow">Current Scramble Settings</div>
-<h2>Payment Instructions</h2>
-
-<label>Payment Message</label>
-
-<textarea id="admin-payment-instructions"></textarea>
-
-<button
-class="btn"
-onclick="adminSavePaymentInstructions()">
-Save Payment Instructions
-</button>
-
-<p id="admin-payment-message" class="muted"></p>
-
-</div>
-<div id="admin-city-card" class="card">
-
-  <div class="eyebrow">Location Settings</div>
-  <h2>Manage Cities</h2>
-
-  <p class="muted">
-    Cities listed here will be available when players propose matches.
-  </p>
-
-  <div class="edit-box">
-
-    <label>Add City</label>
-
-    <input
-      id="admin-new-city"
-      type="text"
-      placeholder="e.g. New York">
+    <textarea
+      id="admin-payment-instructions">
+    </textarea>
 
     <button
       class="btn"
-      type="button"
-      onclick="adminAddCity()">
-      Add City
+      onclick="adminSavePaymentInstructions()">
+      Save Payment Instructions
     </button>
 
     <p
-      id="admin-city-message"
+      id="admin-payment-message"
       class="muted">
     </p>
 
   </div>
 
-  <div id="admin-city-list">
+</div>
+
+
+<div
+  id="admin-city-card"
+  class="card">
+
+  <div class="eyebrow">
+    Location Settings
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-city-content')"
+    style="cursor:pointer;">
+    Manage Cities ▾
+  </h2>
+
+  <div
+    id="admin-city-content"
+    class="hidden">
 
     <p class="muted">
-      Loading cities...
+      Cities listed here will be available when players propose matches.
     </p>
+
+    <div class="edit-box">
+
+      <label>Add City</label>
+
+      <input
+        id="admin-new-city"
+        type="text"
+        placeholder="e.g. New York">
+
+      <button
+        class="btn"
+        type="button"
+        onclick="adminAddCity()">
+        Add City
+      </button>
+
+      <p
+        id="admin-city-message"
+        class="muted">
+      </p>
+
+    </div>
+
+    <div id="admin-city-list">
+
+      <p class="muted">
+        Loading cities...
+      </p>
+
+    </div>
 
   </div>
 
 </div>
-<div id="admin-rules-qa-card" class="card">
 
-  <div class="eyebrow">Rules</div>
-<h2
-  onclick="toggleAdminQA()"
-  style="cursor:pointer;">
-  Manage Q&A ▾
-</h2>
 
 <div
-  id="admin-qa-content"
-  class="edit-box hidden">
+  id="admin-rules-qa-card"
+  class="card">
+
+  <div class="eyebrow">Rules</div>
+
+  <h2
+    onclick="toggleAdminQA()"
+    style="cursor:pointer;">
+    Manage Q&A ▾
+  </h2>
+
+  <div
+    id="admin-qa-content"
+    class="edit-box hidden">
 
     <label>Question</label>
+
     <input
       id="admin-qa-question"
       type="text">
 
     <label>Answer</label>
+
     <textarea
-      id="admin-qa-answer"></textarea>
+      id="admin-qa-answer">
+    </textarea>
 
     <button
       class="btn"
@@ -1424,57 +1485,105 @@ Save Payment Instructions
       class="muted">
     </p>
 
-  <div id="admin-qa-list">
-    <p class="muted">Loading Q&A...</p>
+    <div id="admin-qa-list">
+      <p class="muted">Loading Q&A...</p>
+    </div>
+
   </div>
 
-</div></div>
-<div id="admin-player-card" class="card">
-
-<div class="eyebrow">Player Management</div>
-<h2>Players & Payments</h2>
-
-<button
-  class="btn secondary"
-  type="button"
-  onclick="adminDownloadPlayers()">
-  Download Player List
-</button>
-
-<div id="admin-player-list">
-<p class="muted">Loading players...</p>
 </div>
+
+
+<div
+  id="admin-player-card"
+  class="card">
+
+  <div class="eyebrow">
+    Player Management
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-player-content')"
+    style="cursor:pointer;">
+    Players & Payments ▾
+  </h2>
+
+  <div
+    id="admin-player-content"
+    class="hidden">
+
+    <button
+      class="btn secondary"
+      type="button"
+      onclick="adminDownloadPlayers()">
+      Download Player List
+    </button>
+
+    <div id="admin-player-list">
+      <p class="muted">Loading players...</p>
+    </div>
+
+  </div>
 
 </div>
 
 
 <div class="card">
 
-<div class="eyebrow">Match Management</div>
-<h2>All Matches</h2>
+  <div class="eyebrow">
+    Match Management
+  </div>
 
-<p class="muted">
-Admin may permanently remove test or invalid matches.
-</p>
+  <h2
+    onclick="toggleAdminSection('admin-match-content')"
+    style="cursor:pointer;">
+    All Matches ▾
+  </h2>
 
-<div id="admin-match-management">
-<p class="muted">Loading matches...</p>
+  <div
+    id="admin-match-content"
+    class="hidden">
+
+    <p class="muted">
+      Admin may permanently remove test or invalid matches.
+    </p>
+
+    <div id="admin-match-management">
+      <p class="muted">Loading matches...</p>
+    </div>
+
+  </div>
+
 </div>
 
+
+<div
+  id="admin-score-card"
+  class="card">
+
+  <div class="eyebrow">
+    Score Entry
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-score-content')"
+    style="cursor:pointer;">
+    Confirmed Matches ▾
+  </h2>
+
+  <div
+    id="admin-score-content"
+    class="hidden">
+
+    <div id="admin-score-list">
+      <p class="muted">
+        Loading confirmed matches...
+      </p>
+    </div>
+
+  </div>
+
 </div>
-
-
-<div id="admin-score-card" class="card">
-
-<div class="eyebrow">Score Entry</div>
-<h2>Confirmed Matches</h2>
-
-<div id="admin-score-list">
-<p class="muted">Loading confirmed matches...</p>
-</div>
-
-</div>
-
 </section>
 
 </main>
@@ -8376,6 +8485,16 @@ show("matches");
 
   }
 );
+  function toggleAdminSection(id){
+
+  const content =
+    document.getElementById(id);
+
+  if(!content) return;
+
+  content.classList.toggle("hidden");
+
+}
 function toggleAdminQA(){
 
   const content =
