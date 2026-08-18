@@ -5695,7 +5695,22 @@ async function loadLeaderboard(){
 
     return;
   }
+if(currentScramble.public_results === false){
 
+  board.innerHTML =
+    '<p class="muted">Results for this Scramble are not publicly displayed.</p>';
+
+  document
+    .getElementById("city-leaders")
+    .innerHTML = "";
+
+  updateMyStanding(
+    [],
+    currentUser
+  );
+
+  return;
+}
   const rows =
     await calculateScrambleStandings(
       currentScramble.id
