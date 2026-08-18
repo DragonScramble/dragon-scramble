@@ -1840,8 +1840,12 @@ async function getActiveScramble(){
     return null;
   }
 
-  activeScrambles =
-    data || [];
+activeScrambles =
+  (data || []).filter(
+    scramble =>
+      scramble.visible !== false ||
+      currentPlayerProfile?.role === "admin"
+  );
 
  const previousScrambleId =
   currentScramble?.id;
