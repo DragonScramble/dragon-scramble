@@ -1652,6 +1652,7 @@ supabase.createClient(
 let currentUser = null;
 let currentPlayerProfile = null;
 let currentScramble = null;
+  let activeScrambles = [];
 let passwordRecoveryMode =
   window.location.hash.includes("type=recovery") ||
   window.location.search.includes("type=recovery");
@@ -1785,22 +1786,26 @@ async function getActiveScramble(){
         "id,name,start_date,end_date,status,closed_at,payment_instructions"
       )
       .eq("status","active")
-      .order("start_date",{ascending:false})
-      .limit(1)
-      .maybeSingle();
+      .order("start_date",{ascending:false});
 
   if(error){
 
     console.error(
-      "Could not load active Scramble:",
+      "Could not load active Scrambles:",
       error
     );
+
+    activeScrambles = [];
+    currentScramble = null;
 
     return null;
   }
 
+  activeScrambles =
+    data || [];
+
   currentScramble =
-    data || null;
+    activeScrambles[0] || null;
 
   return currentScramble;
 
