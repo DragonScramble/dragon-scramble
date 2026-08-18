@@ -7711,10 +7711,12 @@ async function adminConfirmPayment(id){
   const {error} =
     await supabaseClient
       .rpc(
-        "admin_confirm_player_payment",
-        {
-          p_player_id:id
-        }
+       "admin_confirm_player_payment",
+{
+  p_player_id:id,
+  p_scramble_id:
+    currentScramble.id
+}
       );
 
   if(error){
