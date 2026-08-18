@@ -1902,13 +1902,13 @@ async function selectScramble(scrambleId){
 
   await checkEligibility();
 
-  await Promise.all([
+ await Promise.all([
   loadLeaderboard(),
   loadHomeMatches(),
   loadMatchesPage(),
   loadPlayedMatches(),
-  loadRoster(),
-  loadAccount(),
+  roster(),
+  loadAccountPaymentStatus(),
   loadAdminPlayers()
 ]);
 
