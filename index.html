@@ -1813,7 +1813,7 @@ async function getActiveScramble(){
     await supabaseClient
       .from("scrambles")
       .select(
-        "id,name,start_date,end_date,status,closed_at,payment_instructions"
+       "id,name,start_date,end_date,status,closed_at,payment_instructions,color"
       )
       .eq("status","active")
       .order("start_date",{ascending:false});
