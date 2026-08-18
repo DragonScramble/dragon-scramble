@@ -527,7 +527,26 @@ Admin
 </nav>
 
 </header>
+<div
+  id="scramble-selector-bar"
+  class="hidden"
+  style="
+    max-width:1200px;
+    margin:16px auto 0;
+    padding:0 20px;
+  "
+>
+  <div class="card" style="margin:0;">
+    <label for="scramble-selector">
+      VIEWING SCRAMBLE
+    </label>
 
+    <select
+      id="scramble-selector"
+      onchange="selectScramble(this.value)"
+    ></select>
+  </div>
+</div>
 <main>
 <!-- HOW IT WORKS -->
 
@@ -1806,11 +1825,80 @@ async function getActiveScramble(){
 
   currentScramble =
     activeScrambles[0] || null;
-
+renderScrambleSelector();
   return currentScramble;
 
 }
+function renderScrambleSelector(){
 
+  const bar =
+    document.getElementById(
+      "scramble-selector-bar"
+    );
+
+  const selector =
+    document.getElementById(
+      "scramble-selector"
+    );
+
+  if(!bar || !selector){
+    return;
+  }
+
+  if(activeScrambles.length <= 1){
+
+    bar.classList.add("hidden");
+    return;
+
+  }
+
+  selector.innerHTML =
+    activeScrambles
+      .map(
+        scramble => `
+          <option
+            value="${scramble.id}"
+            ${
+              scramble.id === currentScramble?.id
+                ? "selected"
+                : ""
+            }
+          >
+            ${escapeHtml(scramble.name)}
+          </option>
+        `
+      )
+      .join("");
+
+  bar.classList.remove("hidden");
+
+}
+
+
+async function selectScramble(scrambleId){
+
+  const selected =
+    activeScrambles.find(
+      scramble =>
+        scramble.id === scrambleId
+    );
+
+  if(!selected){
+    return;
+  }
+
+  currentScramble = selected;
+
+  applyScrambleDateLimits();
+
+  await checkEligibility();
+
+  await Promise.all([
+    loadLeaderboard(),
+    loadHomeMatches()
+  ]);
+
+}
 function applyScrambleDateLimits(){
 
   const dateInput =
