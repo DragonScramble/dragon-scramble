@@ -7043,12 +7043,13 @@ const color =
     await supabaseClient
       .rpc(
         "admin_update_scramble",
-        {
+    {
   p_scramble_id:id,
   p_name:name,
   p_start_date:start,
   p_end_date:end,
-  p_color:color
+  p_color:color,
+  p_public_results:publicResults
 }
       );
 
