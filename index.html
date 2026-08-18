@@ -6999,7 +6999,29 @@ async function loadAdminScrambleHistory(){
   </label>
 
 </div>
- 
+ <div style="margin:10px 0 14px;">
+
+  <label
+    style="
+      display:flex;
+      align-items:center;
+      gap:8px;
+      text-transform:none;
+      letter-spacing:0;
+      font-size:14px;
+      color:var(--ink);
+    ">
+
+    <input
+      id="scramble-visible-${scramble.id}"
+      type="checkbox"
+      ${scramble.visible !== false ? "checked" : ""}>
+
+    Visible Scramble
+
+  </label>
+
+</div>
             <button
               class="btn"
               onclick="adminSaveScrambleEdit('${scramble.id}')">
@@ -7055,6 +7077,10 @@ const color =
   document.getElementById(
     `scramble-public-results-${id}`
   ).checked;
+  const visible =
+  document.getElementById(
+    `scramble-visible-${id}`
+  ).checked;
   const {error} =
     await supabaseClient
       .rpc(
@@ -7065,7 +7091,8 @@ const color =
   p_start_date:start,
   p_end_date:end,
   p_color:color,
-  p_public_results:publicResults
+p_public_results:publicResults,
+p_visible:visible
 }
       );
 
