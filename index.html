@@ -1823,8 +1823,17 @@ async function getActiveScramble(){
   activeScrambles =
     data || [];
 
-  currentScramble =
-    activeScrambles[0] || null;
+ const previousScrambleId =
+  currentScramble?.id;
+
+currentScramble =
+  activeScrambles.find(
+    scramble =>
+      scramble.id === previousScrambleId
+  ) ||
+  activeScrambles[0] ||
+  null;
+
 renderScrambleSelector();
   return currentScramble;
 
