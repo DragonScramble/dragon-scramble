@@ -2255,12 +2255,15 @@ async function playerNotifyPayment(){
     return;
   }
 
-  const {error} =
-    await supabaseClient
-      .rpc(
-        "player_notify_payment"
-      );
-
+ const {error} =
+  await supabaseClient
+    .rpc(
+      "player_notify_payment",
+      {
+        p_scramble_id:
+          currentScramble.id
+      }
+    );
   if(error){
 
     alert(
