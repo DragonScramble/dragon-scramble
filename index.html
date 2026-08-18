@@ -6833,7 +6833,7 @@ async function loadAdminScrambleHistory(){
     await supabaseClient
       .from("scrambles")
       .select(
- "id,name,start_date,end_date,status,closed_at,payment_instructions,color"
+"id,name,start_date,end_date,status,closed_at,payment_instructions,color,public_results"
       )
       .order(
         "start_date",
@@ -6961,6 +6961,29 @@ async function loadAdminScrambleHistory(){
     padding:3px;
     cursor:pointer;
   ">
+  <div style="margin:10px 0 14px;">
+
+  <label
+    style="
+      display:flex;
+      align-items:center;
+      gap:8px;
+      text-transform:none;
+      letter-spacing:0;
+      font-size:14px;
+      color:var(--ink);
+    ">
+
+    <input
+      id="scramble-public-results-${scramble.id}"
+      type="checkbox"
+      ${scramble.public_results !== false ? "checked" : ""}>
+
+    Public Results
+
+  </label>
+
+</div>
             <button
               class="btn"
               onclick="adminSaveScrambleEdit('${scramble.id}')">
@@ -7012,6 +7035,10 @@ const color =
   document.getElementById(
     `scramble-color-${id}`
   ).value;
+  const publicResults =
+  document.getElementById(
+    `scramble-public-results-${id}`
+  ).checked;
   const {error} =
     await supabaseClient
       .rpc(
