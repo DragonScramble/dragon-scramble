@@ -2430,7 +2430,7 @@ async function loadMatchesPage(){
     loadUpcomingMatches(),
     loadPlayedMatches()
   ]);
-
+await loadMyUpcomingMatches();
 }
 
 
@@ -2601,7 +2601,341 @@ async function joinMatch(id){
 
 }
 
+async function loadMyUpcomingMatches(){
 
+  const list =
+    document.getElementById(
+      "my-upcoming-match-list"
+    );
+
+  const legend =
+    document.getElementById(
+      "my-upcoming-scramble-legend"
+    );
+
+  if(!list || !legend){
+    return;
+  }
+
+  if(!currentUser){
+    list.innerHTML = "";
+    legend.innerHTML = "";
+    return;
+  }
+
+  await getActiveScramble();
+
+  const activeIds =
+    activeScrambles.map(
+      scramble => scramble.id
+    );
+
+  if(!activeIds.length){
+    list.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+    legend.innerHTML = "";
+    return;
+  }
+
+  const {data:mySeats,error:seatError} =
+    await supabaseClient
+      .from("match_players")
+      .select("match_id")
+      .eq(
+        "player_id",
+        currentUser.id
+      );
+
+  if(seatError){
+    console.error(
+      "Could not load player matches:",
+      seatError
+    );
+    return;
+  }
+
+  const myMatchIds =
+    (mySeats || []).map(
+      seat => seat.match_id
+    );
+
+  if(!myMatchIds.length){
+    list.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+    legend.innerHTML = "";
+    return;
+  }
+
+  const {data:matches,error:matchError} =
+    await supabaseClient
+      .from("matches")
+      .select(
+        "id,scramble_id,scheduled_at,location,status"
+      )
+      .in(
+        "id",
+        myMatchIds
+      )
+      .in(
+        "scramble_id",
+        activeIds
+      )
+      .in(
+        "status",
+        ["open","confirmed"]
+      )
+      .gte(
+        "scheduled_at",
+        new Date().toISOString()
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
+
+  if(matchError){
+    console.error(
+      "Could not load upcoming player matches:",
+      matchError
+    );
+    return;
+  }
+
+  const myMatches =
+    matches || [];
+
+  if(!myMatches.length){
+    list.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+    legend.innerHTML = "";
+    return;
+  }
+
+  const matchIds =
+    myMatches.map(
+      match => match.id
+    );
+
+  const [
+    seatsResult,
+    playersResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      )
+      .in(
+        "match_id",
+        matchIds
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      )
+
+  ]);
+
+  const seats =
+    seatsResult.data || [];
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+        .map(
+          player => [
+            player.id,
+            player.nickname ||
+              "Player"
+          ]
+        )
+    );
+
+  const scrambleMap =
+    new Map(
+      activeScrambles.map(
+        scramble => [
+          scramble.id,
+          scramble
+        ]
+      )
+    );
+
+  const representedScrambleIds =
+    [
+      ...new Set(
+        myMatches.map(
+          match =>
+            match.scramble_id
+        )
+      )
+    ];
+
+  legend.innerHTML =
+    representedScrambleIds
+      .map(scrambleId => {
+
+        const scramble =
+          scrambleMap.get(
+            scrambleId
+          );
+
+        if(!scramble){
+          return "";
+        }
+
+        const color =
+          scramble.color ||
+          "#B88A3B";
+
+        return `
+          <span
+            style="
+              display:inline-flex;
+              align-items:center;
+              gap:6px;
+            ">
+
+            <span
+              style="
+                width:10px;
+                height:10px;
+                border-radius:50%;
+                background:${escapeHtml(color)};
+                display:inline-block;
+              ">
+            </span>
+
+            ${escapeHtml(scramble.name)}
+
+          </span>
+        `;
+
+      })
+      .join("");
+
+  list.innerHTML =
+    myMatches
+      .map(match => {
+
+        const scramble =
+          scrambleMap.get(
+            match.scramble_id
+          );
+
+        const color =
+          scramble?.color ||
+          "#B88A3B";
+
+        const matchSeats =
+          seats
+            .filter(
+              seat =>
+                seat.match_id ===
+                match.id
+            )
+            .sort(
+              (a,b) =>
+                new Date(a.joined_at) -
+                new Date(b.joined_at)
+            );
+
+        const playerNames =
+          matchSeats
+            .map(
+              seat =>
+                escapeHtml(
+                  playerMap.get(
+                    seat.player_id
+                  ) ||
+                  "Player"
+                )
+            )
+            .join(" · ");
+
+        const count =
+          matchSeats.length;
+
+        const status =
+          match.status ===
+            "confirmed"
+            ? "Confirmed"
+            : `${count}/4`;
+
+        return `
+
+          <div
+            class="card"
+            style="
+              padding:10px 14px;
+              margin-bottom:8px;
+              overflow-x:auto;
+            ">
+
+            <div
+              style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                white-space:nowrap;
+                font-size:14px;
+              ">
+
+              <span
+                style="
+                  width:10px;
+                  height:10px;
+                  min-width:10px;
+                  border-radius:50%;
+                  background:${escapeHtml(color)};
+                  display:inline-block;
+                ">
+              </span>
+
+              <span class="pill">
+                ${escapeHtml(status)}
+              </span>
+
+              <strong>
+                ${escapeHtml(
+                  dateText(
+                    match.scheduled_at
+                  )
+                )}
+                ·
+                ${escapeHtml(
+                  timeText(
+                    match.scheduled_at
+                  )
+                )}
+              </strong>
+
+              <span>
+                📍 ${escapeHtml(
+                  match.location
+                )}
+              </span>
+
+              <span>
+                ${playerNames}
+              </span>
+
+            </div>
+
+          </div>
+
+        `;
+
+      })
+      .join("");
+
+}
 /* UPCOMING MATCHES */
 
 async function loadUpcomingMatches(){
