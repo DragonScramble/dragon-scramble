@@ -5990,22 +5990,13 @@ async function loadHallOfFame(){
   
 
   const {
-    data:scrambles,
-    error
-  } =
-    await supabaseClient
-      .from("scrambles")
-      .select(
-        "id,name,start_date,end_date,closed_at,status"
-      )
-      .eq(
-        "status",
-        "closed"
-      )
-      .order(
-        "closed_at",
-        {ascending:false}
-      );
+  data:scrambles,
+  error
+} =
+  await supabaseClient
+    .rpc(
+      "public_closed_scrambles"
+    );
 
   if(error){
 
