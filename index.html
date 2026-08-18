@@ -6177,13 +6177,7 @@ async function loadHallOfFame(){
       "hall-of-fame-list"
     );
 
-  if(!currentUser){
-
-    box.innerHTML =
-      '<p class="muted">Sign in to view the Hall of Fame.</p>';
-
-    return;
-  }
+  
 
   const {
     data:scrambles,
