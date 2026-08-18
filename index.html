@@ -5863,15 +5863,7 @@ async function loadLeaderboard(){
 
   await getActiveScramble();
 
-  if(!currentUser){
-
-    board.innerHTML =
-      '<p class="muted">Sign in to view the leaderboard.</p>';
-
-    updateMyStanding([],null);
-
-    return;
-  }
+ 
 
   if(!currentScramble){
 
