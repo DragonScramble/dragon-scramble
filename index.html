@@ -7738,14 +7738,13 @@ async function adminSetPlayerActive(
   const {error} =
     await supabaseClient
       .rpc(
-        "admin_set_player_active",
-        {
-
-          p_player_id:id,
-
-          p_active:active
-
-        }
+   "admin_set_player_active",
+{
+  p_player_id:id,
+  p_active:active,
+  p_scramble_id:
+    currentScramble.id
+}
       );
 
   if(error){
