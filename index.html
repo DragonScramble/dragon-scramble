@@ -1903,9 +1903,14 @@ async function selectScramble(scrambleId){
   await checkEligibility();
 
   await Promise.all([
-    loadLeaderboard(),
-    loadHomeMatches()
-  ]);
+  loadLeaderboard(),
+  loadHomeMatches(),
+  loadMatchesPage(),
+  loadPlayedMatches(),
+  loadRoster(),
+  loadAccount(),
+  loadAdminPlayers()
+]);
 
 }
 function applyScrambleDateLimits(){
