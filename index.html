@@ -6793,10 +6793,7 @@ async function loadAdminScrambleHistory(){
       `
     ).join("");
 
-  createBox.classList.toggle(
-    "hidden",
-    !!currentScramble
-  );
+ createBox.classList.remove("hidden");
 
 }
 
