@@ -6054,7 +6054,25 @@ async function roster(){
 
     return;
   }
+await checkEligibility();
 
+const isAdmin =
+  currentPlayerProfile?.role === "admin";
+
+if(
+  !isAdmin &&
+  !currentEligibility.active
+){
+
+  list.innerHTML = `
+    <p class="muted">
+      The player roster is available only to active players in
+      ${escapeHtml(currentScramble.name)}.
+    </p>
+  `;
+
+  return;
+}
   const [
     membersResult,
     playersResult
