@@ -5404,229 +5404,47 @@ async function calculateScrambleStandings(
   scrambleId
 ){
 
-  const [
-  playersResult,
-  scoresResult,
-  gamesResult,
-  matchesResult,
-  membersResult,
-  adjustmentsResult
-] = await Promise.all([
-    
-    supabaseClient
-      .from("players")
-      .select("id,nickname"),
-
-    supabaseClient
-      .from("scores")
-      .select(
-        "player_id,game_id,points"
-      ),
-
-    supabaseClient
-      .from("games")
-      .select(
-        "id,match_id"
-      ),
-
-    supabaseClient
-      .from("matches")
-      .select(
-        "id,proposer_id,status,completed_at,scramble_id"
-      )
-      .eq(
-        "scramble_id",
-        scrambleId
-      ),
-
-  supabaseClient
-  .from("match_players")
-  .select(
-    "match_id,player_id"
-  ),
-
-supabaseClient
-  .rpc(
-    "get_point_adjustments",
-    {
-      p_scramble_id:scrambleId
-    }
-  )
-
-]);
-  const completed =
-    (matchesResult.data || [])
-    .filter(
-      match =>
-        match.status ===
-          "completed"
-        ||
-        !!match.completed_at
-    );
-
-  const completedIds =
-    new Set(
-      completed.map(
-        match =>
-          match.id
-      )
-    );
-
-  const gameToMatch =
-    new Map(
-      (gamesResult.data || [])
-      .map(
-        game => [
-          game.id,
-          game.match_id
-        ]
-      )
-    );
-
-  const players =
-    new Map();
-
-  for(
-    const player of
-    playersResult.data || []
-  ){
-
-    players.set(
-      player.id,
-      {
-        id:player.id,
-        nickname:
-          player.nickname ||
-          "Player",
-        points:0,
-        matches:new Set()
-      }
-    );
-
-  }
-
-  for(
-    const membership of
-    membersResult.data || []
-  ){
-
-    if(
-      completedIds.has(
-        membership.match_id
-      )
-    ){
-
-      players
-        .get(
-          membership.player_id
-        )
-        ?.matches
-        .add(
-          membership.match_id
-        );
-
-    }
-
-  }
-
-  for(
-    const score of
-    scoresResult.data || []
-  ){
-
-    const matchId =
-      gameToMatch.get(
-        score.game_id
+  const {data,error} =
+    await supabaseClient
+      .rpc(
+        "public_scramble_standings",
+        {
+          p_scramble_id:scrambleId
+        }
       );
 
-    if(
-      !completedIds.has(
-        matchId
-      )
-    ){
-      continue;
-    }
+  if(error){
 
-    const player =
-      players.get(
-        score.player_id
-      );
-
-    if(player){
-
-      player.points +=
-        Number(
-          score.points ||
-          0
-        );
-
-    }
-
-  }
-/* ADMIN MANUAL POINT ADJUSTMENTS */
-
-for(
-  const adjustment of
-  adjustmentsResult.data || []
-){
-
-  const player =
-    players.get(
-      adjustment.player_id
+    console.error(
+      "Could not load standings:",
+      error
     );
 
-  if(player){
-
-    player.points +=
-      Number(
-        adjustment.points ||
-        0
-      );
-
+    return [];
   }
 
-}
-  for(
-    const match of
-    completed
-  ){
-
-    const proposer =
-      players.get(
-        match.proposer_id
-      );
-
-    if(proposer){
-
-      proposer.points += 5;
-
-    }
-
-  }
-
-  return Array.from(
-    players.values()
-  )
-  .map(
+  return (data || []).map(
     player => ({
-
-      ...player,
-
+      id:player.player_id,
+      nickname:
+        player.nickname ||
+        "Player",
+      points:
+        Number(
+          player.points ||
+          0
+        ),
       matches_played:
-        player.matches.size,
-
+        Number(
+          player.matches_played ||
+          0
+        ),
       average:
-        player.matches.size
-          ? player.points /
-            player.matches.size
-          : 0
-
+        Number(
+          player.average ||
+          0
+        )
     })
-  )
-  .filter(
-    player =>
-      player.matches_played >
-      0
   );
 
 }
