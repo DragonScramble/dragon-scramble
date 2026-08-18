@@ -1389,7 +1389,18 @@ Admin may submit results for any confirmed match.
           </div>
 
         </div>
+<label>Scramble Color</label>
 
+<input
+  id="new-scramble-color"
+  type="color"
+  value="#B88A3B"
+  style="
+    width:70px;
+    height:44px;
+    padding:3px;
+    cursor:pointer;
+  ">
         <button
           class="btn"
           onclick="adminCreateScramble()">
@@ -6986,7 +6997,10 @@ async function adminCreateScramble(){
     document.getElementById(
       "new-scramble-end"
     ).value;
-
+const color =
+  document.getElementById(
+    "new-scramble-color"
+  ).value;
   const message =
     document.getElementById(
       "new-scramble-message"
@@ -7008,15 +7022,12 @@ async function adminCreateScramble(){
     await supabaseClient
       .rpc(
         "admin_create_scramble",
-        {
-
-          p_name:name,
-
-          p_start_date:start,
-
-          p_end_date:end
-
-        }
+       {
+  p_name:name,
+  p_start_date:start,
+  p_end_date:end,
+  p_color:color
+}
       );
 
   if(error){
