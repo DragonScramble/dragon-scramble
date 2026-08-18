@@ -6786,7 +6786,7 @@ async function loadAdminScrambleHistory(){
     await supabaseClient
       .from("scrambles")
       .select(
-        "id,name,start_date,end_date,status,closed_at,payment_instructions"
+ "id,name,start_date,end_date,status,closed_at,payment_instructions,color"
       )
       .order(
         "start_date",
@@ -6902,7 +6902,18 @@ async function loadAdminScrambleHistory(){
               </div>
 
             </div>
+<label>Scramble Color</label>
 
+<input
+  id="scramble-color-${scramble.id}"
+  type="color"
+  value="${escapeHtml(scramble.color || '#B88A3B')}"
+  style="
+    width:70px;
+    height:44px;
+    padding:3px;
+    cursor:pointer;
+  ">
             <button
               class="btn"
               onclick="adminSaveScrambleEdit('${scramble.id}')">
@@ -6950,22 +6961,21 @@ async function adminSaveScrambleEdit(id){
     document.getElementById(
       `scramble-end-${id}`
     ).value;
-
+const color =
+  document.getElementById(
+    `scramble-color-${id}`
+  ).value;
   const {error} =
     await supabaseClient
       .rpc(
         "admin_update_scramble",
         {
-
-          p_scramble_id:id,
-
-          p_name:name,
-
-          p_start_date:start,
-
-          p_end_date:end
-
-        }
+  p_scramble_id:id,
+  p_name:name,
+  p_start_date:start,
+  p_end_date:end,
+  p_color:color
+}
       );
 
   if(error){
