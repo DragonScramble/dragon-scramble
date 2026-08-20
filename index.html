@@ -4187,13 +4187,13 @@ function renderCompletedMatchDetails(
 
     if(game.self_picked){
       extras.push(
-        "Self-picked +10"
+      "Self-picked ×2"
       );
     }
 
     if(game.jokerless){
       extras.push(
-        "Jokerless +20"
+      "Jokerless ×2"
       );
     }
 
@@ -4439,7 +4439,7 @@ function renderAdminCompletedEdit(
                 type="checkbox"
                 ${game?.self_picked ? "checked" : ""}>
 
-              Self-picked +10
+            Self-picked ×2
 
             </label>
 
@@ -4450,7 +4450,7 @@ function renderAdminCompletedEdit(
                 type="checkbox"
                 ${game?.jokerless ? "checked" : ""}>
 
-              Jokerless +20
+            Jokerless ×2
 
             </label>
 
@@ -5025,7 +5025,7 @@ const scoreContentId =
                         id="${safePrefix}-self-${match.id}-${n}"
                         type="checkbox">
 
-                      Self-picked +10
+                     Self-picked ×2
 
                     </label>
 
@@ -5035,7 +5035,7 @@ const scoreContentId =
                         id="${safePrefix}-jokerless-${match.id}-${n}"
                         type="checkbox">
 
-                      Jokerless +20
+                      Jokerless ×2
 
                     </label>
 
@@ -5444,10 +5444,9 @@ async function calculateScrambleStandings(
           0
         ),
       average:
-        Number(
-          player.average ||
-          0
-        )
+  player.average === null
+    ? null
+    : Number(player.average)
     })
   );
 
@@ -5774,7 +5773,7 @@ await loadCityLeaders(
           </div>
 
           <div class="avg">
-            ${player.average.toFixed(1)} avg
+            ${player.average === null ? "N/A" : player.average.toFixed(1) + " avg"}
           </div>
 
         </div>
@@ -5849,7 +5848,7 @@ function updateMyStanding(
     player.nickname;
 
   stats.textContent =
-    `${player.points} points · ${player.average.toFixed(1)} average`;
+    `${player.points} points · ${player.average === null ? "N/A" : player.average.toFixed(1)} average`;
 
 }
 
@@ -6060,17 +6059,21 @@ async function loadHallOfFame(){
       )
       .slice(0,3);
 
-    const averages =
-      [...standings]
-      .sort(
-        (a,b) =>
-          b.average -
-          a.average
-          ||
-          b.points -
-          a.points
-      )
-      .slice(0,3);
+   const averages =
+  [...standings]
+  .filter(
+    player =>
+      player.average !== null
+  )
+  .sort(
+    (a,b) =>
+      b.average -
+      a.average
+      ||
+      b.points -
+      a.points
+  )
+  .slice(0,3);
 
     html += `
 
