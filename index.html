@@ -2961,13 +2961,16 @@ async function loadUpcomingMatches(){
     await supabaseClient
       .from("matches")
       .select(
-  "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at,city_id"
+ .select(
+  "id,proposer_id,scramble_id,scheduled_at,location,match_type,status,confirmed_at,city_id"
 )
     
-      .eq(
-        "scramble_id",
-        currentScramble.id
-      )
+     .in(
+  "scramble_id",
+  activeScrambles.map(
+    scramble => scramble.id
+  )
+)
       .in(
         "status",
         ["open","confirmed"]
@@ -3010,6 +3013,14 @@ const cityMap =
       city.id,
       city.name
     ])
+  );const scrambleMap =
+  new Map(
+    activeScrambles.map(
+      scramble => [
+        scramble.id,
+        scramble
+      ]
+    )
   );
   matches.sort((a, b) => {
 
@@ -3100,9 +3111,82 @@ list.innerHTML =
 
         <div class="city-group">
 
-          <h2>
-            ${escapeHtml(cityName.toUpperCase())}
-          </h2>
+         ${(() => {
+
+  const cityScrambleIds =
+    [
+      ...new Set(
+        cityMatches.map(
+          match => match.scramble_id
+        )
+      )
+    ];
+
+  const cityScrambleLegend =
+    cityScrambleIds
+      .map(scrambleId => {
+
+        const scramble =
+          scrambleMap.get(scrambleId);
+
+        if(!scramble){
+          return "";
+        }
+
+        const color =
+          scramble.color ||
+          "#B88A3B";
+
+        return `
+          <span
+            style="
+              display:inline-flex;
+              align-items:center;
+              gap:5px;
+              font-size:13px;
+              font-weight:normal;
+              letter-spacing:0;
+              white-space:nowrap;
+            ">
+
+            <span
+              style="
+                width:10px;
+                height:10px;
+                border-radius:50%;
+                background:${escapeHtml(color)};
+                display:inline-block;
+              ">
+            </span>
+
+            ${escapeHtml(scramble.name)}
+
+          </span>
+        `;
+
+      })
+      .join("");
+
+  return `
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        flex-wrap:wrap;
+        gap:14px;
+        margin:0 0 16px;
+      ">
+
+      <h2 style="margin:0;">
+        ${escapeHtml(cityName.toUpperCase())}
+      </h2>
+
+      ${cityScrambleLegend}
+
+    </div>
+  `;
+
+})()}
 
           ${
             cityMatches.map(
