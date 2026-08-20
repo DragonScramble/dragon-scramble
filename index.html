@@ -2961,6 +2961,8964 @@ async function loadUpcomingMatches(){
     await supabaseClient
       .from("matches")
       .select(
+  "id,proposer_id,scheduled_at,location,match_type,status,confirmed_at,city_id"
+)
+    
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .in(
+        "status",
+        ["open","confirmed"]
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
+
+  if(error){
+
+    list.innerHTML =
+      '<div class="card"><p class="error">Unable to load matches.</p></div>';
+
+    return;
+  }
+
+  if(
+    !matches ||
+    !matches.length
+  ){
+
+    list.innerHTML =
+      '<div class="card"><p class="muted">No upcoming matches yet.</p></div>';
+
+    return;
+  }
+const { data: cities, error: citiesError } =
+  await supabaseClient
+    .from("cities")
+    .select("id,name");
+
+if(citiesError){
+  console.error("Could not load cities:", citiesError);
+}
+
+const cityMap =
+  new Map(
+    (cities || []).map(city => [
+      city.id,
+      city.name
+    ])
+  );
+  matches.sort((a, b) => {
+
+  const cityA =
+    cityMap.get(a.city_id) || "";
+
+  const cityB =
+    cityMap.get(b.city_id) || "";
+
+  const cityCompare =
+    cityB.localeCompare(cityA);
+
+  if(cityCompare !== 0){
+    return cityCompare;
+  }
+
+  return (
+    new Date(a.scheduled_at) -
+    new Date(b.scheduled_at)
+  );
+
+});
+  const ids =
+    matches.map(
+      match => match.id
+    );
+
+  const [
+    seatsResult,
+    playersResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      )
+      .in(
+        "match_id",
+        ids
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      )
+
+  ]);
+
+  const seats =
+    seatsResult.data || [];
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+      .map(
+        player => [
+          player.id,
+          player
+        ]
+      )
+    );
+
+  const matchesByCity =
+  new Map();
+
+matches.forEach(match => {
+
+  const cityName =
+    cityMap.get(match.city_id) || "Other";
+
+  if(!matchesByCity.has(cityName)){
+    matchesByCity.set(cityName, []);
+  }
+
+  matchesByCity
+    .get(cityName)
+    .push(match);
+
+});
+
+list.innerHTML =
+  Array.from(matchesByCity.entries())
+    .map(([cityName, cityMatches]) => {
+
+      return `
+
+        <div class="city-group">
+
+          <h2>
+            ${escapeHtml(cityName.toUpperCase())}
+          </h2>
+
+          ${
+            cityMatches.map(
+              match => {
+
+        const matchSeats =
+          seats
+          .filter(
+            seat =>
+              seat.match_id ===
+              match.id
+          )
+          .sort(
+            (a,b) =>
+              new Date(a.joined_at) -
+              new Date(b.joined_at)
+          );
+
+        const joined =
+          matchSeats.some(
+            seat =>
+              seat.player_id ===
+              currentUser.id
+          );
+
+        const isProposer =
+          currentUser.id ===
+          match.proposer_id;
+
+        const isAdmin =
+          currentPlayerProfile?.role ===
+          "admin";
+
+        const count =
+          matchSeats.length;
+
+        const proposerName =
+          playerMap.get(
+            match.proposer_id
+          )?.nickname ||
+          "Player";
+
+       const names =
+  matchSeats.map(seat => {
+
+    const nickname =
+      escapeHtml(
+        playerMap.get(
+          seat.player_id
+        )?.nickname ||
+        "Player"
+      );
+
+    if(
+      seat.player_id ===
+      match.proposer_id
+    ){
+      return `<span style="color:var(--gold);font-weight:bold;">${nickname}</span>`;
+    }
+
+    return nickname;
+
+  });
+
+        let actions = "";
+
+        if(
+          match.status ===
+          "confirmed"
+        ){
+
+          actions +=
+            '<span class="pill">Confirmed</span>';
+
+          if(
+            joined ||
+            isAdmin
+          ){
+
+            actions += `
+
+              <button
+                class="btn alt"
+                onclick="show('results')">
+                Enter Results
+              </button>
+
+            `;
+
+          }
+
+        }
+        else if(joined){
+
+          actions +=
+            '<span class="pill">You’re in</span>';
+
+        }
+        else if(
+          currentEligibility.eligible
+        ){
+
+          actions += `
+
+            <button
+              class="btn"
+              onclick="joinMatch('${match.id}')">
+              Join Match
+            </button>
+
+          `;
+
+        }
+
+
+       /* EVERY PLAYER MAY LEAVE AN OPEN OR CONFIRMED MATCH,
+   INCLUDING THE CURRENT PROPOSER */
+
+if(
+  joined &&
+  (
+    match.status === "open" ||
+    match.status === "confirmed"
+  )
+){
+
+  actions += `
+
+    <button
+      class="btn secondary"
+      onclick="leaveMatch(
+        '${match.id}',
+        ${isProposer}
+      )">
+
+      Leave Match
+
+    </button>
+
+  `;
+}
+
+
+        /* CURRENT PROPOSER ALSO HAS EDIT + CANCEL */
+
+        if(
+          isProposer &&
+          (
+            match.status === "open" ||
+            match.status === "confirmed"
+          )
+        ){
+
+          actions += `
+
+            <button
+              class="btn secondary"
+              onclick="toggleEdit('${match.id}')">
+              Edit Match
+            </button>
+
+          `;
+
+        }
+
+        if(isProposer){
+
+          actions += `
+
+            <button
+              class="btn danger"
+              onclick="toggleCancel('${match.id}')">
+              Cancel Match
+            </button>
+
+          `;
+
+        }
+
+
+        const scheduled =
+          new Date(
+            match.scheduled_at
+          );
+
+        const localDate =
+          `${scheduled.getFullYear()}-${String(
+            scheduled.getMonth()+1
+          ).padStart(2,"0")}-${String(
+            scheduled.getDate()
+          ).padStart(2,"0")}`;
+
+        const localTime =
+          `${String(
+            scheduled.getHours()
+          ).padStart(2,"0")}:${String(
+            scheduled.getMinutes()
+          ).padStart(2,"0")}`;
+
+        const confirmedEdit =
+          match.status === "confirmed";
+
+        return `
+
+<div class="card upcoming-match-card" data-city-id="${match.city_id || ""}">
+
+  <div class="match-summary-row">
+
+    <div class="match-date">
+      ${escapeHtml(
+        dateText(match.scheduled_at)
+      )}
+    </div>
+
+    <div class="match-time">
+      ${escapeHtml(
+        timeText(match.scheduled_at)
+      )}
+    </div>
+
+    <div class="match-type">
+      ${
+        match.match_type === "focused"
+          ? "Focused"
+          : "Social"
+      }
+    </div>
+
+    <div class="match-location">
+      📍 ${escapeHtml(match.location)}
+    </div>
+
+    <div class="match-count">
+      ${count} / 4 players
+    </div>
+
+    <div class="match-actions">
+      ${actions}
+    </div>
+
+  </div>
+
+  <div class="match-player-line">
+
+    ${names.join(" · ")}
+
+    ${
+      count < 4
+        ? `<span class="muted"> · ${4-count} seat${4-count === 1 ? "" : "s"} open</span>`
+        : ""
+    }
+
+  </div>
+
+            ${
+              isProposer
+                ? `
+
+                  <div
+                    id="edit-${match.id}"
+                    class="edit-box hidden">
+
+                    <h3>
+                      ${
+                        confirmedEdit
+                          ? "Update Match Location"
+                          : "Edit Match"
+                      }
+                    </h3>
+
+                    ${
+                      confirmedEdit
+                        ? `
+
+                          <div class="notice">
+
+                            After confirmation, only the location may be changed,
+                            and only until 6 hours before the match.
+
+                          </div>
+
+                        `
+                        : `
+
+                          <div class="formgrid">
+
+                            <div>
+
+                              <label>
+                                Date
+                              </label>
+
+                              <input
+                                id="edit-date-${match.id}"
+                                type="date"
+                     value="${localDate}"
+min="${currentScramble?.start_date || ''}"
+max="${currentScramble?.end_date || ''}">
+                            </div>
+
+                            <div>
+
+                              <label>
+                                Time
+                              </label>
+
+                           <select id="edit-time-${match.id}">
+  ${
+    [
+      "08:00","08:15","08:30","08:45",
+      "09:00","09:15","09:30","09:45",
+      "10:00","10:15","10:30","10:45",
+      "11:00","11:15","11:30","11:45",
+      "12:00","12:15","12:30","12:45",
+      "13:00","13:15","13:30","13:45",
+      "14:00","14:15","14:30","14:45",
+      "15:00","15:15","15:30","15:45",
+      "16:00","16:15","16:30","16:45",
+      "17:00","17:15","17:30","17:45",
+      "18:00","18:15","18:30","18:45",
+      "19:00","19:15","19:30","19:45",
+      "20:00","20:15","20:30","20:45"
+    ]
+    .map(time => `
+      <option
+        value="${time}"
+        ${time === localTime ? "selected" : ""}>
+        ${
+          new Date(`2000-01-01T${time}:00`)
+            .toLocaleTimeString(
+              undefined,
+              {
+                hour:"numeric",
+                minute:"2-digit"
+              }
+            )
+        }
+      </option>
+    `)
+    .join("")
+  }
+</select>
+
+                            </div>
+
+                          </div>
+
+                        `
+                    }
+
+                    <label>
+                      Location
+                    </label>
+
+                 <input
+  id="edit-location-${match.id}"
+  type="text"
+  value="${escapeHtml(match.location)}">
+
+                    ${
+                      confirmedEdit
+                        ? ""
+                        : `
+
+                          <label>
+                            Match Type
+                          </label>
+
+                          <select
+                            id="edit-type-${match.id}">
+
+                            <option
+                              value="social"
+                              ${match.match_type === "social" ? "selected" : ""}>
+                              Social
+                            </option>
+
+                            <option
+                              value="focused"
+                              ${match.match_type === "focused" ? "selected" : ""}>
+                              Focused
+                            </option>
+
+                          </select>
+
+                        `
+                    }
+
+                    <button
+                      class="btn"
+                      onclick="updateMatch(
+                        '${match.id}',
+                        '${match.status}'
+                      )">
+
+                      Save Changes
+
+                    </button>
+
+                    <p
+                      id="edit-message-${match.id}"
+                      class="muted">
+                    </p>
+
+                  </div>
+
+
+                  <div
+                    id="cancel-${match.id}"
+                    class="edit-box hidden">
+
+                    <h3>
+                      Cancel Match
+                    </h3>
+
+                    <textarea
+                      id="cancel-reason-${match.id}"
+                      placeholder="Cancellation reason"></textarea>
+
+                    <button
+                      class="btn danger"
+                      onclick="cancelMatch('${match.id}')">
+
+                      Confirm Cancellation
+
+                    </button>
+
+                  </div>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        `;
+
+                  }
+            ).join("")
+          }
+
+        </div>
+
+      `;
+
+    })
+    .join("");
+
+}
+
+
+/* EDIT MATCH */
+
+function toggleEdit(id){
+
+  document
+    .getElementById(
+      `edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function updateMatch(
+  id,
+  status
+){
+
+  const location =
+    document.getElementById(
+      `edit-location-${id}`
+    ).value.trim();
+
+  const message =
+    document.getElementById(
+      `edit-message-${id}`
+    );
+
+  if(!location){
+
+    message.textContent =
+      "Location is required.";
+
+    return;
+  }
+
+  message.textContent =
+    "Saving...";
+
+  if(status === "confirmed"){
+
+    const {error} =
+      await supabaseClient
+        .rpc(
+          "update_confirmed_match_location",
+          {
+            p_match_id:id,
+            p_location:location
+          }
+        );
+
+    if(error){
+
+      message.textContent =
+        error.message;
+
+      return;
+    }
+
+    await loadUpcomingMatches();
+    await loadHomeMatches();
+
+    return;
+  }
+
+  const date =
+    document.getElementById(
+      `edit-date-${id}`
+    ).value;
+
+  const time =
+    document.getElementById(
+      `edit-time-${id}`
+    ).value;
+
+  const type =
+    document.getElementById(
+      `edit-type-${id}`
+    ).value;
+
+  if(
+    !date ||
+    !time
+  ){
+
+    message.textContent =
+      "Date and time are required.";
+
+    return;
+  }
+
+  const scheduled =
+    new Date(
+      `${date}T${time}:00`
+    );
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "update_open_dragon_match",
+        {
+
+          p_match_id:id,
+
+          p_scheduled_at:
+            scheduled.toISOString(),
+
+          p_location:
+            location,
+
+          p_match_type:
+            type
+
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      error.message;
+
+    return;
+  }
+
+  await loadUpcomingMatches();
+  await loadHomeMatches();
+
+}
+
+
+/* LEAVE MATCH + PROPOSER TRANSFER */
+
+async function leaveMatch(
+  id,
+  isProposer
+){
+
+  let message =
+    "Leave this match? Your seat will become available.";
+
+  if(isProposer){
+
+    message =
+      "Leave this match as proposer?\n\n" +
+      "If another player has already joined, the first player who joined after you will automatically become the new proposer and will take over proposer responsibilities.\n\n" +
+      "If you are the only player, the match will be removed.";
+
+  }
+
+  if(!confirm(message)){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "leave_dragon_match",
+        {
+          p_match_id:id
+        }
+      );
+
+  if(error){
+
+    alert(
+      "Could not leave match: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadUpcomingMatches();
+  await loadHomeMatches();
+
+}
+
+
+/* CANCEL MATCH */
+
+function toggleCancel(id){
+
+  document
+    .getElementById(
+      `cancel-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function cancelMatch(id){
+
+  const reason =
+    document.getElementById(
+      `cancel-reason-${id}`
+    ).value.trim();
+
+  if(!reason){
+
+    alert(
+      "Please enter a cancellation reason."
+    );
+
+    return;
+  }
+
+  if(
+    !confirm(
+      "Cancel this match?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "cancel_dragon_match",
+        {
+          p_match_id:id,
+          p_reason:reason
+        }
+      );
+
+  if(error){
+
+    alert(
+      "Could not cancel match: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMatchesPage();
+  await loadHomeMatches();
+
+}
+
+
+/* PLAYED MATCHES */
+
+async function loadPlayedMatches(){
+
+  const list =
+    document.getElementById(
+      "played-match-list"
+    );
+
+  if(!currentScramble){
+
+    list.innerHTML =
+      '<div class="card"><p class="muted">Played-match details are available only while the Scramble is active.</p></div>';
+
+    return;
+  }
+
+  const [
+    matchesResult,
+    seatsResult,
+    playersResult,
+    gamesResult,
+    scoresResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("matches")
+      .select(
+        "id,proposer_id,scheduled_at,location,match_type,status,completed_at"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "status",
+        "completed"
+      )
+      .order(
+        "scheduled_at",
+        {ascending:false}
+      ),
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      ),
+
+    supabaseClient
+      .from("games")
+      .select(
+        "id,match_id,game_number,east_player_id,winner_player_id,is_wall_game,base_hand_value,self_picked,jokerless"
+      ),
+
+    supabaseClient
+      .from("scores")
+      .select(
+        "game_id,player_id,points"
+      )
+
+  ]);
+
+  if(
+    matchesResult.error ||
+    seatsResult.error ||
+    playersResult.error ||
+    gamesResult.error ||
+    scoresResult.error
+  ){
+
+    list.innerHTML =
+      '<div class="card"><p class="error">Unable to load played matches.</p></div>';
+
+    return;
+  }
+
+  const matches =
+    matchesResult.data || [];
+
+  if(!matches.length){
+
+    list.innerHTML =
+      '<div class="card"><p class="muted">No played matches yet.</p></div>';
+
+    return;
+  }
+
+  const seats =
+    seatsResult.data || [];
+
+  const games =
+    gamesResult.data || [];
+
+  const scores =
+    scoresResult.data || [];
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+      .map(
+        player => [
+          player.id,
+          player.nickname ||
+          "Player"
+        ]
+      )
+    );
+
+  const isAdmin =
+    currentPlayerProfile?.role ===
+    "admin";
+
+  list.innerHTML =
+    matches.map(
+      match => {
+
+        const matchSeats =
+          seats
+          .filter(
+            seat =>
+              seat.match_id ===
+              match.id
+          )
+          .sort(
+            (a,b) =>
+              new Date(a.joined_at) -
+              new Date(b.joined_at)
+          );
+
+        const names =
+          matchSeats.map(
+            seat =>
+              escapeHtml(
+                playerMap.get(
+                  seat.player_id
+                ) ||
+                "Player"
+              )
+          );
+
+        const matchGames =
+          games
+          .filter(
+            game =>
+              game.match_id ===
+              match.id
+          )
+          .sort(
+            (a,b) =>
+              a.game_number -
+              b.game_number
+          );
+
+        const proposerName =
+          playerMap.get(
+            match.proposer_id
+          ) ||
+          "Player";
+
+        const detailsHtml =
+          renderCompletedMatchDetails(
+            match,
+            matchGames,
+            scores,
+            playerMap
+          );
+
+        const editHtml =
+          isAdmin
+            ? renderAdminCompletedEdit(
+                match,
+                matchSeats,
+                matchGames,
+                playerMap
+              )
+            : "";
+
+        return `
+
+          <div class="card">
+
+            <span class="pill">
+              Completed
+            </span>
+
+            &nbsp;
+
+            <span class="pill">
+              ${
+                match.match_type ===
+                "focused"
+                  ? "Focused"
+                  : "Social"
+              }
+            </span>
+
+            <h2>
+
+              ${escapeHtml(
+                dateText(
+                  match.scheduled_at
+                )
+              )}
+
+              ·
+
+              ${escapeHtml(
+                timeText(
+                  match.scheduled_at
+                )
+              )}
+
+            </h2>
+
+            <p>
+              📍 ${escapeHtml(match.location)}
+            </p>
+
+            <div class="players">
+              ${names.join(" · ")}
+            </div>
+
+            <p class="muted">
+
+              Proposer:
+              <b>${escapeHtml(proposerName)}</b>
+
+            </p>
+
+            <button
+              class="btn"
+              onclick="togglePlayedDetails('${match.id}')">
+              View Details
+            </button>
+
+            ${
+              isAdmin
+                ? `
+
+                  <button
+                    class="btn alt"
+                    onclick="toggleCompletedEdit('${match.id}')">
+                    Edit Results
+                  </button>
+
+                `
+                : ""
+            }
+
+            <div
+              id="played-details-${match.id}"
+              class="edit-box hidden">
+
+              ${detailsHtml}
+
+            </div>
+
+            ${
+              isAdmin
+                ? `
+
+                  <div
+                    id="completed-edit-${match.id}"
+                    class="edit-box hidden">
+
+                    ${editHtml}
+
+                  </div>
+
+                `
+                : ""
+            }
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+function togglePlayedDetails(id){
+
+  document
+    .getElementById(
+      `played-details-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+function toggleCompletedEdit(id){
+
+  document
+    .getElementById(
+      `completed-edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+function renderCompletedMatchDetails(
+  match,
+  games,
+  scores,
+  playerMap
+){
+
+  if(games.length !== 4){
+
+    return `
+      <p class="error">
+        Complete game details are not available for this match.
+      </p>
+    `;
+  }
+
+  let html = `
+
+    <div class="eyebrow">
+      Four-Game Breakdown
+    </div>
+
+  `;
+
+  for(
+    const game of
+    games
+  ){
+
+    const east =
+      playerMap.get(
+        game.east_player_id
+      ) ||
+      "Player";
+
+    if(game.is_wall_game){
+
+      html += `
+
+        <div class="game-result">
+
+          <strong>
+            Game ${game.game_number}
+          </strong>
+
+          <br>
+
+          East:
+          ${escapeHtml(east)}
+
+          <br><br>
+
+          <b>Wall Game</b>
+
+          <br>
+
+          +10 points to each player
+
+        </div>
+
+      `;
+
+      continue;
+    }
+
+    const winner =
+      playerMap.get(
+        game.winner_player_id
+      ) ||
+      "Player";
+
+    const winnerScore =
+      scores.find(
+        score =>
+          score.game_id ===
+            game.id
+        &&
+          score.player_id ===
+            game.winner_player_id
+      );
+
+    let extras = [];
+
+    if(game.self_picked){
+      extras.push(
+      "Self-picked ×2"
+      );
+    }
+
+    if(game.jokerless){
+      extras.push(
+      "Jokerless ×2"
+      );
+    }
+
+    html += `
+
+      <div class="game-result">
+
+        <strong>
+          Game ${game.game_number}
+        </strong>
+
+        <br>
+
+        East:
+        ${escapeHtml(east)}
+
+        <br>
+
+        Winner:
+        <b>${escapeHtml(winner)}</b>
+
+        <br>
+
+        NMJL Hand Value:
+        ${Number(
+          game.base_hand_value ||
+          0
+        )} points
+
+        ${
+          extras.length
+            ? `<br>${extras.join("<br>")}`
+            : "<br>No extras"
+        }
+
+        <br><br>
+
+        <b>
+          Total awarded:
+          ${Number(
+            winnerScore?.points ||
+            0
+          )} points
+        </b>
+
+      </div>
+
+    `;
+
+  }
+
+  const proposer =
+    playerMap.get(
+      match.proposer_id
+    ) ||
+    "Player";
+
+  html += `
+
+    <div class="match-total">
+
+      <b>Match Bonus</b>
+
+      <br>
+
+      Proposer
+      ${escapeHtml(proposer)}
+      receives
+      <b>+5 points</b>
+      for the completed match.
+
+    </div>
+
+  `;
+
+  return html;
+
+}
+
+
+/* ADMIN EDIT COMPLETED RESULTS */
+
+function renderAdminCompletedEdit(
+  match,
+  matchSeats,
+  games,
+  playerMap
+){
+
+  const players =
+    matchSeats.map(
+      seat => ({
+        id:
+          seat.player_id,
+
+        nickname:
+          playerMap.get(
+            seat.player_id
+          ) ||
+          "Player"
+      })
+    );
+
+  if(players.length !== 4){
+
+    return `
+
+      <p class="error">
+        This match cannot be edited because
+        it does not contain exactly four players.
+      </p>
+
+    `;
+  }
+
+  const gameMap =
+    new Map(
+      games.map(
+        game => [
+          game.game_number,
+          game
+        ]
+      )
+    );
+
+  let html = `
+
+    <div class="eyebrow">
+      Admin Correction
+    </div>
+
+    <h3>
+      Edit Completed Results
+    </h3>
+
+    <div class="notice">
+      Saving will replace all four original game results
+      and recalculate the leaderboard.
+    </div>
+
+  `;
+
+  for(
+    let n = 1;
+    n <= 4;
+    n++
+  ){
+
+    const game =
+      gameMap.get(n);
+
+    const east =
+      players[n-1];
+
+    const result =
+      game?.is_wall_game
+        ? "wall"
+        : (
+          game?.winner_player_id ||
+          ""
+        );
+
+    html += `
+
+      <div class="game-entry">
+
+        <h3>
+
+          Game ${n}
+          ·
+          East:
+          ${escapeHtml(east.nickname)}
+
+        </h3>
+
+        <label>
+          Winner / Result
+        </label>
+
+        <select
+          id="edit-result-${match.id}-${n}"
+          onchange="completedEditResultChanged(
+            '${match.id}',
+            ${n}
+          )">
+
+          <option value="">
+            Select Winner
+          </option>
+
+          ${
+            players.map(
+              player => `
+
+                <option
+                  value="${player.id}"
+                  ${result === player.id ? "selected" : ""}>
+
+                  ${escapeHtml(player.nickname)}
+
+                </option>
+
+              `
+            ).join("")
+          }
+
+          <option
+            value="wall"
+            ${result === "wall" ? "selected" : ""}>
+            Wall Game
+          </option>
+
+        </select>
+
+        <div
+          id="edit-winner-options-${match.id}-${n}"
+          class="${result === "wall" ? "hidden" : ""}">
+
+          <label>
+            NMJL Hand Value
+          </label>
+
+          <input
+            <select
+  id="edit-base-${match.id}-${n}"
+  onchange="handValueChanged(
+    'edit',
+    '${match.id}',
+    ${n}
+  )">
+
+  <option value="">Select hand value</option>
+
+  ${[25,30,35,40,45,50,75]
+    .map(value => `
+      <option
+        value="${value}"
+        ${
+          game &&
+          !game.is_wall_game &&
+          Number(game.base_hand_value) === value
+            ? "selected"
+            : ""
+        }>
+        ${value}
+      </option>
+    `)
+    .join("")}
+
+</select>
+
+            <label>
+
+              <input
+                id="edit-self-${match.id}-${n}"
+                type="checkbox"
+                ${game?.self_picked ? "checked" : ""}>
+
+            Self-picked ×2
+
+            </label>
+
+            <label>
+
+              <input
+                id="edit-jokerless-${match.id}-${n}"
+                type="checkbox"
+                ${game?.jokerless ? "checked" : ""}>
+
+            Jokerless ×2
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+  html += `
+
+    <button
+      class="btn alt"
+      onclick='adminSaveCompletedResults(
+        "${match.id}",
+        ${JSON.stringify(players)}
+      )'>
+
+      Save Corrected Results
+
+    </button>
+
+    <p
+      id="completed-edit-message-${match.id}"
+      class="muted">
+    </p>
+
+  `;
+
+  return html;
+
+}
+
+
+function completedEditResultChanged(
+  matchId,
+  gameNumber
+){
+
+  const result =
+    document.getElementById(
+      `edit-result-${matchId}-${gameNumber}`
+    ).value;
+
+  document
+    .getElementById(
+      `edit-winner-options-${matchId}-${gameNumber}`
+    )
+    .classList.toggle(
+      "hidden",
+      result === "wall"
+    );
+
+}
+function handValueChanged(
+  prefix,
+  matchId,
+  gameNumber
+){
+
+  const base =
+    Number(
+      document.getElementById(
+        `${prefix}-base-${matchId}-${gameNumber}`
+      ).value
+    );
+
+  const jokerless =
+    document.getElementById(
+      `${prefix}-jokerless-${matchId}-${gameNumber}`
+    );
+
+  if(!jokerless){
+    return;
+  }
+
+  const disabled =
+    base === 50 ||
+    base === 75;
+
+  if(disabled){
+    jokerless.checked = false;
+  }
+
+  jokerless.disabled =
+    disabled;
+
+}
+
+async function adminSaveCompletedResults(
+  matchId,
+  players
+){
+
+  const message =
+    document.getElementById(
+      `completed-edit-message-${matchId}`
+    );
+
+  const games = [];
+
+  for(
+    let n = 1;
+    n <= 4;
+    n++
+  ){
+
+    const result =
+      document.getElementById(
+        `edit-result-${matchId}-${n}`
+      ).value;
+
+    if(!result){
+
+      message.textContent =
+        `Select a result for Game ${n}.`;
+
+      message.className =
+        "error";
+
+      return;
+    }
+
+    if(result === "wall"){
+
+      games.push({
+
+        game_number:n,
+
+        east_player_id:
+          players[n-1].id,
+
+        winner_player_id:null,
+
+        is_wall_game:true,
+
+        base_hand_value:0,
+
+        self_picked:false,
+
+        jokerless:false
+
+      });
+
+      continue;
+    }
+
+    const base =
+      Number(
+        document.getElementById(
+          `edit-base-${matchId}-${n}`
+        ).value
+      );
+
+    if(
+      !base ||
+      base <= 0
+    ){
+
+      message.textContent =
+        `Enter the NMJL hand value for Game ${n}.`;
+
+      message.className =
+        "error";
+
+      return;
+    }
+
+    games.push({
+
+      game_number:n,
+
+      east_player_id:
+        players[n-1].id,
+
+      winner_player_id:
+        result,
+
+      is_wall_game:false,
+
+      base_hand_value:
+        base,
+
+      self_picked:
+        document.getElementById(
+          `edit-self-${matchId}-${n}`
+        ).checked,
+
+      jokerless:
+  ![50,75].includes(base) &&
+  document.getElementById(
+    `edit-jokerless-${matchId}-${n}`
+  ).checked
+
+    });
+
+  }
+
+  if(
+    !confirm(
+      "Replace the existing results for this completed match?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_edit_completed_match",
+        {
+
+          p_match_id:
+            matchId,
+
+          p_games:
+            games
+
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      "Could not update results: " +
+      error.message;
+
+    message.className =
+      "error";
+
+    return;
+  }
+
+  message.textContent =
+    "Results corrected successfully.";
+
+  message.className =
+    "success";
+
+  await loadPlayedMatches();
+  await loadLeaderboard();
+
+}
+
+
+/* SCORE ENTRY */
+
+async function loadScoreEntry(
+  targetId,
+  adminMode=false
+){
+
+  const list =
+    document.getElementById(
+      targetId
+    );
+
+  list.innerHTML =
+    '<p class="muted">Loading confirmed matches...</p>';
+
+  if(
+    !currentUser ||
+    !currentScramble
+  ){
+
+    list.innerHTML =
+      '<p class="muted">No active Scramble.</p>';
+
+    return;
+  }
+
+  const {
+    data:matches,
+    error
+  } =
+    await supabaseClient
+      .from("matches")
+      .select(
+        "id,scheduled_at,location,status,match_type"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "status",
+        "confirmed"
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
+
+  if(error){
+
+    list.innerHTML =
+      '<p class="error">Unable to load matches.</p>';
+
+    return;
+  }
+
+  if(
+    !matches ||
+    !matches.length
+  ){
+
+    list.innerHTML =
+      '<p class="muted">No confirmed matches are waiting for results.</p>';
+
+    return;
+  }
+
+  const ids =
+    matches.map(
+      match => match.id
+    );
+
+  const [
+    seatsResult,
+    playersResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      )
+      .in(
+        "match_id",
+        ids
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      )
+
+  ]);
+
+  const seats =
+    seatsResult.data || [];
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+      .map(
+        player => [
+          player.id,
+          player
+        ]
+      )
+    );
+
+  const isAdmin =
+    currentPlayerProfile?.role ===
+    "admin";
+
+  const allowedMatches =
+    matches.filter(
+      match => {
+
+        if(
+          adminMode ||
+          isAdmin
+        ){
+          return true;
+        }
+
+        return seats.some(
+          seat =>
+            seat.match_id ===
+              match.id
+          &&
+            seat.player_id ===
+              currentUser.id
+        );
+
+      }
+    );
+
+  if(!allowedMatches.length){
+
+    list.innerHTML =
+      '<p class="muted">You do not have a confirmed match waiting for results.</p>';
+
+    return;
+  }
+
+  list.innerHTML =
+    allowedMatches.map(
+      match => {
+
+        const matchSeats =
+          seats
+          .filter(
+            seat =>
+              seat.match_id ===
+              match.id
+          )
+          .sort(
+            (a,b) =>
+              new Date(a.joined_at) -
+              new Date(b.joined_at)
+          );
+
+        if(
+          matchSeats.length !==
+          4
+        ){
+
+          return `
+
+            <div class="notice">
+              This match does not currently contain exactly four players.
+            </div>
+
+          `;
+
+        }
+
+        const players =
+          matchSeats.map(
+            seat => ({
+
+              id:
+                seat.player_id,
+
+              nickname:
+                playerMap.get(
+                  seat.player_id
+                )?.nickname ||
+                "Player"
+
+            })
+          );
+
+        return renderNewScoreForm(
+          match,
+          players,
+          targetId
+        );
+
+      }
+    ).join("");
+
+}
+
+
+function renderNewScoreForm(
+  match,
+  players,
+  prefix
+){
+
+  const safePrefix =
+    prefix.replaceAll("-","_");
+const isAdminScore =
+  prefix === "admin-score-list";
+
+const scoreContentId =
+  `${safePrefix}-match-${match.id}`;
+  return `
+
+   <div class="card">
+
+  <div
+    onclick="${
+      isAdminScore
+        ? `toggleAdminSection('${scoreContentId}')`
+        : ""
+    }"
+    style="${
+      isAdminScore
+        ? "cursor:pointer;"
+        : ""
+    }">
+
+    <div class="eyebrow">
+      Confirmed Match
+    </div>
+
+    <h2>
+
+      ${escapeHtml(
+        dateText(
+          match.scheduled_at
+        )
+      )}
+
+      ·
+
+      ${escapeHtml(
+        timeText(
+          match.scheduled_at
+        )
+      )}
+
+      ${isAdminScore ? " ▾" : ""}
+
+    </h2>
+
+    <p>
+      📍 ${escapeHtml(match.location)}
+    </p>
+
+    <div class="players">
+
+      ${players
+        .map(
+          player =>
+            escapeHtml(
+              player.nickname
+            )
+        )
+        .join(" · ")}
+
+    </div>
+
+  </div>
+
+  <div
+    id="${scoreContentId}"
+    class="${isAdminScore ? "hidden" : ""}">
+
+    <div class="notice">
+      Enter all four games.
+      Each player is East once.
+    </div>
+      ${
+        players.map(
+          (east,index) => {
+
+            const n =
+              index + 1;
+
+            return `
+
+              <div class="game-entry">
+
+                <h3>
+
+                  Game ${n}
+                  ·
+                  East:
+                  ${escapeHtml(east.nickname)}
+
+                </h3>
+
+                <label>
+                  Winner / Result
+                </label>
+
+                <select
+                  id="${safePrefix}-result-${match.id}-${n}"
+                  onchange="newScoreResultChanged(
+                    '${safePrefix}',
+                    '${match.id}',
+                    ${n}
+                  )">
+
+                  <option value="">
+                    Select Winner
+                  </option>
+
+                  ${
+                    players.map(
+                      player => `
+
+                        <option value="${player.id}">
+                          ${escapeHtml(player.nickname)}
+                        </option>
+
+                      `
+                    ).join("")
+                  }
+
+                  <option value="wall">
+                    Wall Game
+                  </option>
+
+                </select>
+
+                <div
+                  id="${safePrefix}-winner-options-${match.id}-${n}">
+
+                  <label>
+                    NMJL Hand Value
+                  </label>
+
+                 <select
+  id="${safePrefix}-base-${match.id}-${n}"
+  onchange="handValueChanged(
+    '${safePrefix}',
+    '${match.id}',
+    ${n}
+  )">
+
+  <option value="">Select hand value</option>
+  <option value="25">25</option>
+  <option value="30">30</option>
+  <option value="35">35</option>
+  <option value="40">40</option>
+  <option value="45">45</option>
+  <option value="50">50</option>
+  <option value="75">75</option>
+
+</select>
+
+                  <div class="checkrow">
+
+                    <label>
+
+                      <input
+                        id="${safePrefix}-self-${match.id}-${n}"
+                        type="checkbox">
+
+                     Self-picked ×2
+
+                    </label>
+
+                    <label>
+
+                      <input
+                        id="${safePrefix}-jokerless-${match.id}-${n}"
+                        type="checkbox">
+
+                      Jokerless ×2
+
+                    </label>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        ).join("")
+      }
+
+      <button
+        class="btn alt"
+        onclick='submitMatchResults(
+          "${match.id}",
+          ${JSON.stringify(players)},
+          "${safePrefix}"
+        )'>
+
+        Submit Match Results
+
+      </button>
+<p
+  id="${safePrefix}-score-message-${match.id}"
+  class="muted">
+</p>
+
+  </div>
+
+</div>
+
+`;
+}
+
+
+function newScoreResultChanged(
+  prefix,
+  matchId,
+  gameNumber
+){
+
+  const result =
+    document.getElementById(
+      `${prefix}-result-${matchId}-${gameNumber}`
+    ).value;
+
+  document
+    .getElementById(
+      `${prefix}-winner-options-${matchId}-${gameNumber}`
+    )
+    .classList.toggle(
+      "hidden",
+      result === "wall"
+    );
+
+}
+
+
+async function submitMatchResults(
+  matchId,
+  players,
+  prefix
+){
+
+  const message =
+    document.getElementById(
+      `${prefix}-score-message-${matchId}`
+    );
+
+  const games = [];
+
+  for(
+    let n = 1;
+    n <= 4;
+    n++
+  ){
+
+    const result =
+      document.getElementById(
+        `${prefix}-result-${matchId}-${n}`
+      ).value;
+
+    if(!result){
+
+      message.textContent =
+        `Select a result for Game ${n}.`;
+
+      message.className =
+        "error";
+
+      return;
+    }
+
+    if(result === "wall"){
+
+      games.push({
+
+        game_number:n,
+
+        east_player_id:
+          players[n-1].id,
+
+        winner_player_id:null,
+
+        is_wall_game:true,
+
+        base_hand_value:0,
+
+        self_picked:false,
+
+        jokerless:false
+
+      });
+
+      continue;
+    }
+
+    const base =
+      Number(
+        document.getElementById(
+          `${prefix}-base-${matchId}-${n}`
+        ).value
+      );
+
+    if(
+      !base ||
+      base <= 0
+    ){
+
+      message.textContent =
+        `Enter the NMJL hand value for Game ${n}.`;
+
+      message.className =
+        "error";
+
+      return;
+    }
+
+    games.push({
+
+      game_number:n,
+
+      east_player_id:
+        players[n-1].id,
+
+      winner_player_id:
+        result,
+
+      is_wall_game:false,
+
+      base_hand_value:
+        base,
+
+      self_picked:
+        document.getElementById(
+          `${prefix}-self-${matchId}-${n}`
+        ).checked,
+
+    jokerless:
+  ![50,75].includes(base) &&
+  document.getElementById(
+    `${prefix}-jokerless-${matchId}-${n}`
+  ).checked
+
+    });
+
+  }
+
+  if(
+    !confirm(
+      "Submit all four game results? The match will be marked Completed."
+    )
+  ){
+    return;
+  }
+
+  message.textContent =
+    "Submitting results...";
+
+  message.className =
+    "muted";
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "complete_dragon_match",
+        {
+
+          p_match_id:
+            matchId,
+
+          p_games:
+            games
+
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      "Could not submit results: " +
+      error.message;
+
+    message.className =
+      "error";
+
+    return;
+  }
+
+  message.textContent =
+    "Match completed successfully.";
+
+  message.className =
+    "success";
+
+  await loadLeaderboard();
+  await loadHomeMatches();
+
+  setTimeout(
+    () =>
+      show("matches"),
+    700
+  );
+
+}
+
+
+/* HOME */
+
+async function loadHomeMatches(){
+
+  const confirmedBox =
+    document.getElementById(
+      "next-confirmed-home"
+    );
+
+  const openBox =
+    document.getElementById(
+      "next-open-home"
+    );
+
+  await getActiveScramble();
+
+  document
+    .getElementById(
+      "current-scramble-title"
+    )
+    .textContent =
+      currentScramble?.name ||
+      "No active Scramble";
+
+  if(
+    !currentUser ||
+    !currentScramble
+  ){
+
+    confirmedBox.innerHTML =
+      '<p class="muted">No confirmed upcoming match.</p>';
+
+    openBox.innerHTML =
+      '<p class="muted">No open tables right now.</p>';
+
+    return;
+  }
+
+  const {data} =
+    await supabaseClient
+      .from("matches")
+      .select(
+        "id,scheduled_at,location,status"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .in(
+        "status",
+        [
+          "open",
+          "confirmed"
+        ]
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
+
+  const upcoming =
+    data || [];
+
+  const confirmed =
+    upcoming.find(
+      match =>
+        match.status ===
+        "confirmed"
+    );
+
+  const openMatch =
+    upcoming.find(
+      match =>
+        match.status ===
+        "open"
+    );
+
+  confirmedBox.innerHTML =
+    confirmed
+      ? homeMatchHtml(
+          confirmed,
+          false
+        )
+      : '<p class="muted">No confirmed upcoming match yet.</p>';
+
+  openBox.innerHTML =
+    openMatch
+      ? homeMatchHtml(
+          openMatch,
+          true
+        )
+      : '<p class="muted">No open tables right now.</p>';
+
+}
+
+
+function homeMatchHtml(
+  match,
+  button
+){
+
+  return `
+
+    <h2>
+
+      ${escapeHtml(
+        dateText(
+          match.scheduled_at
+        )
+      )}
+
+      ·
+
+      ${escapeHtml(
+        timeText(
+          match.scheduled_at
+        )
+      )}
+
+    </h2>
+
+    <p>
+      📍 ${escapeHtml(match.location)}
+    </p>
+
+    ${
+      button
+        ? '<button class="btn" onclick="show(\'matches\')">View Match</button>'
+        : '<span class="pill">Confirmed</span>'
+    }
+
+  `;
+
+}
+
+
+/* STANDINGS */
+
+async function calculateScrambleStandings(
+  scrambleId
+){
+
+  const {data,error} =
+    await supabaseClient
+      .rpc(
+        "public_scramble_standings",
+        {
+          p_scramble_id:scrambleId
+        }
+      );
+
+  if(error){
+
+    console.error(
+      "Could not load standings:",
+      error
+    );
+
+    return [];
+  }
+
+  return (data || []).map(
+    player => ({
+      id:player.player_id,
+      nickname:
+        player.nickname ||
+        "Player",
+      points:
+        Number(
+          player.points ||
+          0
+        ),
+      matches_played:
+        Number(
+          player.matches_played ||
+          0
+        ),
+      average:
+  player.average === null
+    ? null
+    : Number(player.average)
+    })
+  );
+
+}
+
+async function loadCityLeaders(scrambleId){
+
+  const container =
+    document.getElementById("city-leaders");
+
+  if(!container) return;
+
+  const [
+    citiesResult,
+    matchesResult,
+    gamesResult,
+    scoresResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("cities")
+      .select("id,name"),
+
+    supabaseClient
+      .from("matches")
+      .select("id,proposer_id,status,completed_at,city_id")
+      .eq("scramble_id",scrambleId),
+
+    supabaseClient
+      .from("games")
+      .select("id,match_id"),
+
+    supabaseClient
+      .from("scores")
+      .select("player_id,game_id,points")
+
+  ]);
+
+  const completed =
+    (matchesResult.data || [])
+      .filter(match =>
+        (
+          match.status === "completed" ||
+          !!match.completed_at
+        ) &&
+        match.city_id
+      );
+
+  if(!completed.length){
+    container.innerHTML = "";
+    return;
+  }
+
+  const cityMap =
+    new Map(
+      (citiesResult.data || [])
+        .map(city => [
+          city.id,
+          city.name
+        ])
+    );
+
+  const gameToMatch =
+    new Map(
+      (gamesResult.data || [])
+        .map(game => [
+          game.id,
+          game.match_id
+        ])
+    );
+
+  const matchMap =
+    new Map(
+      completed.map(match => [
+        match.id,
+        match
+      ])
+    );
+
+  const cityPlayers =
+    new Map();
+
+  for(const score of scoresResult.data || []){
+
+    const matchId =
+      gameToMatch.get(score.game_id);
+
+    const match =
+      matchMap.get(matchId);
+
+    if(!match) continue;
+
+    if(!cityPlayers.has(match.city_id)){
+      cityPlayers.set(
+        match.city_id,
+        new Map()
+      );
+    }
+
+    const players =
+      cityPlayers.get(match.city_id);
+
+    players.set(
+      score.player_id,
+      (players.get(score.player_id) || 0) +
+      Number(score.points || 0)
+    );
+
+  }
+
+  for(const match of completed){
+
+    if(!cityPlayers.has(match.city_id)){
+      cityPlayers.set(
+        match.city_id,
+        new Map()
+      );
+    }
+
+    const players =
+      cityPlayers.get(match.city_id);
+
+    players.set(
+      match.proposer_id,
+      (players.get(match.proposer_id) || 0) + 5
+    );
+
+  }
+
+  const playerIds =
+    new Set();
+
+  cityPlayers.forEach(players => {
+    players.forEach((points,id) => {
+      playerIds.add(id);
+    });
+  });
+
+  const {data:players} =
+    await supabaseClient
+      .from("players")
+      .select("id,nickname")
+      .in(
+        "id",
+        Array.from(playerIds)
+      );
+
+  const nicknameMap =
+    new Map(
+      (players || []).map(player => [
+        player.id,
+        player.nickname || "Player"
+      ])
+    );
+
+  const citySections = [];
+
+  cityPlayers.forEach(
+    (players,cityId) => {
+
+      const leaders =
+        Array.from(players.entries())
+          .map(([id,points]) => ({
+            id,
+            nickname:
+              nicknameMap.get(id) ||
+              "Player",
+            points
+          }))
+          .sort(
+            (a,b) =>
+              b.points - a.points
+          )
+          .slice(0,3);
+
+      if(!leaders.length) return;
+
+      citySections.push({
+        city:
+          cityMap.get(cityId) ||
+          "Other",
+        leaders
+      });
+
+    }
+  );
+
+  citySections.sort(
+    (a,b) =>
+      a.city.localeCompare(b.city)
+  );
+
+  container.innerHTML =
+    citySections.map(section => `
+
+      <div class="card">
+
+        <div class="eyebrow">
+          ${escapeHtml(section.city)} Leaders
+        </div>
+
+        ${section.leaders.map(
+          (player,index) => `
+
+            <div class="leader">
+
+              <div class="rank">
+                ${index+1}
+              </div>
+
+              <div class="nick">
+                ${escapeHtml(player.nickname)}
+              </div>
+
+              <div class="score">
+                ${player.points} pts
+              </div>
+
+            </div>
+
+          `
+        ).join("")}
+
+      </div>
+
+    `).join("");
+
+}
+async function loadLeaderboard(){
+
+  const board =
+    document.getElementById(
+      "board"
+    );
+
+  await getActiveScramble();
+
+ 
+
+  if(!currentScramble){
+
+    board.innerHTML =
+      '<p class="muted">No active Scramble.</p>';
+
+    updateMyStanding(
+      [],
+      currentUser
+    );
+
+    return;
+  }
+if(currentScramble.public_results === false){
+
+  board.innerHTML =
+    '<p class="muted">Results for this Scramble are not publicly displayed.</p>';
+
+  document
+    .getElementById("city-leaders")
+    .innerHTML = "";
+
+  updateMyStanding(
+    [],
+    currentUser
+  );
+
+  return;
+}
+  const rows =
+    await calculateScrambleStandings(
+      currentScramble.id
+    );
+await loadCityLeaders(
+  currentScramble.id
+);
+  rows.sort(
+    (a,b) =>
+      b.points -
+      a.points
+      ||
+      b.average -
+      a.average
+  );
+
+  if(!rows.length){
+
+    board.innerHTML =
+      '<p class="muted">No completed matches yet.</p>';
+
+    updateMyStanding(
+      [],
+      currentUser
+    );
+
+    return;
+  }
+
+  board.innerHTML =
+    rows.map(
+      (player,index) => `
+
+        <div class="leader">
+
+          <div class="rank">
+            ${index+1}
+          </div>
+
+          <div>
+
+            <div class="nick">
+              ${escapeHtml(player.nickname)}
+            </div>
+
+            <div class="muted">
+
+              ${player.matches_played}
+              match${player.matches_played === 1 ? "" : "es"}
+
+            </div>
+
+          </div>
+
+          <div class="score">
+            ${player.points} pts
+          </div>
+
+          <div class="avg">
+            ${player.average === null ? "N/A" : player.average.toFixed(1) + " avg"}
+          </div>
+
+        </div>
+
+      `
+    ).join("");
+
+  updateMyStanding(
+    rows,
+    currentUser
+  );
+
+}
+
+
+function updateMyStanding(
+  rows,
+  user
+){
+
+  const rank =
+    document.getElementById(
+      "my-rank"
+    );
+
+  const nickname =
+    document.getElementById(
+      "my-nickname"
+    );
+
+  const stats =
+    document.getElementById(
+      "my-stats"
+    );
+
+  if(!user){
+
+    rank.textContent = "—";
+    nickname.textContent =
+      "Sign in to view";
+    stats.textContent = "";
+
+    return;
+  }
+
+  const index =
+    rows.findIndex(
+      row =>
+        row.id ===
+        user.id
+    );
+
+  if(index < 0){
+
+    rank.textContent = "—";
+
+    nickname.textContent =
+      "No completed matches yet";
+
+    stats.textContent = "";
+
+    return;
+  }
+
+  const player =
+    rows[index];
+
+  rank.textContent =
+    `#${index+1}`;
+
+  nickname.textContent =
+    player.nickname;
+
+  stats.textContent =
+    `${player.points} points · ${player.average === null ? "N/A" : player.average.toFixed(1)} average`;
+
+}
+
+
+/* ROSTER */
+
+async function roster(){
+
+  const list =
+    document.getElementById(
+      "rosterlist"
+    );
+
+  await getActiveScramble();
+
+  document
+    .getElementById(
+      "roster-scramble-name"
+    )
+    .textContent =
+      currentScramble?.name ||
+      "No active Scramble";
+
+  if(
+    !currentUser ||
+    !currentScramble
+  ){
+
+    list.innerHTML =
+      '<p class="muted">No active roster.</p>';
+
+    return;
+  }
+await checkEligibility();
+
+const isAdmin =
+  currentPlayerProfile?.role === "admin";
+
+if(
+  !isAdmin &&
+  !currentEligibility.active
+){
+
+  list.innerHTML = `
+    <p class="muted">
+      The player roster is available only to active players in
+      ${escapeHtml(currentScramble.name)}.
+    </p>
+  `;
+
+  return;
+}
+  const [
+    membersResult,
+    playersResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("scramble_players")
+      .select("player_id")
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "active",
+        true
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname,full_name,phone"
+      )
+
+  ]);
+
+  const activeIds =
+    new Set(
+      (membersResult.data || [])
+      .map(
+        row =>
+          row.player_id
+      )
+    );
+
+  const players =
+    (playersResult.data || [])
+    .filter(
+      player =>
+        activeIds.has(
+          player.id
+        )
+    )
+    .sort(
+      (a,b) =>
+        (a.nickname || "")
+        .localeCompare(
+          b.nickname ||
+          ""
+        )
+    );
+
+  if(!players.length){
+
+    list.innerHTML =
+      '<p class="muted">No active players yet.</p>';
+
+    return;
+  }
+
+  list.innerHTML =
+    players.map(
+      player => `
+
+        <div class="leader">
+
+          <div></div>
+
+          <div>
+
+            <div class="nick">
+              ${escapeHtml(player.nickname)}
+            </div>
+
+            <div class="muted">
+              ${escapeHtml(player.full_name)}
+            </div>
+
+          </div>
+
+          <div>
+            ${escapeHtml(player.phone || "")}
+          </div>
+
+          <span class="pill">
+            Active
+          </span>
+
+        </div>
+
+      `
+    ).join("");
+
+}
+
+
+/* HALL OF FAME */
+
+async function loadHallOfFame(){
+
+  const box =
+    document.getElementById(
+      "hall-of-fame-list"
+    );
+
+  
+
+  const {
+  data:scrambles,
+  error
+} =
+  await supabaseClient
+    .rpc(
+      "public_closed_scrambles"
+    );
+
+  if(error){
+
+    box.innerHTML =
+      '<p class="error">Unable to load Hall of Fame.</p>';
+
+    return;
+  }
+
+  if(
+    !scrambles ||
+    !scrambles.length
+  ){
+
+    box.innerHTML =
+      '<p class="muted">No completed Scrambles yet.</p>';
+
+    return;
+  }
+
+  let html = "";
+
+  for(
+    const scramble of
+    scrambles
+  ){
+
+    const standings =
+      await calculateScrambleStandings(
+        scramble.id
+      );
+
+    const totals =
+      [...standings]
+      .sort(
+        (a,b) =>
+          b.points -
+          a.points
+          ||
+          b.average -
+          a.average
+      )
+      .slice(0,3);
+
+   const averages =
+  [...standings]
+  .filter(
+    player =>
+      player.average !== null
+  )
+  .sort(
+    (a,b) =>
+      b.average -
+      a.average
+      ||
+      b.points -
+      a.points
+  )
+  .slice(0,3);
+
+    html += `
+
+      <div class="hof-scramble">
+
+        <div class="eyebrow">
+          Closed Scramble
+        </div>
+
+        <h2>
+          ${escapeHtml(scramble.name)}
+        </h2>
+
+        <p class="muted">
+
+          ${escapeHtml(scramble.start_date || "")}
+
+          –
+
+          ${escapeHtml(scramble.end_date || "")}
+
+        </p>
+
+        <div class="grid">
+
+          <div class="hof-column">
+
+            <h3>
+              🏆 Top Total Points
+            </h3>
+
+            ${
+              totals.length
+                ? totals.map(
+                    (player,index) => `
+
+                      <p>
+
+                        <b>
+                          ${index+1}.
+                          ${escapeHtml(player.nickname)}
+                        </b>
+
+                        —
+                        ${player.points} pts
+
+                      </p>
+
+                    `
+                  ).join("")
+                : '<p class="muted">No results.</p>'
+            }
+
+          </div>
+
+          <div class="hof-column">
+
+            <h3>
+              ⭐ Top Average
+            </h3>
+
+            ${
+              averages.length
+                ? averages.map(
+                    (player,index) => `
+
+                      <p>
+
+                        <b>
+                          ${index+1}.
+                          ${escapeHtml(player.nickname)}
+                        </b>
+
+                        —
+                        ${player.average.toFixed(1)}
+
+                      </p>
+
+                    `
+                  ).join("")
+                : '<p class="muted">No results.</p>'
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+  box.innerHTML = html;
+
+}
+
+async function adminDownloadPlayers(){
+
+  if(
+    !currentUser ||
+    currentPlayerProfile?.role !== "admin"
+  ){
+    alert("Admin access required.");
+    return;
+  }
+
+  const {data, error} =
+    await supabaseClient.rpc(
+      "admin_export_players"
+    );
+
+  if(error){
+    alert(
+      "Could not download player list: " +
+      error.message
+    );
+    return;
+  }
+
+  const csvCell = value => {
+    const text =
+      String(value ?? "")
+        .replace(/"/g,'""');
+
+    return `"${text}"`;
+  };
+
+  const rows = [
+    [
+      "Name",
+      "Nickname",
+      "Phone",
+      "Email"
+    ],
+    ...(data || []).map(player => [
+      player.full_name,
+      player.nickname,
+      player.phone,
+      player.email
+    ])
+  ];
+
+  const csv =
+    rows
+      .map(row =>
+        row.map(csvCell).join(",")
+      )
+      .join("\r\n");
+
+  const blob =
+    new Blob(
+      ["\uFEFF" + csv],
+      {
+        type:
+          "text/csv;charset=utf-8;"
+      }
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const link =
+    document.createElement("a");
+
+  link.href = url;
+  link.download =
+    "dragon-scramble-players.csv";
+
+  document.body.appendChild(link);
+
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+
+}
+/* ADMIN */
+async function loadAdminQA(){
+
+  const list =
+    document.getElementById(
+      "admin-qa-list"
+    );
+
+  if(!list) return;
+
+  const {data, error} =
+    await supabaseClient
+      .from("rules_qa")
+      .select(
+        "id,question,answer,display_order,active"
+      )
+      .order(
+        "display_order",
+        {ascending:true}
+      );
+
+  if(error){
+    list.innerHTML =
+      '<p class="error">Unable to load Q&A.</p>';
+    return;
+  }
+
+  list.innerHTML =
+    (data || []).map(item => `
+
+      <div
+        class="edit-box qa-admin-item"
+        draggable="true"
+        data-qa-id="${item.id}">
+
+        <div
+          class="qa-drag-handle"
+          style="
+            cursor:grab;
+            font-weight:700;
+            margin-bottom:12px;
+          ">
+          ☰ Drag to reorder
+        </div>
+
+        <label>Question</label>
+
+        <input
+          id="qa-question-${item.id}"
+          value="${escapeHtml(item.question)}">
+
+        <label>Answer</label>
+
+        <textarea
+          id="qa-answer-${item.id}"
+          class="qa-answer-input">${escapeHtml(item.answer)}</textarea>
+
+        <button
+          class="btn"
+          type="button"
+          onclick="adminSaveQA('${item.id}')">
+          Save
+        </button>
+
+        <button
+          class="btn secondary"
+          type="button"
+          onclick="adminToggleQA(
+            '${item.id}',
+            ${item.active}
+          )">
+          ${item.active ? "Hide" : "Show"}
+        </button>
+
+        <button
+          class="btn secondary qa-delete-button"
+          type="button"
+          data-qa-id="${item.id}">
+          Delete
+        </button>
+
+      </div>
+
+    `).join("");
+
+
+  /* DELETE Q&A */
+
+  list
+    .querySelectorAll(".qa-delete-button")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const id =
+            button.dataset.qaId;
+
+          const confirmed =
+            confirm(
+              "Delete this Q&A permanently?"
+            );
+
+          if(!confirmed) return;
+
+          const {error} =
+            await supabaseClient
+              .from("rules_qa")
+              .delete()
+              .eq("id",id);
+
+          if(error){
+            alert(
+              "Could not delete Q&A: " +
+              error.message
+            );
+            return;
+          }
+
+          await loadAdminQA();
+          await loadRulesQA();
+
+        }
+      );
+
+    });
+
+
+  /* DRAG TO REORDER */
+
+  let draggedItem = null;
+
+  list
+    .querySelectorAll(".qa-admin-item")
+    .forEach(item => {
+
+      item.addEventListener(
+        "dragstart",
+        () => {
+
+          draggedItem = item;
+
+          item.style.opacity = "0.5";
+
+        }
+      );
+
+      item.addEventListener(
+        "dragend",
+        async () => {
+
+          item.style.opacity = "";
+
+          draggedItem = null;
+
+          const orderedItems =
+            Array.from(
+              list.querySelectorAll(
+                ".qa-admin-item"
+              )
+            );
+
+          for(
+            let index = 0;
+            index < orderedItems.length;
+            index++
+          ){
+
+            const qaId =
+              orderedItems[index]
+                .dataset.qaId;
+
+            const {error} =
+              await supabaseClient
+                .from("rules_qa")
+                .update({
+                  display_order:index + 1
+                })
+                .eq("id",qaId);
+
+            if(error){
+
+              alert(
+                "Could not save Q&A order: " +
+                error.message
+              );
+
+              await loadAdminQA();
+
+              return;
+
+            }
+
+          }
+
+          await loadAdminQA();
+          await loadRulesQA();
+
+        }
+      );
+
+      item.addEventListener(
+        "dragover",
+        event => {
+
+          event.preventDefault();
+
+          if(
+            !draggedItem ||
+            draggedItem === item
+          ){
+            return;
+          }
+
+          const rect =
+            item.getBoundingClientRect();
+
+          const after =
+            event.clientY >
+            rect.top +
+            rect.height / 2;
+
+          if(after){
+
+            item.after(
+              draggedItem
+            );
+
+          }else{
+
+            item.before(
+              draggedItem
+            );
+
+          }
+
+        }
+      );
+
+    });
+
+}
+
+
+async function adminAddQA(){
+
+  const question =
+    document
+      .getElementById(
+        "admin-qa-question"
+      )
+      .value.trim();
+
+  const answer =
+    document
+      .getElementById(
+        "admin-qa-answer"
+      )
+      .value.trim();
+
+  const message =
+    document.getElementById(
+      "admin-qa-message"
+    );
+
+  if(!question || !answer){
+    message.textContent =
+      "Question and answer are required.";
+    return;
+  }
+
+  const {data:lastItem} =
+    await supabaseClient
+      .from("rules_qa")
+      .select("display_order")
+      .order(
+        "display_order",
+        {ascending:false}
+      )
+      .limit(1)
+      .maybeSingle();
+
+  const {error} =
+    await supabaseClient
+      .from("rules_qa")
+      .insert({
+        question,
+        answer,
+        display_order:
+          Number(
+            lastItem?.display_order || 0
+          ) + 1,
+        active:true
+      });
+
+  if(error){
+    message.textContent =
+      "Could not add Q&A: " +
+      error.message;
+    return;
+  }
+
+  document
+    .getElementById(
+      "admin-qa-question"
+    )
+    .value = "";
+
+  document
+    .getElementById(
+      "admin-qa-answer"
+    )
+    .value = "";
+
+  message.textContent =
+    "Q&A added.";
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+
+
+async function adminSaveQA(id){
+
+  const question =
+    document
+      .getElementById(
+        `qa-question-${id}`
+      )
+      .value.trim();
+
+  const answer =
+    document
+      .getElementById(
+        `qa-answer-${id}`
+      )
+      .value.trim();
+
+  const order =
+    Number(
+      document
+        .getElementById(
+          `qa-order-${id}`
+        )
+        .value
+    );
+
+  const {error} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        question,
+        answer,
+        display_order:order
+      })
+      .eq("id",id);
+
+  if(error){
+    alert(
+      "Could not save Q&A: " +
+      error.message
+    );
+    return;
+  }
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+
+
+async function adminToggleQA(
+  id,
+  isActive
+){
+
+  const {error} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        active:!isActive
+      })
+      .eq("id",id);
+
+  if(error){
+    alert(
+      "Could not update Q&A: " +
+      error.message
+    );
+    return;
+  }
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+  async function adminMoveQA(
+  id,
+  currentOrder,
+  direction
+){
+
+  const {data, error} =
+    await supabaseClient
+      .from("rules_qa")
+      .select(
+        "id,display_order"
+      )
+      .order(
+        "display_order",
+        {ascending:true}
+      );
+
+  if(error){
+    alert(
+      "Could not reorder Q&A: " +
+      error.message
+    );
+    return;
+  }
+
+  const items = data || [];
+
+  const currentIndex =
+    items.findIndex(
+      item => item.id === id
+    );
+
+  const targetIndex =
+    currentIndex + direction;
+
+  if(
+    currentIndex < 0 ||
+    targetIndex < 0 ||
+    targetIndex >= items.length
+  ){
+    return;
+  }
+
+  const currentItem =
+    items[currentIndex];
+
+  const targetItem =
+    items[targetIndex];
+
+  const currentValue =
+    currentItem.display_order;
+
+  const targetValue =
+    targetItem.display_order;
+
+  const {error:firstError} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        display_order:targetValue
+      })
+      .eq(
+        "id",
+        currentItem.id
+      );
+
+  if(firstError){
+    alert(
+      "Could not reorder Q&A: " +
+      firstError.message
+    );
+    return;
+  }
+
+  const {error:secondError} =
+    await supabaseClient
+      .from("rules_qa")
+      .update({
+        display_order:currentValue
+      })
+      .eq(
+        "id",
+        targetItem.id
+      );
+
+  if(secondError){
+    alert(
+      "Could not reorder Q&A: " +
+      secondError.message
+    );
+    return;
+  }
+
+  await loadAdminQA();
+  await loadRulesQA();
+
+}
+async function loadAdminDashboard(){
+
+  if(
+    !currentUser ||
+    currentPlayerProfile?.role !==
+    "admin"
+  ){
+    return;
+  }
+
+  await getActiveScramble();
+
+await Promise.all([
+
+  loadAdminScrambleHistory(),
+
+  loadAdminMatchManagement(),
+
+  loadAdminCities(),
+
+  loadAdminQA()
+
+]);
+
+  if(currentScramble){
+
+    document
+      .getElementById(
+        "admin-payment-card"
+      )
+      .classList.remove("hidden");
+
+    document
+      .getElementById(
+        "admin-player-card"
+      )
+      .classList.remove("hidden");
+
+    document
+      .getElementById(
+        "admin-score-card"
+      )
+      .classList.remove("hidden");
+
+    document
+      .getElementById(
+        "admin-payment-instructions"
+      )
+      .value =
+        currentScramble.payment_instructions ||
+        "";
+
+    await Promise.all([
+
+      loadAdminPlayers(),
+
+      loadScoreEntry(
+        "admin-score-list",
+        true
+      )
+
+    ]);
+
+  }else{
+
+    document
+      .getElementById(
+        "admin-payment-card"
+      )
+      .classList.add("hidden");
+
+    document
+      .getElementById(
+        "admin-player-card"
+      )
+      .classList.add("hidden");
+
+    document
+      .getElementById(
+        "admin-score-card"
+      )
+      .classList.add("hidden");
+
+  }
+
+}
+
+
+/* ADMIN SCRAMBLES */
+
+async function loadAdminScrambleHistory(){
+
+  const box =
+    document.getElementById(
+      "admin-scramble-history"
+    );
+
+  const createBox =
+    document.getElementById(
+      "admin-create-scramble"
+    );
+
+  const {
+    data:scrambles,
+    error
+  } =
+    await supabaseClient
+      .from("scrambles")
+      .select(
+"id,name,start_date,end_date,status,closed_at,payment_instructions,color,public_results,visible"
+      )
+      .order(
+        "start_date",
+        {ascending:false}
+      );
+
+  if(error){
+
+    box.innerHTML =
+      '<p class="error">Unable to load Scrambles.</p>';
+
+    return;
+  }
+
+  box.innerHTML =
+    (scrambles || [])
+    .map(
+      scramble => `
+
+        <div class="scramble-admin-row">
+
+          <span class="pill ${
+            scramble.status ===
+            "active"
+              ? ""
+              : "inactive"
+          }">
+
+            ${escapeHtml(scramble.status)}
+
+          </span>
+
+          <h3>
+            ${escapeHtml(scramble.name)}
+          </h3>
+
+          <p class="muted">
+
+            ${escapeHtml(scramble.start_date || "")}
+
+            –
+
+            ${escapeHtml(scramble.end_date || "")}
+
+          </p>
+
+          <button
+            class="btn secondary"
+            onclick="toggleScrambleEdit('${scramble.id}')">
+
+            Edit Name & Dates
+
+          </button>
+
+          ${
+            scramble.status ===
+            "active"
+              ? `
+
+                <button
+                  class="btn danger"
+                  onclick="adminCloseScramble(
+                    '${scramble.id}',
+                    '${escapeHtml(scramble.name)}'
+                  )">
+
+                  Close Scramble
+
+                </button>
+
+              `
+              : ""
+          }
+
+          <div
+            id="scramble-edit-${scramble.id}"
+            class="edit-box hidden">
+
+            <label>
+              Scramble Name
+            </label>
+
+            <input
+              id="scramble-name-${scramble.id}"
+              value="${escapeHtml(scramble.name)}">
+
+            <div class="formgrid">
+
+              <div>
+
+                <label>
+                  Start Date
+                </label>
+
+                <input
+                  id="scramble-start-${scramble.id}"
+                  type="date"
+                  value="${escapeHtml(scramble.start_date || "")}">
+
+              </div>
+
+              <div>
+
+                <label>
+                  End Date
+                </label>
+
+                <input
+                  id="scramble-end-${scramble.id}"
+                  type="date"
+                  value="${escapeHtml(scramble.end_date || "")}">
+
+              </div>
+
+            </div>
+<label>Scramble Color</label>
+
+<input
+  id="scramble-color-${scramble.id}"
+  type="color"
+  value="${escapeHtml(scramble.color || '#B88A3B')}"
+  style="
+    width:70px;
+    height:44px;
+    padding:3px;
+    cursor:pointer;
+  ">
+  <div style="margin:10px 0 14px;">
+
+  <label
+    style="
+      display:flex;
+      align-items:center;
+      gap:8px;
+      text-transform:none;
+      letter-spacing:0;
+      font-size:14px;
+      color:var(--ink);
+    ">
+
+    <input
+      id="scramble-public-results-${scramble.id}"
+      type="checkbox"
+      ${scramble.public_results !== false ? "checked" : ""}>
+
+    Public Results
+
+  </label>
+
+</div>
+ <div style="margin:10px 0 14px;">
+
+  <label
+    style="
+      display:flex;
+      align-items:center;
+      gap:8px;
+      text-transform:none;
+      letter-spacing:0;
+      font-size:14px;
+      color:var(--ink);
+    ">
+
+    <input
+      id="scramble-visible-${scramble.id}"
+      type="checkbox"
+      ${scramble.visible !== false ? "checked" : ""}>
+
+    Visible Scramble
+
+  </label>
+
+</div>
+            <button
+              class="btn"
+              onclick="adminSaveScrambleEdit('${scramble.id}')">
+
+              Save
+
+            </button>
+
+          </div>
+
+        </div>
+
+      `
+    ).join("");
+
+ createBox.classList.remove("hidden");
+
+}
+
+
+function toggleScrambleEdit(id){
+
+  document
+    .getElementById(
+      `scramble-edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function adminSaveScrambleEdit(id){
+
+  const name =
+    document.getElementById(
+      `scramble-name-${id}`
+    ).value.trim();
+
+  const start =
+    document.getElementById(
+      `scramble-start-${id}`
+    ).value;
+
+  const end =
+    document.getElementById(
+      `scramble-end-${id}`
+    ).value;
+const color =
+  document.getElementById(
+    `scramble-color-${id}`
+  ).value;
+  const publicResults =
+  document.getElementById(
+    `scramble-public-results-${id}`
+  ).checked;
+  const visible =
+  document.getElementById(
+    `scramble-visible-${id}`
+  ).checked;
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_update_scramble",
+    {
+  p_scramble_id:id,
+  p_name:name,
+  p_start_date:start,
+  p_end_date:end,
+  p_color:color,
+p_public_results:publicResults,
+p_visible:visible
+}
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await getActiveScramble();
+  await loadAdminScrambleHistory();
+  await loadCurrentScrambleDisplay();
+
+}
+
+
+async function adminCreateScramble(){
+
+  const name =
+    document.getElementById(
+      "new-scramble-name"
+    ).value.trim();
+
+  const start =
+    document.getElementById(
+      "new-scramble-start"
+    ).value;
+
+  const end =
+    document.getElementById(
+      "new-scramble-end"
+    ).value;
+const color =
+  document.getElementById(
+    "new-scramble-color"
+  ).value;
+  const message =
+    document.getElementById(
+      "new-scramble-message"
+    );
+
+  if(
+    !name ||
+    !start ||
+    !end
+  ){
+
+    message.textContent =
+      "Name and dates are required.";
+
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_create_scramble",
+       {
+  p_name:name,
+  p_start_date:start,
+  p_end_date:end,
+  p_color:color
+}
+      );
+
+  if(error){
+
+    message.textContent =
+      error.message;
+
+    return;
+  }
+
+  currentScramble = null;
+
+  await getActiveScramble();
+  await loadAdminDashboard();
+
+}
+
+
+async function adminCloseScramble(
+  id,
+  name
+){
+
+  if(
+    !confirm(
+      `Close "${name}"?`
+    )
+  ){
+    return;
+  }
+
+  if(
+    !confirm(
+      "Scores will become final and individual match details will no longer be shown after the Scramble closes. Continue?"
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_close_scramble",
+        {
+          p_scramble_id:id
+        }
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  currentScramble = null;
+
+  await getActiveScramble();
+  await loadAdminDashboard();
+  await loadHallOfFame();
+  await loadLeaderboard();
+
+}
+
+
+/* ADMIN PAYMENT */
+
+async function adminSavePaymentInstructions(){
+
+  const message =
+    document.getElementById(
+      "admin-payment-instructions"
+    ).value.trim();
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_update_scramble_payment_instructions",
+        {
+
+          p_scramble_id:
+            currentScramble.id,
+
+          p_message:
+            message
+
+        }
+      );
+
+  document
+    .getElementById(
+      "admin-payment-message"
+    )
+    .textContent =
+      error
+        ? error.message
+        : "Payment instructions saved.";
+
+  await getActiveScramble();
+
+}
+  async function adminAddCity(){
+
+  const input =
+    document.getElementById(
+      "admin-new-city"
+    );
+
+  const message =
+    document.getElementById(
+      "admin-city-message"
+    );
+
+  const name =
+    input.value.trim();
+
+  if(!name){
+    message.textContent =
+      "Enter a city name.";
+    return;
+  }
+
+  message.textContent =
+    "Adding city...";
+
+ const { error } =
+  await supabaseClient
+    .rpc(
+      "admin_add_city",
+      {
+        p_name: name
+      }
+    );
+
+  if(error){
+    message.textContent =
+      "Could not add city: " +
+      error.message;
+    return;
+  }
+
+  input.value = "";
+
+  message.textContent =
+    "City added.";
+
+  await loadAdminCities();
+  await loadCities();
+
+}
+async function loadAdminCities(){
+
+  const list =
+    document.getElementById(
+      "admin-city-list"
+    );
+
+  if(!list) return;
+
+  const { data:cities, error } =
+    await supabaseClient
+      .from("cities")
+      .select("id,name,active")
+      .order("name");
+
+  if(error){
+
+    list.innerHTML =
+      '<p class="error">Unable to load cities.</p>';
+
+    return;
+  }
+
+  if(!cities || !cities.length){
+
+    list.innerHTML =
+      '<p class="muted">No cities added yet.</p>';
+
+    return;
+  }
+
+  list.innerHTML =
+    cities.map(city => `
+
+   <div class="admin-player">
+
+  <div>
+    <b>${escapeHtml(city.name)}</b>
+    <br>
+    <span class="muted">
+      ${city.active ? "Active" : "Hidden"}
+    </span>
+  </div>
+
+  <div class="admin-actions">
+
+    <button
+      class="btn ${city.active ? "secondary" : "alt"}"
+      onclick="adminToggleCity(
+        '${city.id}',
+        ${city.active}
+      )">
+
+      ${city.active ? "Hide" : "Show"}
+
+    </button>
+
+  </div>
+
+</div>
+
+    `).join("");
+
+}
+async function adminToggleCity(id, isActive){
+
+ const { error } =
+  await supabaseClient
+    .rpc(
+      "admin_toggle_city",
+      {
+        p_city_id: id,
+        p_active: !isActive
+      }
+    );
+
+  if(error){
+
+    alert(
+      "Could not update city: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadAdminCities();
+  await loadCities();
+
+}
+/* ADMIN PLAYERS */
+
+async function loadAdminPlayers(){
+
+  const list =
+    document.getElementById(
+      "admin-player-list"
+    );
+
+  const [
+    playersResult,
+    paymentsResult,
+    membersResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,full_name,nickname,phone,role,created_at"
+      ),
+
+    supabaseClient
+      .from("payment_status")
+      .select(
+        "player_id,status,notified_at"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      ),
+
+    supabaseClient
+      .from("scramble_players")
+      .select(
+        "player_id,active"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+
+  ]);
+
+  const payments =
+    new Map(
+      (paymentsResult.data || [])
+      .map(
+        row => [
+          row.player_id,
+          row
+        ]
+      )
+    );
+
+  const memberships =
+    new Map(
+      (membersResult.data || [])
+      .map(
+        row => [
+          row.player_id,
+          row
+        ]
+      )
+    );
+
+  list.innerHTML =
+    (playersResult.data || [])
+    .map(
+      player => {
+
+        const payment =
+          payments.get(
+            player.id
+          );
+
+        const membership =
+          memberships.get(
+            player.id
+          );
+
+        const paid =
+          payment?.status ===
+          "paid";
+
+        const pending =
+          payment?.status ===
+          "pending"
+          &&
+          payment?.notified_at;
+
+        const active =
+          membership?.active ===
+          true;
+
+        const self =
+          player.id ===
+          currentUser.id;
+
+        let paymentLabel =
+          '<span class="pill pending">Not Submitted</span>';
+
+        if(pending){
+
+          paymentLabel =
+            '<span class="pill notice-pending">Payment Notice Pending</span>';
+
+        }
+
+        if(paid){
+
+          paymentLabel =
+            '<span class="pill">Paid ✓</span>';
+
+        }
+
+        return `
+
+          <div>
+
+            <div class="admin-player">
+
+              <div>
+
+                <div class="nick">
+                  ${escapeHtml(player.nickname)}
+                </div>
+
+                <div class="muted">
+
+                  ${escapeHtml(player.full_name)}
+
+                  ·
+
+                  ${escapeHtml(player.phone || "")}
+
+                </div>
+
+                <div>
+
+                  <span class="pill ${
+                    active ? "" : "inactive"
+                  }">
+
+                    ${
+                      active
+                        ? "Active"
+                        : "Hidden"
+                    }
+
+                  </span>
+
+                  &nbsp;
+
+                  ${paymentLabel}
+
+                </div>
+
+              </div>
+
+              <div class="admin-actions">
+
+                <button
+                  class="btn secondary"
+                  onclick="togglePlayerEdit('${player.id}')">
+                  Edit Profile
+                </button>
+
+                ${
+                  !paid
+                    ? `
+
+                      <button
+                        class="btn"
+                        onclick="adminConfirmPayment('${player.id}')">
+                        Confirm Payment
+                      </button>
+
+                    `
+                    : ""
+                }
+
+                ${
+                  !self &&
+                  active
+                    ? `
+
+                      <button
+                        class="btn alt"
+                        onclick="adminSetPlayerActive(
+                          '${player.id}',
+                          false
+                        )">
+                        Hide from Roster
+                      </button>
+
+                    `
+                    : ""
+                }
+
+                ${
+                  !self &&
+                  !active &&
+                  paid
+                    ? `
+
+                      <button
+                        class="btn alt"
+                        onclick="adminSetPlayerActive(
+                          '${player.id}',
+                          true
+                        )">
+                        Reactivate
+                      </button>
+
+                    `
+                    : ""
+                }
+
+                ${
+                  !self
+                    ? `
+
+                      <button
+                        class="btn danger"
+                        onclick="adminDeletePlayer(
+                          '${player.id}',
+                          '${escapeHtml(player.nickname)}'
+                        )">
+                        Delete Player
+                      </button>
+
+                    `
+                    : ""
+                }
+
+              </div>
+
+            </div>
+
+<div
+  id="player-edit-${player.id}"
+  class="edit-box hidden">
+
+  <label>
+    Full Name
+  </label>
+
+  <input
+    id="admin-name-${player.id}"
+    value="${escapeHtml(player.full_name)}">
+
+  <label>
+    Nickname
+  </label>
+
+  <input
+    id="admin-nickname-${player.id}"
+    value="${escapeHtml(player.nickname)}">
+
+  <label>
+    Phone
+  </label>
+
+  <input
+    id="admin-phone-${player.id}"
+    value="${escapeHtml(player.phone || "")}">
+
+  <button
+    class="btn"
+    onclick="adminSavePlayerProfile('${player.id}')">
+    Save Profile
+  </button>
+
+
+  <div class="edit-box">
+
+    <h3>Point Adjustment</h3>
+
+    <p class="muted">
+      Enter a positive number to add points or a negative number to deduct points.
+    </p>
+
+    <label>
+      Points
+    </label>
+
+    <input
+      id="admin-points-${player.id}"
+      type="number"
+      step="1"
+      placeholder="Example: -20 or 25">
+
+    <label>
+      Reason
+    </label>
+
+    <input
+      id="admin-points-reason-${player.id}"
+      type="text"
+      placeholder="Example: Late cancellation">
+
+    <button
+      class="btn"
+      onclick="adminAdjustPoints('${player.id}')">
+      Apply Point Adjustment
+    </button>
+
+  </div>
+
+</div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+function togglePlayerEdit(id){
+
+  document
+    .getElementById(
+      `player-edit-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function adminSavePlayerProfile(id){
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_update_player_profile",
+        {
+
+          p_player_id:id,
+
+          p_full_name:
+            document.getElementById(
+              `admin-name-${id}`
+            ).value.trim(),
+
+          p_nickname:
+            document.getElementById(
+              `admin-nickname-${id}`
+            ).value.trim(),
+
+          p_phone:
+            document.getElementById(
+              `admin-phone-${id}`
+            ).value.trim()
+
+        }
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadAdminPlayers();
+
+}
+
+
+async function adminAdjustPoints(id){
+
+  const pointsInput =
+    document.getElementById(
+      `admin-points-${id}`
+    );
+
+  const reasonInput =
+    document.getElementById(
+      `admin-points-reason-${id}`
+    );
+
+  const points =
+    Number(pointsInput.value);
+
+  const reason =
+    reasonInput.value.trim();
+
+
+  if(
+    !Number.isInteger(points) ||
+    points === 0
+  ){
+
+    alert(
+      "Enter a whole number other than 0. Use a negative number to deduct points."
+    );
+
+    return;
+  }
+
+
+  if(!reason){
+
+    alert(
+      "Please enter a reason for the point adjustment."
+    );
+
+    return;
+  }
+
+
+  if(
+    !confirm(
+      `Apply ${points > 0 ? "+" : ""}${points} points to this player?\n\nReason: ${reason}`
+    )
+  ){
+
+    return;
+  }
+
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_add_point_adjustment",
+        {
+
+          p_player_id:id,
+          p_points:points,
+          p_reason:reason
+
+        }
+      );
+
+
+  if(error){
+
+    alert(
+      "Could not adjust points: " +
+      error.message
+    );
+
+    return;
+  }
+
+
+  alert(
+    `Point adjustment saved: ${points > 0 ? "+" : ""}${points}`
+  );
+
+
+  await loadAdminPlayers();
+  await loadLeaderboard();
+
+}
+
+
+async function adminConfirmPayment(id){
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+       "admin_confirm_player_payment",
+{
+  p_player_id:id,
+  p_scramble_id:
+    currentScramble.id
+}
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadAdminPlayers();
+
+}
+
+
+async function adminSetPlayerActive(
+  id,
+  active
+){
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+   "admin_set_player_active",
+{
+  p_player_id:id,
+  p_active:active,
+  p_scramble_id:
+    currentScramble.id
+}
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadAdminPlayers();
+
+}
+
+
+async function adminDeletePlayer(
+  id,
+  name
+){
+
+  if(
+    !confirm(
+      `Delete ${name}?`
+    )
+  ){
+    return;
+  }
+
+  if(
+    !confirm(
+      "This cannot be undone."
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_delete_player",
+        {
+          p_player_id:id
+        }
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadAdminPlayers();
+
+}
+
+
+/* ADMIN MATCH MANAGEMENT */
+
+async function loadAdminMatchManagement(){
+
+  const box =
+    document.getElementById(
+      "admin-match-management"
+    );
+
+  const [
+    matchesResult,
+    scramblesResult,
+    playersResult,
+    seatsResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("matches")
+      .select(
+        "id,scramble_id,proposer_id,scheduled_at,location,match_type,status"
+      )
+      .order(
+        "scheduled_at",
+        {ascending:false}
+      ),
+
+    supabaseClient
+      .from("scrambles")
+      .select(
+        "id,name,status"
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      ),
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      )
+
+  ]);
+
+  const scrambleMap =
+    new Map(
+      (scramblesResult.data || [])
+      .map(
+        item => [
+          item.id,
+          item
+        ]
+      )
+    );
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+      .map(
+        item => [
+          item.id,
+          item.nickname
+        ]
+      )
+    );
+
+  const seats =
+    seatsResult.data || [];
+
+  if(
+    !matchesResult.data ||
+    !matchesResult.data.length
+  ){
+
+    box.innerHTML =
+      '<p class="muted">No matches yet.</p>';
+
+    return;
+  }
+
+  box.innerHTML =
+    matchesResult.data
+    .map(
+      match => {
+
+        const scramble =
+          scrambleMap.get(
+            match.scramble_id
+          );
+
+        const names =
+          seats
+          .filter(
+            seat =>
+              seat.match_id ===
+              match.id
+          )
+          .map(
+            seat =>
+              playerMap.get(
+                seat.player_id
+              ) ||
+              "Player"
+          );
+
+        return `
+
+          <div class="match-admin-row">
+
+            <span class="pill">
+              ${escapeHtml(match.status)}
+            </span>
+
+            <h3>
+              ${escapeHtml(
+                scramble?.name ||
+                "Scramble"
+              )}
+            </h3>
+
+            <p>
+
+              <b>
+                ${escapeHtml(
+                  dateText(
+                    match.scheduled_at
+                  )
+                )}
+              </b>
+
+              ·
+
+              ${escapeHtml(
+                timeText(
+                  match.scheduled_at
+                )
+              )}
+
+              <br>
+
+              📍 ${escapeHtml(match.location)}
+
+            </p>
+
+            <p class="muted">
+
+              Proposer:
+              <b>
+                ${escapeHtml(
+                  playerMap.get(
+                    match.proposer_id
+                  ) ||
+                  "Player"
+                )}
+              </b>
+
+            </p>
+
+            <div class="players">
+              ${names.map(escapeHtml).join(" · ")}
+            </div>
+
+            ${
+              match.status ===
+                "confirmed"
+              &&
+              scramble?.status ===
+                "active"
+                ? `
+
+                  <button
+                    class="btn alt"
+                    onclick="show('results')">
+                    Enter Results
+                  </button>
+
+                `
+                : ""
+            }
+
+            <button
+              class="btn danger"
+              onclick="toggleAdminMatchDelete('${match.id}')">
+              Delete Match
+            </button>
+
+            <div
+              id="admin-delete-match-${match.id}"
+              class="edit-box hidden">
+
+              <label>
+                Deletion Reason
+              </label>
+
+              <textarea
+                id="admin-delete-reason-${match.id}"
+                placeholder="Test match, invalid result, cheating concern..."></textarea>
+
+              <button
+                class="btn danger"
+                onclick="adminDeleteMatch(
+                  '${match.id}',
+                  '${match.status}'
+                )">
+                Permanently Delete
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+function toggleAdminMatchDelete(id){
+
+  document
+    .getElementById(
+      `admin-delete-match-${id}`
+    )
+    .classList.toggle("hidden");
+
+}
+
+
+async function adminDeleteMatch(
+  id,
+  status
+){
+
+  const reason =
+    document.getElementById(
+      `admin-delete-reason-${id}`
+    ).value.trim();
+
+  if(!reason){
+
+    alert(
+      "A deletion reason is required."
+    );
+
+    return;
+  }
+
+  if(
+    !confirm(
+      status === "completed"
+        ? "This completed match and all its score data will be deleted. Continue?"
+        : "Permanently delete this match?"
+    )
+  ){
+    return;
+  }
+
+  if(
+    !confirm(
+      "This cannot be undone."
+    )
+  ){
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "admin_delete_match",
+        {
+
+          p_match_id:id,
+
+          p_reason:reason
+
+        }
+      );
+
+  if(error){
+
+    alert(error.message);
+    return;
+  }
+
+  await loadAdminMatchManagement();
+  await loadLeaderboard();
+
+  if(currentScramble){
+
+    await loadPlayedMatches();
+    await loadUpcomingMatches();
+
+  }
+
+}
+
+
+/* AUTH */
+
+async function signUpPlayer(){
+
+  const message =
+    document.getElementById(
+      "signup-message"
+    );
+
+  const fullName =
+    document.getElementById(
+      "signup-name"
+    ).value.trim();
+
+  const nickname =
+    document.getElementById(
+      "signup-nickname"
+    ).value.trim();
+
+  const phone =
+    document.getElementById(
+      "signup-phone"
+    ).value.trim();
+
+  const email =
+    document.getElementById(
+      "signup-email"
+    ).value.trim();
+
+  const password =
+    document.getElementById(
+      "signup-password"
+    ).value;
+
+  if(
+    !fullName ||
+    !nickname ||
+    !phone ||
+    !email ||
+    !password
+  ){
+
+    message.textContent =
+      "Please complete all fields.";
+
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .auth
+      .signUp({
+
+        email:email,
+
+        password:password,
+
+        options:{
+
+          data:{
+
+            full_name:fullName,
+
+            nickname:nickname,
+
+            phone:phone
+
+          },
+
+          emailRedirectTo:
+            "https://dragonscramble.github.io/dragon-scramble/"
+
+        }
+
+      });
+
+  message.textContent =
+    error
+      ? "Account could not be created: " +
+        error.message
+      : "Account created. Please check your email.";
+
+}
+
+
+async function signInPlayer(){
+
+  const email =
+    document.getElementById(
+      "login-email"
+    ).value.trim();
+
+  const password =
+    document.getElementById(
+      "login-password"
+    ).value;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .auth
+      .signInWithPassword({
+
+        email:email,
+
+        password:password
+
+      });
+
+  if(error){
+
+    document
+      .getElementById(
+        "login-message"
+      )
+      .textContent =
+        "Sign in failed: " +
+        error.message;
+
+    return;
+  }
+
+  currentUser =
+    data.user;
+
+  await showLoggedInPlayer(
+    data.user
+  );
+
+  await getActiveScramble();
+  await checkEligibility();
+  await loadAccountPaymentStatus();
+  await loadLeaderboard();
+  await loadHomeMatches();
+show("matches");
+}
+async function resetPassword(){
+
+  const email =
+    document.getElementById(
+      "login-email"
+    ).value.trim();
+
+  const message =
+    document.getElementById(
+      "login-message"
+    );
+
+  if(!email){
+
+    message.textContent =
+      "Enter your email address first, then click Forgot Password.";
+
+    return;
+  }
+
+  message.textContent =
+    "Sending password reset email...";
+
+  const { error } =
+    await supabaseClient
+      .auth
+      .resetPasswordForEmail(
+        email,
+        {
+          redirectTo:
+            "https://dragonscramble.github.io/dragon-scramble/"
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      "Could not send reset email: " +
+      error.message;
+
+    return;
+  }
+
+  message.textContent =
+    "Password reset email sent. Check your inbox.";
+
+}
+async function saveNewPassword(){
+
+  const password =
+    document.getElementById(
+      "new-password"
+    ).value;
+
+  const confirmPassword =
+    document.getElementById(
+      "confirm-new-password"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "reset-password-message"
+    );
+
+  if(!password || !confirmPassword){
+
+    message.textContent =
+      "Please complete both password fields.";
+
+    return;
+  }
+
+  if(password !== confirmPassword){
+
+    message.textContent =
+      "Passwords do not match.";
+
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .auth
+      .updateUser({
+        password:password
+      });
+
+  if(error){
+
+    message.textContent =
+      "Could not update password: " +
+      error.message;
+
+    return;
+  }
+
+  message.textContent =
+    "Password updated successfully.";
+
+  document
+    .getElementById(
+      "reset-password-card"
+    )
+    .classList.add("hidden");
+passwordRecoveryMode = false;
+  show("account");
+
+}function toggleChangePassword(){
+
+  const box =
+    document.getElementById(
+      "change-password-box"
+    );
+
+  const message =
+    document.getElementById(
+      "change-password-message"
+    );
+
+  if(!box) return;
+
+  box.classList.toggle("hidden");
+
+  if(message){
+    message.textContent = "";
+  }
+
+}
+
+
+async function changeMyPassword(){
+
+  const password =
+    document.getElementById(
+      "account-new-password"
+    ).value;
+
+  const confirmPassword =
+    document.getElementById(
+      "account-confirm-password"
+    ).value;
+
+  const message =
+    document.getElementById(
+      "change-password-message"
+    );
+
+  if(!password || !confirmPassword){
+
+    message.textContent =
+      "Please complete both password fields.";
+
+    return;
+  }
+
+  if(password !== confirmPassword){
+
+    message.textContent =
+      "Passwords do not match.";
+
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .auth
+      .updateUser({
+        password:password
+      });
+
+  if(error){
+
+    message.textContent =
+      "Could not update password: " +
+      error.message;
+
+    return;
+  }
+
+  document
+    .getElementById(
+      "account-new-password"
+    ).value = "";
+
+  document
+    .getElementById(
+      "account-confirm-password"
+    ).value = "";
+
+  message.textContent =
+    "Password updated successfully.";
+
+}
+async function showLoggedInPlayer(user){
+
+  const {
+    data:player,
+    error
+  } =
+    await supabaseClient
+      .from("players")
+      .select(
+        "full_name,nickname,role"
+      )
+      .eq(
+        "id",
+        user.id
+      )
+      .single();
+
+  if(
+    error ||
+    !player
+  ){
+    return;
+  }
+
+  currentPlayerProfile =
+    player;
+
+  document
+    .getElementById(
+      "player-nickname"
+    )
+    .textContent =
+      player.nickname;
+document
+  .getElementById(
+    "account-nickname-input"
+  )
+  .value =
+    player.nickname;
+  document
+  .getElementById(
+    "account-current-nickname"
+  )
+  .textContent =
+    player.nickname;
+  document
+    .getElementById(
+      "player-name"
+    )
+    .textContent =
+      player.full_name;
+
+  document
+    .getElementById(
+      "logged-in-player"
+    )
+    .classList.remove("hidden");
+
+  document
+    .getElementById(
+      "signup-card"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "login-card"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "admin-nav"
+    )
+    .classList.toggle(
+      "hidden",
+      player.role !==
+      "admin"
+    );
+
+}
+
+
+async function signOutPlayer(){
+
+  await supabaseClient
+    .auth
+    .signOut();
+
+  currentUser = null;
+  currentPlayerProfile = null;
+  currentScramble = null;
+
+  currentEligibility = {
+    active:false,
+    paid:false,
+    eligible:false
+  };
+
+  document
+    .getElementById(
+      "admin-nav"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "logged-in-player"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "signup-card"
+    )
+    .classList.remove("hidden");
+
+  document
+    .getElementById(
+      "login-card"
+    )
+    .classList.remove("hidden");
+
+show("home");
+
+}
+
+
+/* SESSION */
+
+supabaseClient
+.auth
+.onAuthStateChange(
+  (event,session) => {
+if(
+  event === "PASSWORD_RECOVERY"
+){
+passwordRecoveryMode = true;
+  currentUser =
+    session?.user || null;
+
+  show("account");
+
+  document
+    .getElementById(
+      "login-card"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "signup-card"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "logged-in-player"
+    )
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "reset-password-card"
+    )
+    .classList.remove("hidden");
+
+  return;
+}
+    if(
+  (
+    event === "INITIAL_SESSION" ||
+    event === "SIGNED_IN"
+  )
+  &&
+  session?.user
+  &&
+  !passwordRecoveryMode
+){
+
+      currentUser =
+        session.user;
+
+      setTimeout(
+        async () => {
+
+          await showLoggedInPlayer(
+            session.user
+          );
+
+          await getActiveScramble();
+
+          await checkEligibility();
+
+          await loadCurrentScrambleDisplay();
+
+          await loadAccountPaymentStatus();
+
+          await loadLeaderboard();
+
+          await loadHomeMatches();
+show("matches");
+        },
+        0
+      );
+
+    }
+
+    if(
+      event ===
+      "SIGNED_OUT"
+    ){
+
+      currentUser = null;
+      currentPlayerProfile = null;
+      currentScramble = null;
+
+    }
+
+  }
+);
+  function toggleAdminSection(id){
+
+  const content =
+    document.getElementById(id);
+
+  if(!content) return;
+
+  content.classList.toggle("hidden");
+
+}
+function toggleAdminQA(){
+
+  const content =
+    document.getElementById(
+      "admin-qa-content"
+    );
+
+  if(!content) return;
+
+  content.classList.toggle("hidden");
+
+}
+function toggleNicknameEditor(show){
+
+  const editor =
+    document.getElementById("nickname-editor");
+
+  const message =
+    document.getElementById("account-nickname-message");
+
+  if(show){
+
+    editor.classList.remove("hidden");
+
+    document.getElementById(
+      "account-nickname-input"
+    ).value =
+      currentPlayerProfile?.nickname || "";
+
+  } else {
+
+    editor.classList.add("hidden");
+
+    message.textContent = "";
+
+  }
+
+}
+async function saveMyNickname(){
+
+  const input =
+    document.getElementById("account-nickname-input");
+
+  const message =
+    document.getElementById("account-nickname-message");
+
+  const newNickname = input.value.trim();
+
+  if(!currentUser || !currentPlayerProfile){
+    message.textContent = "Please sign in first.";
+    return;
+  }
+
+  if(!newNickname){
+    message.textContent = "Please enter a nickname.";
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("players")
+      .update({
+        nickname: newNickname
+      })
+      .eq("id", currentUser.id);
+
+  if(error){
+    console.error("Nickname update failed:", error);
+    message.textContent =
+      "We couldn't update your nickname. Please try again.";
+    return;
+  }
+
+  currentPlayerProfile.nickname = newNickname;
+
+  document
+    .getElementById("player-nickname")
+    .textContent = newNickname;
+document
+  .getElementById("account-current-nickname")
+  .textContent = newNickname;
+
+toggleNicknameEditor(false);
+  input.value = newNickname;
+
+
+  await loadLeaderboard();
+  await loadHomeMatches();
+}
+ async function loadCities(){
+
+  const select =
+    document.getElementById("match-city");
+
+  if(!select) return;
+
+  const { data, error } =
+    await supabaseClient
+      .from("cities")
+      .select("id, name")
+      .eq("active", true)
+      .order("name");
+
+  if(error){
+    console.error("Could not load cities:", error);
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Select a city</option>';
+
+  (data || []).forEach(city => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = city.id;
+    option.textContent = city.name;
+
+    select.appendChild(option);
+
+  });
+}
+  /* START */
+
+loadCurrentScrambleDisplay();
+loadLeaderboard();
+loadHomeMatches();
+loadCities();
+  
+console.log(
+  "Dragon Scramble connected to Supabase"
+);
+
+</script>
+
+</body>
+</html>}
+nav button.active-tab::after{
+  content:"";
+  position:absolute;
+  left:15%;
+  right:15%;
+  bottom:0;
+  height:2px;
+  background:var(--gold);
+  border-radius:2px;
+}
+.admin-nav{
+  border:1px solid #d3b36b!important;
+  border-radius:8px;
+  padding:7px 10px;
+}
+
+main{
+max-width:1400px;
+  margin:auto;
+  padding:35px 20px;
+}
+
+.hidden{display:none!important}
+
+.hero{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:24px;
+  margin-bottom:25px;
+}
+
+h1{
+  font-size:48px;
+  line-height:1;
+  margin:0 0 10px;
+}
+
+h2{margin:8px 0}
+h3{margin:8px 0}
+
+.eyebrow{
+  text-transform:uppercase;
+  letter-spacing:3px;
+  color:var(--gold);
+  font-size:11px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 5px 18px #2b342c10;
+}
+.city-group{
+  padding:22px;
+  margin:0 0 28px;
+  border-radius:18px;
+}
+
+.city-group:nth-child(odd){
+  background:#eee2ca;
+}
+
+.city-group:nth-child(even){
+  background:#b88d43;
+}
+
+.city-group > h2{
+  margin:0 0 16px;
+  letter-spacing:1px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.muted{color:var(--muted)}
+.error{color:#8b3030}
+.success{color:#315d45}
+
+.leader{
+  display:grid;
+  grid-template-columns:48px 1fr auto auto;
+  gap:14px;
+  align-items:center;
+  padding:15px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.admin-player{
+  display:grid;
+  grid-template-columns:1.3fr auto;
+  gap:14px;
+  align-items:center;
+  padding:16px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.admin-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px;
+}
+
+.rank{
+  font-size:24px;
+  color:var(--gold);
+}
+
+.nick{
+  font-weight:bold;
+  font-size:18px;
+}
+
+.score{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.pill{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:99px;
+  background:#e5eee7;
+  font-size:11px;
+  text-transform:uppercase;
+}
+
+.pending{background:#f0e9d7}
+.inactive{background:#ececec}
+.notice-pending{background:#f5e7bc}
+
+.btn{
+  border:0;
+  border-radius:8px;
+  padding:11px 16px;
+  background:var(--ink);
+  color:white;
+  cursor:pointer;
+  margin-right:4px;
+  margin-top:5px;
+}
+
+.btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.propose-callout{
+  background:#b88d43;
+  border:1px solid #9d742f;
+  border-radius:14px;
+  padding:28px 34px;
+  margin:0 0 34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:30px;
+}
+
+.propose-callout h2{
+  font-size:34px;
+  margin:4px 0 8px;
+}
+
+.propose-callout p{
+  font-size:17px;
+  margin:0;
+}
+
+.propose-match-btn{
+  font-size:19px;
+  font-weight:bold;
+  padding:17px 28px;
+  white-space:nowrap;
+}
+.alt{background:var(--gold)}
+.danger{background:var(--danger)}
+.secondary{background:#68736c}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:10px;
+  border:1px solid #cfc7b8;
+  border-radius:7px;
+  background:white;
+  margin:5px 0 12px;
+  font:inherit;
+}
+
+input[type="checkbox"]{
+  width:auto;
+  margin-right:6px;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--muted);
+}
+
+.formgrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.players{
+  padding:11px;
+  background:#f3eee3;
+  border-radius:9px;
+  margin:12px 0;
+}
+
+.rule{
+  padding:13px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.notice{
+  padding:12px;
+  background:#e5eee7;
+  border-radius:9px;
+  margin:12px 0;
+}
+
+.payment-box{
+  background:#f3eee3;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:18px;
+  margin:18px 0;
+  white-space:pre-wrap;
+}
+
+.edit-box{
+  border-top:1px solid var(--line);
+  margin-top:18px;
+  padding-top:18px;
+}
+
+.game-entry{
+  border-top:1px solid var(--line);
+  padding:18px 0;
+}
+
+.game-result{
+  padding:15px;
+  margin:10px 0;
+  background:#f3eee3;
+  border-radius:10px;
+}
+
+.match-total{
+  padding:15px;
+  background:#e5eee7;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.checkrow{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  margin:8px 0 14px;
+}
+
+.checkrow label{
+  text-transform:none;
+  letter-spacing:0;
+  font-size:14px;
+  color:var(--ink);
+}
+
+.section-divider{
+  margin:40px 0 20px;
+  border-top:1px solid var(--line);
+  padding-top:28px;
+}
+
+.hof-scramble{
+  margin-top:22px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+}
+
+.hof-column{
+  padding:15px;
+  background:#f3eee3;
+  border-radius:10px;
+}
+
+.scramble-admin-row,
+.match-admin-row{
+  border-bottom:1px solid var(--line);
+  padding:18px 0;
+}
+@media(min-width:761px){
+
+  .upcoming-match-card{
+    padding:14px 18px;
+    margin-bottom:10px;
+  }
+
+  .match-summary-row{
+    display:grid;
+    grid-template-columns:
+      1.35fr
+      .8fr
+      .9fr
+      1.8fr
+      1fr
+      auto;
+    align-items:center;
+    gap:18px;
+  }
+
+  .match-date,
+  .match-time,
+  .match-type,
+  .match-location,
+  .match-count{
+    margin:0;
+  }
+
+  .match-player-line{
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid var(--line);
+    font-size:14px;
+  }
+
+  .match-actions{
+    white-space:nowrap;
+    text-align:right;
+  }
+
+}
+ .qa-admin-item{
+  padding:12px 14px;
+  margin-bottom:8px;
+}
+
+.qa-admin-item label{
+  margin:4px 0 3px;
+  font-size:12px;
+}
+
+.qa-admin-item input{
+  min-height:40px;
+  padding:8px 12px;
+  margin-bottom:5px;
+}
+
+.qa-answer-input{
+  min-height:52px;
+  height:52px;
+  padding:8px 12px;
+  margin-bottom:8px;
+  resize:vertical;
+}
+
+.qa-admin-item button{
+  padding:9px 14px;
+  margin:0 5px 0 0;
+}
+.instagram-card{
+  margin-top:24px;
+  text-align:center;
+}
+
+.instagram-card .btn{
+  display:inline-block;
+  margin-top:8px;
+  text-decoration:none;
+}@media(max-width:760px){
+  .hero,.grid,.formgrid{grid-template-columns:1fr}
+  h1{font-size:38px}
+  .leader{grid-template-columns:35px 1fr auto}
+  .admin-player{grid-template-columns:1fr}
+  .admin-actions{justify-content:flex-start}
+  .avg{display:none}
+  header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+.propose-callout{
+  flex-direction:column;
+  align-items:stretch;
+  padding:22px 18px;
+}
+
+.propose-match-btn{
+  width:100%;
+  margin-right:0;
+  white-space:normal;
+  text-align:center;
+}
+
+.propose-callout h2{
+  font-size:28px;
+}
+  .match-summary-row{
+  display:block;
+}
+
+.match-summary-row > div{
+  margin-bottom:8px;
+}
+
+.match-actions{
+  margin-top:10px;
+}
+
+.match-player-line{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div
+  class="brand"
+  onclick="show('how-it-works')"
+  style="cursor:pointer;"
+>
+<img src="dragon-scramble-logo.png" class="brand-logo" alt="Dragon Scramble logo"> DRAGON <span>SCRAMBLE</span>
+</div>
+
+<nav>
+<button onclick="show('home')">Leaderboard</button>
+<button onclick="show('matches')">Matches</button>
+<button onclick="show('roster')">Roster</button>
+<button onclick="show('hall')">Hall of Fame</button>
+<button onclick="show('rules')">Rules</button>
+<button onclick="show('account')">Account</button>
+
+<button
+id="admin-nav"
+class="admin-nav hidden"
+onclick="show('admin')">
+Admin
+</button>
+</nav>
+
+</header>
+<div
+  id="scramble-selector-bar"
+  class="hidden"
+  style="
+    max-width:1200px;
+    margin:16px auto 0;
+    padding:0 20px;
+  "
+>
+  <div class="card" style="margin:0;">
+    <label for="scramble-selector">
+      VIEWING SCRAMBLE
+    </label>
+
+    <select
+      id="scramble-selector"
+      onchange="selectScramble(this.value)"
+    ></select>
+  </div>
+</div>
+<main>
+<!-- HOW IT WORKS -->
+
+<section id="how-it-works" class="hidden">
+
+  <div class="eyebrow">Dragon Scramble</div>
+  <h1>How It Works</h1>
+
+ <div class="card">
+
+<img
+  src="dragon-scramble-how-it-works.png"
+    alt="How Dragon Scramble Works"
+    style="
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius:10px;
+    "
+  >
+
+</div>
+
+</section>
+<!-- LEADERBOARD -->
+
+<section id="home">
+
+<div class="hero">
+
+<div>
+<div class="eyebrow">American Mahjong · Friendly Competition</div>
+<h1>The Dragon Scramble</h1>
+<h2 id="current-scramble-title">Loading current Scramble...</h2>
+<p class="muted">Play four. Climb the board. Keep it social.</p>
+</div>
+
+<div class="card">
+<div class="eyebrow">Your Standing</div>
+<div id="my-rank" style="font-size:34px">—</div>
+<b id="my-nickname">Sign in to view</b>
+<div id="my-stats" class="muted"></div>
+</div>
+
+</div>
+
+<div class="card">
+<div class="eyebrow">Overall Player Ranking</div>
+<div id="board">
+<p class="muted">Loading leaderboard...</p>
+</div>
+</div>
+
+<div id="city-leaders"></div>
+
+<div class="grid">
+
+<div class="card">
+<div class="eyebrow">Next Confirmed Match</div>
+<div id="next-confirmed-home">
+<p class="muted">Loading...</p>
+</div>
+</div>
+
+<div class="card">
+<div class="eyebrow">Open Table</div>
+<div id="next-open-home">
+<p class="muted">Loading...</p>
+</div>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- MATCHES -->
+
+<section id="matches" class="hidden">
+
+<div class="hero">
+
+<div>
+<div class="eyebrow">Tables</div>
+<h1>Matches</h1>
+<h2 id="matches-scramble-name"></h2>
+
+<p class="muted">
+Only active, payment-confirmed players can propose or join.
+</p>
+</div>
+
+</div>
+
+<div class="propose-callout">
+
+  <div>
+    <div class="eyebrow">New Match</div>
+    <h2>Propose a Match</h2>
+
+    <p>
+      Create a new match and invite players to join.<br>
+      Choose the city, date, time and match type.
+    </p>
+  </div>
+
+  <button
+    class="btn propose-match-btn"
+    onclick="toggleProposal()">
+    + Propose a Match
+  </button>
+
+</div>
+
+<div
+id="match-eligibility-message"
+class="notice hidden">
+</div>
+
+
+<div id="proposal" class="card hidden">
+
+<div class="eyebrow">New Match</div>
+<h2>Propose a Match</h2>
+
+<div class="formgrid">
+
+<div>
+<label>Date</label>
+<input id="match-date" type="date">
+</div>
+
+<div>
+<label>Time</label>
+
+<select id="match-time">
+  <option value="">Select time</option>
+  <option value="08:00">8:00 AM</option>
+  <option value="08:15">8:15 AM</option>
+  <option value="08:30">8:30 AM</option>
+  <option value="08:45">8:45 AM</option>
+
+  <option value="09:00">9:00 AM</option>
+  <option value="09:15">9:15 AM</option>
+  <option value="09:30">9:30 AM</option>
+  <option value="09:45">9:45 AM</option>
+
+  <option value="10:00">10:00 AM</option>
+  <option value="10:15">10:15 AM</option>
+  <option value="10:30">10:30 AM</option>
+  <option value="10:45">10:45 AM</option>
+
+  <option value="11:00">11:00 AM</option>
+  <option value="11:15">11:15 AM</option>
+  <option value="11:30">11:30 AM</option>
+  <option value="11:45">11:45 AM</option>
+
+  <option value="12:00">12:00 PM</option>
+  <option value="12:15">12:15 PM</option>
+  <option value="12:30">12:30 PM</option>
+  <option value="12:45">12:45 PM</option>
+
+  <option value="13:00">1:00 PM</option>
+  <option value="13:15">1:15 PM</option>
+  <option value="13:30">1:30 PM</option>
+  <option value="13:45">1:45 PM</option>
+
+  <option value="14:00">2:00 PM</option>
+  <option value="14:15">2:15 PM</option>
+  <option value="14:30">2:30 PM</option>
+  <option value="14:45">2:45 PM</option>
+
+  <option value="15:00">3:00 PM</option>
+  <option value="15:15">3:15 PM</option>
+  <option value="15:30">3:30 PM</option>
+  <option value="15:45">3:45 PM</option>
+
+  <option value="16:00">4:00 PM</option>
+  <option value="16:15">4:15 PM</option>
+  <option value="16:30">4:30 PM</option>
+  <option value="16:45">4:45 PM</option>
+
+  <option value="17:00">5:00 PM</option>
+  <option value="17:15">5:15 PM</option>
+  <option value="17:30">5:30 PM</option>
+  <option value="17:45">5:45 PM</option>
+
+  <option value="18:00">6:00 PM</option>
+  <option value="18:15">6:15 PM</option>
+  <option value="18:30">6:30 PM</option>
+  <option value="18:45">6:45 PM</option>
+
+  <option value="19:00">7:00 PM</option>
+  <option value="19:15">7:15 PM</option>
+  <option value="19:30">7:30 PM</option>
+  <option value="19:45">7:45 PM</option>
+
+  <option value="20:00">8:00 PM</option>
+  <option value="20:15">8:15 PM</option>
+  <option value="20:30">8:30 PM</option>
+  <option value="20:45">8:45 PM</option>
+</select>
+
+</div>
+
+</div>
+<label>City</label>
+
+<select id="match-city">
+  <option value="">Select a city</option>
+</select>
+  
+<label>Location</label>
+
+<input
+id="match-location"
+type="text"
+placeholder="Match location">
+
+<label>Match Type</label>
+
+<select id="match-type">
+<option value="social">Social</option>
+<option value="focused">Focused</option>
+</select>
+
+<div class="notice">
+
+<b>Social:</b>
+same Dragon Scramble rules with a more relaxed expectation for pace.
+
+<br><br>
+
+<b>Focused:</b>
+same rules with players expected to maintain a faster pace.
+
+</div>
+
+<div class="notice">
+The proposer provides the
+<b>Mahjong tiles, mat, racks and dice</b>.
+</div>
+
+<button
+class="btn"
+onclick="createMatch()">
+Post Match
+</button>
+
+<p id="proposal-message" class="muted"></p>
+
+</div>
+
+
+<div>
+<div class="section-divider">
+
+  <div class="eyebrow">Your Schedule</div>
+  <h2>My Upcoming Matches</h2>
+
+  <p class="muted">
+    Matches you are currently scheduled to play.
+  </p>
+<div
+  id="my-upcoming-scramble-legend"
+  style="
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    margin:8px 0 14px;
+    font-size:13px;
+  ">
+</div>
+  <div id="my-upcoming-match-list">
+
+    <div class="card">
+      <p class="muted">Loading your upcoming matches...</p>
+    </div>
+
+  </div>
+
+</div>
+<div class="eyebrow">Upcoming</div>
+<h2>Upcoming Matches</h2>
+
+<p class="muted">
+Next upcoming match appears first.
+</p>
+
+<div id="upcoming-match-list">
+
+<div class="card">
+<p class="muted">Loading upcoming matches...</p>
+</div>
+
+</div>
+
+</div>
+
+
+<div class="section-divider">
+
+<div class="eyebrow">History</div>
+<h2>Played Matches</h2>
+
+<p class="muted">
+Most recently played match appears first.
+</p>
+
+<div id="played-match-list">
+
+<div class="card">
+<p class="muted">Loading played matches...</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ROSTER -->
+
+<section id="roster" class="hidden">
+
+<div class="eyebrow">Active Players</div>
+<h1>Player Roster</h1>
+
+<h2 id="roster-scramble-name"></h2>
+
+<p class="muted">
+Only active players for the current Scramble appear here.
+</p>
+
+<div class="card" id="rosterlist">
+<p class="muted">Loading players...</p>
+</div>
+
+</section>
+
+
+<!-- HALL OF FAME -->
+
+<section id="hall" class="hidden">
+
+<div class="eyebrow">Dragon Scramble History</div>
+<h1>Hall of Fame</h1>
+
+<p class="muted">
+Closed Scrambles are preserved here with their final standings.
+</p>
+
+<div class="card" id="hall-of-fame-list">
+<p class="muted">Loading Hall of Fame...</p>
+</div>
+<div class="card instagram-card">
+
+  <div class="eyebrow">Follow the Scramble</div>
+
+  <h2>@dragon_scramble</h2>
+
+  <p class="muted">
+    Follow along for match moments, community highlights and Dragon Scramble updates.
+  </p>
+
+  <a
+    class="btn"
+    href="https://www.instagram.com/dragon_scramble/"
+    target="_blank"
+    rel="noopener noreferrer">
+    Follow on Instagram
+  </a>
+
+</div>
+</section>
+
+
+<!-- RULES -->
+
+<section id="rules" class="hidden">
+
+<div class="eyebrow">Play fair · Have fun</div>
+<h1>Dragon Scramble Rules</h1>
+
+<div class="card">
+
+<div class="eyebrow">Participation & Payment</div>
+
+<h2 id="rules-scramble-name">
+Current Scramble
+</h2>
+
+<div
+id="rules-payment-instructions"
+class="payment-box">
+Loading payment instructions...
+</div>
+
+<div style="margin:12px 0;">
+
+  <a
+    class="btn secondary"
+    href="https://jjrxvynomtdsqsuwyfsd.supabase.co/storage/v1/object/public/dragon-scramble-assets/zelle-qr.jpg"
+    target="_blank"
+    rel="noopener noreferrer">
+    View Zelle QR Code
+  </a>
+
+</div>
+
+<p class="muted">
+After payment is made, sign in to your Account and click
+<b>I’ve Paid — Notify Admin</b>.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<div class="rule">
+<b>NMJL</b><br>
+All National Mah Jongg League rules apply.
+</div>
+
+<div class="rule">
+<b>Four games</b><br>
+Every match has four games, with each player East once.
+</div>
+
+<div class="rule">
+<b>Social vs. Focused</b><br>
+All matches use the same rules. Social has a more relaxed pace expectation. Focused requires a faster pace.
+</div>
+
+<div class="rule">
+<b>Proposer equipment</b><br>
+The current match proposer provides the Mahjong tiles, mat, racks and dice.
+If the proposer leaves an open match, proposer responsibility transfers to the next player who joined.
+</div>
+
+<div class="rule">
+<b>Charleston passing</b><br>
+All four players must place their tiles on the mat before anyone picks up incoming tiles.
+</div>
+
+<div class="rule">
+<b>Phones</b><br>
+No phone above table height. No photos of tiles, racks, hands or the table. No AI or electronic assistance.
+</div>
+
+<div class="rule">
+<b>Notifications</b><br>
+All phone notification sounds must be turned off during play, as a courtesy to other players and to encourage everyone to stay present and focused on the game.
+</div>
+
+<div class="rule">
+<b>Scoring</b><br>
+Winner receives the NMJL hand value shown on the card.<br>
+Self-picked Mahjong = hand value ×2.<br>
+Jokerless Mahjong = hand value ×2 when eligible.<br>
+Self-picked + Jokerless = hand value ×4.<br>
+50- and 75-point hands are not eligible for the Jokerless multiplier.<br>
+Wall Game = +10 to each player and no other points for that game.<br>
+Average score is shown only after a player has completed at least 4 matches.
+</div>
+
+<div class="rule">
+<b>Proposer</b><br>
+The proposer at the time the match is completed receives +5 points.
+</div>
+
+<div class="rule">
+<b>Withdrawal</b><br>
+Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.
+</div>
+
+<div class="rule">
+<b>Late</b><br>
+20 minutes or more late AND the delay results in the match being cancelled: late player −20 points; other three players +25 points each.
+</div>
+
+<div class="rule">
+<b>Emergency</b><br>
+If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.
+</div>
+
+</div>
+<div class="section-divider">
+
+  <div class="eyebrow">Questions & Clarifications</div>
+  <h2>Q&A</h2>
+
+  <div id="rules-qa-list">
+    <div class="card">
+      <p class="muted">Loading Q&A...</p>
+    </div>
+  </div>
+
+</div>
+</section>
+
+
+<!-- ACCOUNT -->
+
+<section id="account" class="hidden">
+
+<div class="eyebrow">Player Account</div>
+<h1>Dragon Scramble Account</h1>
+
+<div
+id="logged-in-player"
+class="card hidden">
+
+<div class="eyebrow">Your Account</div>
+
+<h2>
+Welcome,
+<span id="player-nickname"></span>
+</h2>
+
+<p id="player-name" class="muted"></p>
+<div class="nickname-summary">
+
+  <div>
+    <span class="muted">Mahjong Nickname:</span>
+    <strong id="account-current-nickname"></strong>
+  </div>
+
+  <button
+    class="btn alt"
+    type="button"
+    onclick="toggleNicknameEditor(true)">
+    Change Nickname
+  </button>
+
+</div>
+
+<div
+id="nickname-editor"
+class="edit-box hidden">
+
+<label>New Mahjong Nickname</label>
+
+<input
+id="account-nickname-input"
+type="text"
+placeholder="Enter your nickname">
+
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+
+<button
+class="btn"
+type="button"
+onclick="saveMyNickname()">
+Save
+</button>
+
+<button
+class="btn alt"
+type="button"
+onclick="toggleNicknameEditor(false)">
+Cancel
+</button>
+
+</div>
+
+<p
+id="account-nickname-message"
+class="muted">
+</p>
+
+</div>
+<div
+id="account-payment-section"
+class="hidden">
+
+<div class="eyebrow">Current Scramble</div>
+<h2 id="account-scramble-name"></h2>
+
+<div
+id="account-payment-instructions"
+class="payment-box">
+Loading payment instructions...
+</div>
+
+<div
+  style="
+    text-align:center;
+    margin:18px 0 24px;
+  ">
+
+  <div
+    style="
+      font-weight:bold;
+      margin-bottom:10px;
+    ">
+    Scan to pay with Zelle
+  </div>
+
+  <img
+   src="https://jjrxvynomtdsqsuwyfsd.supabase.co/storage/v1/object/public/dragon-scramble-assets/zelle-qr.jpg"
+    alt="Zelle payment QR code"
+    style="
+      width:100%;
+      max-width:240px;
+      height:auto;
+      display:block;
+      margin:0 auto;
+      border-radius:10px;
+    ">
+
+  <p class="muted">
+    Please verify the recipient information before sending payment.
+  </p>
+
+</div>
+
+<div id="account-payment-status"></div>
+
+</div>
+<div class="edit-box">
+
+  <h3>Account Security</h3>
+
+  <button
+    class="btn secondary"
+    type="button"
+    onclick="toggleChangePassword()">
+    Change Password
+  </button>
+
+  <div
+    id="change-password-box"
+    class="hidden"
+    style="margin-top:14px;">
+
+    <label>New Password</label>
+
+    <input
+      id="account-new-password"
+      type="password"
+      placeholder="Enter new password">
+
+    <label>Confirm New Password</label>
+
+    <input
+      id="account-confirm-password"
+      type="password"
+      placeholder="Enter new password again">
+
+    <button
+      class="btn"
+      type="button"
+      onclick="changeMyPassword()">
+      Save New Password
+    </button>
+
+    <p
+      id="change-password-message"
+      class="muted">
+    </p>
+
+  </div>
+
+</div>
+
+<button
+  class="btn alt"
+  onclick="signOutPlayer()">
+  Sign Out
+</button>
+
+</div>
+
+<div id="login-card" class="card">
+
+<div class="eyebrow">Returning Player</div>
+<h2>Sign In</h2>
+
+<label>Email</label>
+<input id="login-email" type="email">
+
+<label>Password</label>
+<input id="login-password" type="password">
+
+<button
+class="btn alt"
+onclick="signInPlayer()">
+Sign In
+</button>
+
+<button
+class="btn secondary"
+type="button"
+onclick="resetPassword()">
+Forgot Password?
+</button>
+
+<p id="login-message" class="muted"></p>
+
+</div>
+<div id="signup-card" class="card">
+
+<div class="eyebrow">New Player</div>
+<h2>Create Account</h2>
+
+<label>Full Name</label>
+<input id="signup-name" type="text">
+
+<label>Mahjong Nickname</label>
+<input id="signup-nickname" type="text">
+
+<label>Phone</label>
+<input id="signup-phone" type="tel">
+
+<label>Email</label>
+<input id="signup-email" type="email">
+
+<label>Password</label>
+<input id="signup-password" type="password">
+
+<button
+class="btn"
+onclick="signUpPlayer()">
+Create Account
+</button>
+
+<p id="signup-message" class="muted"></p>
+
+</div>
+
+<div id="reset-password-card" class="card hidden">
+
+  <div class="eyebrow">Account Security</div>
+  <h2>Choose New Password</h2>
+
+  <label>New Password</label>
+
+  <input
+    id="new-password"
+    type="password"
+    placeholder="Enter new password">
+
+  <label>Confirm New Password</label>
+
+  <input
+    id="confirm-new-password"
+    type="password"
+    placeholder="Enter new password again">
+
+  <button
+    class="btn"
+    type="button"
+    onclick="saveNewPassword()">
+    Save New Password
+  </button>
+
+  <p
+    id="reset-password-message"
+    class="muted">
+  </p>
+
+</div>
+
+
+</section>
+
+
+<!-- RESULTS -->
+
+<section id="results" class="hidden">
+
+<div class="eyebrow">Match Results</div>
+<h1>Enter Results</h1>
+
+<p class="muted">
+Any player in a confirmed match may submit the results.
+Admin may submit results for any confirmed match.
+</p>
+
+<div id="player-score-list">
+
+<div class="card">
+<p class="muted">Loading confirmed matches...</p>
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ADMIN -->
+
+<section id="admin" class="hidden">
+
+<div class="eyebrow">Administration</div>
+<h1>Admin Dashboard</h1>
+
+
+<div class="card">
+
+  <div class="eyebrow">
+    Scramble History & Management
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-scramble-content')"
+    style="cursor:pointer;">
+    Scrambles ▾
+  </h2>
+
+  <div
+    id="admin-scramble-content"
+    class="hidden">
+
+    <p class="muted">
+      Names and dates may be edited. Closed Scrambles remain locked for scoring.
+    </p>
+
+    <div id="admin-scramble-history">
+      <p class="muted">Loading Scrambles...</p>
+    </div>
+
+    <div
+      id="admin-create-scramble"
+      class="hidden">
+
+      <div class="edit-box">
+
+        <h3>Create New Scramble</h3>
+
+        <label>Scramble Name</label>
+
+        <input
+          id="new-scramble-name"
+          placeholder="e.g. Fall 2026 Dragon Scramble">
+
+        <div class="formgrid">
+
+          <div>
+            <label>Start Date</label>
+            <input
+              id="new-scramble-start"
+              type="date">
+          </div>
+
+          <div>
+            <label>End Date</label>
+            <input
+              id="new-scramble-end"
+              type="date">
+          </div>
+
+        </div>
+<label>Scramble Color</label>
+
+<input
+  id="new-scramble-color"
+  type="color"
+  value="#B88A3B"
+  style="
+    width:70px;
+    height:44px;
+    padding:3px;
+    cursor:pointer;
+  ">
+        <button
+          class="btn"
+          onclick="adminCreateScramble()">
+          Create Active Scramble
+        </button>
+
+        <p
+          id="new-scramble-message"
+          class="muted">
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  id="admin-payment-card"
+  class="card">
+
+  <div class="eyebrow">
+    Current Scramble Settings
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-payment-content')"
+    style="cursor:pointer;">
+    Payment Instructions ▾
+  </h2>
+
+  <div
+    id="admin-payment-content"
+    class="hidden">
+
+    <label>Payment Message</label>
+
+    <textarea
+      id="admin-payment-instructions">
+    </textarea>
+
+    <button
+      class="btn"
+      onclick="adminSavePaymentInstructions()">
+      Save Payment Instructions
+    </button>
+
+    <p
+      id="admin-payment-message"
+      class="muted">
+    </p>
+
+  </div>
+
+</div>
+
+
+<div
+  id="admin-city-card"
+  class="card">
+
+  <div class="eyebrow">
+    Location Settings
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-city-content')"
+    style="cursor:pointer;">
+    Manage Cities ▾
+  </h2>
+
+  <div
+    id="admin-city-content"
+    class="hidden">
+
+    <p class="muted">
+      Cities listed here will be available when players propose matches.
+    </p>
+
+    <div class="edit-box">
+
+      <label>Add City</label>
+
+      <input
+        id="admin-new-city"
+        type="text"
+        placeholder="e.g. New York">
+
+      <button
+        class="btn"
+        type="button"
+        onclick="adminAddCity()">
+        Add City
+      </button>
+
+      <p
+        id="admin-city-message"
+        class="muted">
+      </p>
+
+    </div>
+
+    <div id="admin-city-list">
+
+      <p class="muted">
+        Loading cities...
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  id="admin-rules-qa-card"
+  class="card">
+
+  <div class="eyebrow">Rules</div>
+
+  <h2
+    onclick="toggleAdminQA()"
+    style="cursor:pointer;">
+    Manage Q&A ▾
+  </h2>
+
+  <div
+    id="admin-qa-content"
+    class="edit-box hidden">
+
+    <label>Question</label>
+
+    <input
+      id="admin-qa-question"
+      type="text">
+
+    <label>Answer</label>
+
+    <textarea
+      id="admin-qa-answer">
+    </textarea>
+
+    <button
+      class="btn"
+      type="button"
+      onclick="adminAddQA()">
+      Add Q&A
+    </button>
+
+    <p
+      id="admin-qa-message"
+      class="muted">
+    </p>
+
+    <div id="admin-qa-list">
+      <p class="muted">Loading Q&A...</p>
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  id="admin-player-card"
+  class="card">
+
+  <div class="eyebrow">
+    Player Management
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-player-content')"
+    style="cursor:pointer;">
+    Players & Payments ▾
+  </h2>
+
+  <div
+    id="admin-player-content"
+    class="hidden">
+
+    <button
+      class="btn secondary"
+      type="button"
+      onclick="adminDownloadPlayers()">
+      Download Player List
+    </button>
+
+    <div id="admin-player-list">
+      <p class="muted">Loading players...</p>
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="eyebrow">
+    Match Management
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-match-content')"
+    style="cursor:pointer;">
+    All Matches ▾
+  </h2>
+
+  <div
+    id="admin-match-content"
+    class="hidden">
+
+    <p class="muted">
+      Admin may permanently remove test or invalid matches.
+    </p>
+
+    <div id="admin-match-management">
+      <p class="muted">Loading matches...</p>
+    </div>
+
+  </div>
+
+</div>
+
+
+<div
+  id="admin-score-card"
+  class="card">
+
+  <div class="eyebrow">
+    Score Entry
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-score-content')"
+    style="cursor:pointer;">
+    Confirmed Matches ▾
+  </h2>
+
+  <div
+    id="admin-score-content"
+    class="hidden">
+
+    <div id="admin-score-list">
+      <p class="muted">
+        Loading confirmed matches...
+      </p>
+    </div>
+
+  </div>
+
+</div>
+</section>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+"https://jjrxvynomtdsqsuwyfsd.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_loxGwZ8cgC_QKFuS3ZnDNQ_KfcJAO3F";
+
+const supabaseClient =
+supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentUser = null;
+let currentPlayerProfile = null;
+let currentScramble = null;
+  let activeScrambles = [];
+let passwordRecoveryMode =
+  window.location.hash.includes("type=recovery") ||
+  window.location.search.includes("type=recovery");
+let currentEligibility = {
+  active:false,
+  paid:false,
+  eligible:false
+};
+
+
+/* HELPERS */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function dateText(value){
+
+  return new Date(value)
+    .toLocaleDateString(
+      undefined,
+      {
+        weekday:"short",
+        month:"short",
+        day:"numeric",
+        year:"numeric"
+      }
+    );
+
+}
+
+
+function timeText(value){
+
+  return new Date(value)
+    .toLocaleTimeString(
+      undefined,
+      {
+        hour:"numeric",
+        minute:"2-digit"
+      }
+    );
+
+}
+
+
+function show(id){
+
+  document
+    .querySelectorAll("main > section")
+    .forEach(
+      section =>
+        section.classList.add("hidden")
+    );
+
+  document
+    .getElementById(id)
+    .classList.remove("hidden");
+
+  window.scrollTo(0,0);
+document
+  .querySelectorAll("nav button")
+  .forEach(button =>
+    button.classList.remove("active-tab")
+  );
+
+const activeButton =
+  document.querySelector(
+    `nav button[onclick="show('${id}')"]`
+  );
+
+if(activeButton){
+  activeButton.classList.add("active-tab");
+}
+  if(id === "home"){
+    loadLeaderboard();
+    loadHomeMatches();
+  }
+
+  if(id === "matches"){
+    loadMatchesPage();
+  }
+
+  if(id === "roster"){
+    roster();
+  }
+
+  if(id === "hall"){
+    loadHallOfFame();
+  }
+
+  if(id === "rules"){
+  loadCurrentScrambleDisplay();
+  loadRulesQA();
+}
+
+  if(id === "account"){
+    loadAccountPaymentStatus();
+  }
+
+  if(id === "results"){
+    loadScoreEntry(
+      "player-score-list",
+      false
+    );
+  }
+
+  if(id === "admin"){
+    loadAdminDashboard();
+  }
+
+}
+
+
+/* ACTIVE SCRAMBLE */
+
+async function getActiveScramble(){
+
+  const {data,error} =
+    await supabaseClient
+      .from("scrambles")
+      .select(
+     "id,name,start_date,end_date,status,closed_at,payment_instructions,color,public_results,visible"
+      )
+      .eq("status","active")
+      .order("start_date",{ascending:false});
+
+  if(error){
+
+    console.error(
+      "Could not load active Scrambles:",
+      error
+    );
+
+    activeScrambles = [];
+    currentScramble = null;
+
+    return null;
+  }
+
+activeScrambles =
+  (data || []).filter(
+    scramble =>
+      scramble.visible !== false ||
+      currentPlayerProfile?.role === "admin"
+  );
+
+ const previousScrambleId =
+  currentScramble?.id;
+
+currentScramble =
+  activeScrambles.find(
+    scramble =>
+      scramble.id === previousScrambleId
+  ) ||
+  activeScrambles[0] ||
+  null;
+
+renderScrambleSelector();
+  return currentScramble;
+
+}
+function renderScrambleSelector(){
+
+  const bar =
+    document.getElementById(
+      "scramble-selector-bar"
+    );
+
+  const selector =
+    document.getElementById(
+      "scramble-selector"
+    );
+
+  if(!bar || !selector){
+    return;
+  }
+
+  if(activeScrambles.length <= 1){
+
+    bar.classList.add("hidden");
+    return;
+
+  }
+
+  selector.innerHTML =
+    activeScrambles
+      .map(
+        scramble => `
+          <option
+            value="${scramble.id}"
+            ${
+              scramble.id === currentScramble?.id
+                ? "selected"
+                : ""
+            }
+          >
+            ${escapeHtml(scramble.name)}
+          </option>
+        `
+      )
+      .join("");
+
+  bar.classList.remove("hidden");
+
+}
+
+
+async function selectScramble(scrambleId){
+
+  const selected =
+    activeScrambles.find(
+      scramble =>
+        scramble.id === scrambleId
+    );
+
+  if(!selected){
+    return;
+  }
+
+  currentScramble = selected;
+
+  applyScrambleDateLimits();
+
+  await checkEligibility();
+
+ await Promise.all([
+  loadLeaderboard(),
+  loadHomeMatches(),
+  loadMatchesPage(),
+  loadPlayedMatches(),
+  roster(),
+  loadAccountPaymentStatus(),
+  loadCurrentScrambleDisplay(),
+  loadAdminDashboard()
+]);
+
+}
+function applyScrambleDateLimits(){
+
+  const dateInput =
+    document.getElementById("match-date");
+
+  if(
+    !dateInput ||
+    !currentScramble
+  ){
+    return;
+  }
+
+  if(currentScramble.start_date){
+    dateInput.min =
+      currentScramble.start_date;
+  }
+
+  if(currentScramble.end_date){
+    dateInput.max =
+      currentScramble.end_date;
+  }
+
+}
+async function loadCurrentScrambleDisplay(){
+
+  await getActiveScramble();
+applyScrambleDateLimits();
+  document
+    .getElementById(
+      "current-scramble-title"
+    )
+    .textContent =
+      currentScramble?.name ||
+      "No active Scramble";
+
+  document
+    .getElementById(
+      "rules-scramble-name"
+    )
+    .textContent =
+      currentScramble?.name ||
+      "No active Scramble";
+
+  document
+    .getElementById(
+      "rules-payment-instructions"
+    )
+    .textContent =
+      currentScramble
+        ? (
+          currentScramble.payment_instructions ||
+          "Payment instructions have not yet been published."
+        )
+        : "Registration and payment are currently closed.";
+
+}
+async function loadRulesQA(){
+
+  const list =
+    document.getElementById(
+      "rules-qa-list"
+    );
+
+  if(!list) return;
+
+  const {data, error} =
+    await supabaseClient
+      .from("rules_qa")
+      .select(
+        "id,question,answer,display_order"
+      )
+      .eq("active",true)
+      .order(
+        "display_order",
+        {ascending:true}
+      );
+
+  if(error){
+
+    list.innerHTML =
+      '<div class="card"><p class="error">Unable to load Q&A.</p></div>';
+
+    return;
+  }
+
+  list.innerHTML =
+    (data || [])
+      .map(item => `
+
+        <div class="card">
+
+          <h3>
+            ${escapeHtml(item.question)}
+          </h3>
+
+          <p>
+            ${escapeHtml(item.answer)}
+          </p>
+
+        </div>
+
+      `)
+      .join("");
+
+}
+
+/* ELIGIBILITY */
+
+async function checkEligibility(){
+
+  currentEligibility = {
+    active:false,
+    paid:false,
+    eligible:false
+  };
+
+  if(
+    !currentUser ||
+    !currentScramble
+  ){
+    return currentEligibility;
+  }
+
+  const [
+    membershipResult,
+    paymentResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("scramble_players")
+      .select("active")
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "player_id",
+        currentUser.id
+      )
+      .maybeSingle(),
+
+    supabaseClient
+      .from("payment_status")
+      .select(
+        "status,notified_at,confirmed_at"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "player_id",
+        currentUser.id
+      )
+      .maybeSingle()
+
+  ]);
+
+  currentEligibility.active =
+    membershipResult.data?.active === true;
+
+  currentEligibility.paid =
+    paymentResult.data?.status === "paid";
+
+  currentEligibility.eligible =
+    currentEligibility.active &&
+    currentEligibility.paid;
+
+  return currentEligibility;
+
+}
+
+
+/* ACCOUNT */
+
+async function loadAccountPaymentStatus(){
+
+  if(!currentUser){
+    return;
+  }
+
+  await getActiveScramble();
+
+  const section =
+    document.getElementById(
+      "account-payment-section"
+    );
+
+  section.classList.remove("hidden");
+
+  const scrambleName =
+    document.getElementById(
+      "account-scramble-name"
+    );
+
+  const instructions =
+    document.getElementById(
+      "account-payment-instructions"
+    );
+
+  const statusBox =
+    document.getElementById(
+      "account-payment-status"
+    );
+
+  if(!currentScramble){
+
+    scrambleName.textContent =
+      "No active Scramble";
+
+    instructions.textContent =
+      "Registration and payment are currently closed.";
+
+    statusBox.innerHTML =
+      '<div class="notice">There is currently no active Dragon Scramble.</div>';
+
+    return;
+  }
+
+  scrambleName.textContent =
+    currentScramble.name;
+
+  instructions.textContent =
+    currentScramble.payment_instructions ||
+    "Payment instructions have not yet been published.";
+
+  const [
+    paymentResult,
+    membershipResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("payment_status")
+      .select(
+        "status,notified_at,confirmed_at"
+      )
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "player_id",
+        currentUser.id
+      )
+      .maybeSingle(),
+
+    supabaseClient
+      .from("scramble_players")
+      .select("active")
+      .eq(
+        "scramble_id",
+        currentScramble.id
+      )
+      .eq(
+        "player_id",
+        currentUser.id
+      )
+      .maybeSingle()
+
+  ]);
+
+  const payment =
+    paymentResult.data;
+
+  const active =
+    membershipResult.data?.active === true;
+
+  if(
+    payment?.status === "paid" &&
+    active
+  ){
+
+    statusBox.innerHTML = `
+
+      <div class="notice">
+        <b>Payment confirmed ✓</b>
+        <br>
+        You are active for
+        <b>${escapeHtml(currentScramble.name)}</b>.
+      </div>
+
+    `;
+
+    return;
+  }
+
+  if(payment?.status === "paid"){
+
+    statusBox.innerHTML = `
+
+      <div class="notice">
+        <b>Payment confirmed ✓</b>
+        <br>
+        Your participation is currently inactive.
+      </div>
+
+    `;
+
+    return;
+  }
+
+  if(
+    payment?.status === "pending" &&
+    payment?.notified_at
+  ){
+
+    statusBox.innerHTML = `
+
+      <div class="notice notice-pending">
+        <b>Payment notice sent</b>
+        <br>
+        Awaiting Admin confirmation.
+      </div>
+
+    `;
+
+    return;
+  }
+
+  statusBox.innerHTML = `
+
+    <div class="notice">
+      After sending payment,
+      click below to notify the Admin.
+    </div>
+
+    <button
+      class="btn alt"
+      onclick="playerNotifyPayment()">
+      I’ve Paid — Notify Admin
+    </button>
+
+  `;
+
+}
+
+
+async function playerNotifyPayment(){
+
+  if(
+    !confirm(
+      "Have you already sent the participation payment?"
+    )
+  ){
+    return;
+  }
+
+ const {error} =
+  await supabaseClient
+    .rpc(
+      "player_notify_payment",
+      {
+        p_scramble_id:
+          currentScramble.id
+      }
+    );
+  if(error){
+
+    alert(
+      "Could not notify Admin: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await checkEligibility();
+  await loadAccountPaymentStatus();
+
+}
+
+
+/* MATCH PAGE */
+
+function toggleProposal(){
+
+  if(!currentUser){
+
+    show("account");
+    return;
+  }
+
+  if(!currentEligibility.eligible){
+
+    const message =
+      document.getElementById(
+        "match-eligibility-message"
+      );
+
+    message.textContent =
+      "You must be active and payment-confirmed for the current Scramble.";
+
+    message.classList.remove("hidden");
+
+    return;
+  }
+
+  document
+    .getElementById("proposal")
+    .classList.toggle("hidden");
+
+}
+
+
+async function loadMatchesPage(){
+
+  const upcoming =
+    document.getElementById(
+      "upcoming-match-list"
+    );
+
+  const played =
+    document.getElementById(
+      "played-match-list"
+    );
+
+  if(!currentUser){
+
+    upcoming.innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          Sign in to view matches
+        </h2>
+
+        <button
+          class="btn"
+          onclick="show('account')">
+          Sign In
+        </button>
+
+      </div>
+
+    `;
+
+    played.innerHTML = "";
+
+    return;
+  }
+
+  await getActiveScramble();
+
+  document
+    .getElementById(
+      "matches-scramble-name"
+    )
+    .textContent =
+      currentScramble?.name ||
+      "No active Scramble";
+
+  if(!currentScramble){
+
+    upcoming.innerHTML =
+      '<div class="card"><p class="muted">There is currently no active Scramble.</p></div>';
+
+    played.innerHTML =
+      '<div class="card"><p class="muted">See Hall of Fame for completed Scramble standings.</p></div>';
+
+    return;
+  }
+
+  await checkEligibility();
+
+  const eligibilityMessage =
+    document.getElementById(
+      "match-eligibility-message"
+    );
+
+  if(!currentEligibility.eligible){
+
+    eligibilityMessage.innerHTML = `
+
+      <b>
+        Not yet active for
+        ${escapeHtml(currentScramble.name)}.
+      </b>
+
+      <br>
+
+      Complete payment and wait for Admin confirmation.
+
+    `;
+
+    eligibilityMessage.classList.remove("hidden");
+
+  }else{
+
+    eligibilityMessage.classList.add("hidden");
+
+  }
+
+  await Promise.all([
+    loadUpcomingMatches(),
+    loadPlayedMatches()
+  ]);
+await loadMyUpcomingMatches();
+}
+
+
+/* PROPOSE MATCH */
+
+async function createMatch(){
+
+  const message =
+    document.getElementById(
+      "proposal-message"
+    );
+
+  await getActiveScramble();
+  await checkEligibility();
+
+  if(
+    !currentScramble ||
+    !currentEligibility.eligible
+  ){
+
+    message.textContent =
+      "You must be active and paid for the current Scramble.";
+
+    return;
+  }
+
+  const date =
+    document.getElementById(
+      "match-date"
+    ).value;
+
+  const time =
+    document.getElementById(
+      "match-time"
+    ).value;
+  
+const city =
+  document.getElementById(
+    "match-city"
+  ).value;
+  
+  const location =
+    document.getElementById(
+      "match-location"
+    ).value.trim();
+
+  const matchType =
+    document.getElementById(
+      "match-type"
+    ).value;
+
+ if(
+  !date ||
+  !time ||
+  !city ||
+  !location
+){
+
+    message.textContent =
+       "Please enter date, time, city and location.";
+
+    return;
+  }
+
+  const scheduled =
+    new Date(
+      `${date}T${time}:00`
+    );
+
+  if(
+    scheduled <= new Date()
+  ){
+
+    message.textContent =
+      "The match must be in the future.";
+
+    return;
+  }
+
+  message.textContent =
+    "Posting match...";
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "propose_dragon_match",
+        {
+
+          p_scheduled_at:
+            scheduled.toISOString(),
+p_city_id:
+  city,
+          p_location:
+            location,
+
+          p_match_type:
+             matchType,
+
+p_scramble_id:
+  currentScramble.id
+
+        }
+      );
+
+  if(error){
+
+    message.textContent =
+      "Match could not be created: " +
+      error.message;
+
+    return;
+  }
+
+  document
+    .getElementById("proposal")
+    .classList.add("hidden");
+
+  document
+    .getElementById(
+      "match-location"
+    ).value = "";
+
+  message.textContent = "";
+
+  await loadMatchesPage();
+  await loadHomeMatches();
+
+}
+
+
+/* JOIN MATCH */
+
+async function joinMatch(id){
+
+  await getActiveScramble();
+  await checkEligibility();
+
+  if(!currentEligibility.eligible){
+
+    alert(
+      "Only active, paid players can join."
+    );
+
+    return;
+  }
+
+  const {error} =
+    await supabaseClient
+      .rpc(
+        "join_dragon_match",
+        {
+          p_match_id:id
+        }
+      );
+
+  if(error){
+
+    alert(
+      "Could not join match: " +
+      error.message
+    );
+
+    return;
+  }
+
+  await loadMatchesPage();
+  await loadHomeMatches();
+
+}
+
+async function loadMyUpcomingMatches(){
+
+  const list =
+    document.getElementById(
+      "my-upcoming-match-list"
+    );
+
+  const legend =
+    document.getElementById(
+      "my-upcoming-scramble-legend"
+    );
+
+  if(!list || !legend){
+    return;
+  }
+
+  if(!currentUser){
+    list.innerHTML = "";
+    legend.innerHTML = "";
+    return;
+  }
+
+  await getActiveScramble();
+
+  const activeIds =
+    activeScrambles.map(
+      scramble => scramble.id
+    );
+
+  if(!activeIds.length){
+    list.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+    legend.innerHTML = "";
+    return;
+  }
+
+  const {data:mySeats,error:seatError} =
+    await supabaseClient
+      .from("match_players")
+      .select("match_id")
+      .eq(
+        "player_id",
+        currentUser.id
+      );
+
+  if(seatError){
+    console.error(
+      "Could not load player matches:",
+      seatError
+    );
+    return;
+  }
+
+  const myMatchIds =
+    (mySeats || []).map(
+      seat => seat.match_id
+    );
+
+  if(!myMatchIds.length){
+    list.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+    legend.innerHTML = "";
+    return;
+  }
+
+  const {data:matches,error:matchError} =
+    await supabaseClient
+      .from("matches")
+      .select(
+        "id,scramble_id,scheduled_at,location,status"
+      )
+      .in(
+        "id",
+        myMatchIds
+      )
+      .in(
+        "scramble_id",
+        activeIds
+      )
+      .in(
+        "status",
+        ["open","confirmed"]
+      )
+      .gte(
+        "scheduled_at",
+        new Date().toISOString()
+      )
+      .order(
+        "scheduled_at",
+        {ascending:true}
+      );
+
+  if(matchError){
+    console.error(
+      "Could not load upcoming player matches:",
+      matchError
+    );
+    return;
+  }
+
+  const myMatches =
+    matches || [];
+
+  if(!myMatches.length){
+    list.innerHTML =
+      '<div class="card"><p class="muted">You have no upcoming matches.</p></div>';
+
+    legend.innerHTML = "";
+    return;
+  }
+
+  const matchIds =
+    myMatches.map(
+      match => match.id
+    );
+
+  const [
+    seatsResult,
+    playersResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("match_players")
+      .select(
+        "match_id,player_id,joined_at"
+      )
+      .in(
+        "match_id",
+        matchIds
+      ),
+
+    supabaseClient
+      .from("players")
+      .select(
+        "id,nickname"
+      )
+
+  ]);
+
+  const seats =
+    seatsResult.data || [];
+
+  const playerMap =
+    new Map(
+      (playersResult.data || [])
+        .map(
+          player => [
+            player.id,
+            player.nickname ||
+              "Player"
+          ]
+        )
+    );
+
+  const scrambleMap =
+    new Map(
+      activeScrambles.map(
+        scramble => [
+          scramble.id,
+          scramble
+        ]
+      )
+    );
+
+  const representedScrambleIds =
+    [
+      ...new Set(
+        myMatches.map(
+          match =>
+            match.scramble_id
+        )
+      )
+    ];
+
+  legend.innerHTML =
+    representedScrambleIds
+      .map(scrambleId => {
+
+        const scramble =
+          scrambleMap.get(
+            scrambleId
+          );
+
+        if(!scramble){
+          return "";
+        }
+
+        const color =
+          scramble.color ||
+          "#B88A3B";
+
+        return `
+          <span
+            style="
+              display:inline-flex;
+              align-items:center;
+              gap:6px;
+            ">
+
+            <span
+              style="
+                width:10px;
+                height:10px;
+                border-radius:50%;
+                background:${escapeHtml(color)};
+                display:inline-block;
+              ">
+            </span>
+
+            ${escapeHtml(scramble.name)}
+
+          </span>
+        `;
+
+      })
+      .join("");
+
+  list.innerHTML =
+    myMatches
+      .map(match => {
+
+        const scramble =
+          scrambleMap.get(
+            match.scramble_id
+          );
+
+        const color =
+          scramble?.color ||
+          "#B88A3B";
+
+        const matchSeats =
+          seats
+            .filter(
+              seat =>
+                seat.match_id ===
+                match.id
+            )
+            .sort(
+              (a,b) =>
+                new Date(a.joined_at) -
+                new Date(b.joined_at)
+            );
+
+        const playerNames =
+          matchSeats
+            .map(
+              seat =>
+                escapeHtml(
+                  playerMap.get(
+                    seat.player_id
+                  ) ||
+                  "Player"
+                )
+            )
+            .join(" · ");
+
+        const count =
+          matchSeats.length;
+
+        const status =
+          match.status ===
+            "confirmed"
+            ? "Confirmed"
+            : `${count}/4`;
+
+        return `
+
+          <div
+            class="card"
+            style="
+              padding:10px 14px;
+              margin-bottom:8px;
+              overflow-x:auto;
+            ">
+
+            <div
+              style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+            
+                font-size:14px;
+              ">
+
+              <span
+                style="
+                  width:10px;
+                  height:10px;
+                  min-width:10px;
+                  border-radius:50%;
+                  background:${escapeHtml(color)};
+                  display:inline-block;
+                ">
+              </span>
+
+              <span class="pill">
+                ${escapeHtml(status)}
+              </span>
+
+              <strong>
+                ${escapeHtml(
+                  dateText(
+                    match.scheduled_at
+                  )
+                )}
+                ·
+                ${escapeHtml(
+                  timeText(
+                    match.scheduled_at
+                  )
+                )}
+              </strong>
+
+              <span>
+                📍 ${escapeHtml(
+                  match.location
+                )}
+              </span>
+
+              <span>
+                ${playerNames}
+              </span>
+
+            </div>
+
+          </div>
+
+        `;
+
+      })
+      .join("");
+
+}
+/* UPCOMING MATCHES */
+
+async function loadUpcomingMatches(){
+
+  const list =
+    document.getElementById(
+      "upcoming-match-list"
+    );
+
+  const {
+    data:matches,
+    error
+  } =
+    await supabaseClient
+      .from("matches")
+      .select(
  .select(
   "id,proposer_id,scramble_id,scheduled_at,location,match_type,status,confirmed_at,city_id"
 )
