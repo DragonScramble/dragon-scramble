@@ -4417,20 +4417,33 @@ function renderAdminCompletedEdit(
           </label>
 
           <input
-            id="edit-base-${match.id}-${n}"
-            type="number"
-            min="1"
-            value="${
-              game &&
-              !game.is_wall_game
-                ? Number(
-                    game.base_hand_value ||
-                    0
-                  )
-                : ""
-            }">
+            <select
+  id="edit-base-${match.id}-${n}"
+  onchange="handValueChanged(
+    'edit',
+    '${match.id}',
+    ${n}
+  )">
 
-          <div class="checkrow">
+  <option value="">Select hand value</option>
+
+  ${[25,30,35,40,45,50,75]
+    .map(value => `
+      <option
+        value="${value}"
+        ${
+          game &&
+          !game.is_wall_game &&
+          Number(game.base_hand_value) === value
+            ? "selected"
+            : ""
+        }>
+        ${value}
+      </option>
+    `)
+    .join("")}
+
+</select>
 
             <label>
 
@@ -4509,7 +4522,40 @@ function completedEditResultChanged(
     );
 
 }
+function handValueChanged(
+  prefix,
+  matchId,
+  gameNumber
+){
 
+  const base =
+    Number(
+      document.getElementById(
+        `${prefix}-base-${matchId}-${gameNumber}`
+      ).value
+    );
+
+  const jokerless =
+    document.getElementById(
+      `${prefix}-jokerless-${matchId}-${gameNumber}`
+    );
+
+  if(!jokerless){
+    return;
+  }
+
+  const disabled =
+    base === 50 ||
+    base === 75;
+
+  if(disabled){
+    jokerless.checked = false;
+  }
+
+  jokerless.disabled =
+    disabled;
+
+}
 
 async function adminSaveCompletedResults(
   matchId,
@@ -4611,9 +4657,10 @@ async function adminSaveCompletedResults(
         ).checked,
 
       jokerless:
-        document.getElementById(
-          `edit-jokerless-${matchId}-${n}`
-        ).checked
+  ![50,75].includes(base) &&
+  document.getElementById(
+    `edit-jokerless-${matchId}-${n}`
+  ).checked
 
     });
 
@@ -5011,11 +5058,24 @@ const scoreContentId =
                     NMJL Hand Value
                   </label>
 
-                  <input
-                    id="${safePrefix}-base-${match.id}-${n}"
-                    type="number"
-                    min="1"
-                    placeholder="e.g. 25">
+                 <select
+  id="${safePrefix}-base-${match.id}-${n}"
+  onchange="handValueChanged(
+    '${safePrefix}',
+    '${match.id}',
+    ${n}
+  )">
+
+  <option value="">Select hand value</option>
+  <option value="25">25</option>
+  <option value="30">30</option>
+  <option value="35">35</option>
+  <option value="40">40</option>
+  <option value="45">45</option>
+  <option value="50">50</option>
+  <option value="75">75</option>
+
+</select>
 
                   <div class="checkrow">
 
@@ -5198,10 +5258,11 @@ async function submitMatchResults(
           `${prefix}-self-${matchId}-${n}`
         ).checked,
 
-      jokerless:
-        document.getElementById(
-          `${prefix}-jokerless-${matchId}-${n}`
-        ).checked
+    jokerless:
+  ![50,75].includes(base) &&
+  document.getElementById(
+    `${prefix}-jokerless-${matchId}-${n}`
+  ).checked
 
     });
 
