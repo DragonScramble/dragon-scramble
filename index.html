@@ -516,6 +516,7 @@ label{
 <button onclick="show('roster')">Roster</button>
 <button onclick="show('hall')">Hall of Fame</button>
 <button onclick="show('rules')">Rules</button>
+<button onclick="show('about')">About Us</button>
 <button onclick="show('account')">Account</button>
 
 <button
@@ -1050,6 +1051,29 @@ If an emergency occurs after play begins, every unfinished game becomes a Wall G
 </div>
 </section>
 
+<!-- ABOUT US -->
+
+<section id="about" class="hidden">
+
+  <div class="eyebrow">Dragon Scramble</div>
+  <h1>About Us</h1>
+
+  <div class="card">
+
+    <div
+      id="about-us-content"
+      style="
+        white-space:pre-wrap;
+        font-size:16px;
+        line-height:1.7;
+      ">
+      Loading...
+    </div>
+
+  </div>
+
+</section>
+
 
 <!-- ACCOUNT -->
 
@@ -1581,7 +1605,44 @@ Admin may submit results for any confirmed match.
 
 </div>
 
+<div class="card">
 
+  <div class="eyebrow">
+    Website Content
+  </div>
+
+  <h2
+    onclick="toggleAdminSection('admin-about-content')"
+    style="cursor:pointer;">
+    About Us ▾
+  </h2>
+
+  <div
+    id="admin-about-content"
+    class="edit-box hidden">
+
+    <label>About Us Text</label>
+
+    <textarea
+      id="admin-about-text"
+      style="min-height:180px;">
+    </textarea>
+
+    <button
+      class="btn"
+      type="button"
+      onclick="adminSaveAboutUs()">
+      Save About Us
+    </button>
+
+    <p
+      id="admin-about-message"
+      class="muted">
+    </p>
+
+  </div>
+
+</div>
 <div
   id="admin-player-card"
   class="card">
@@ -1800,7 +1861,9 @@ if(activeButton){
   loadCurrentScrambleDisplay();
   loadRulesQA();
 }
-
+if(id === "about"){
+  loadAboutUs();
+}
   if(id === "account"){
     loadAccountPaymentStatus();
   }
@@ -6830,9 +6893,11 @@ await Promise.all([
 
   loadAdminMatchManagement(),
 
-  loadAdminCities(),
+    loadAdminCities(),
 
-  loadAdminQA()
+  loadAdminQA(),
+
+  loadAdminAboutUs()
 
 ]);
 
@@ -8881,6 +8946,110 @@ show("matches");
   if(!content) return;
 
   content.classList.toggle("hidden");
+
+}
+  async function loadAboutUs(){
+
+  const content =
+    document.getElementById(
+      "about-us-content"
+    );
+
+  if(!content) return;
+
+  const {data,error} =
+    await supabaseClient
+      .from("site_content")
+      .select("content")
+      .eq("key","about_us")
+      .maybeSingle();
+
+  if(error){
+
+    content.textContent =
+      "Unable to load About Us.";
+
+    return;
+  }
+
+  content.textContent =
+    data?.content || "";
+
+}
+
+
+async function loadAdminAboutUs(){
+
+  const textarea =
+    document.getElementById(
+      "admin-about-text"
+    );
+
+  if(!textarea) return;
+
+  const {data,error} =
+    await supabaseClient
+      .from("site_content")
+      .select("content")
+      .eq("key","about_us")
+      .maybeSingle();
+
+  if(error){
+
+    console.error(
+      "Could not load About Us:",
+      error
+    );
+
+    return;
+  }
+
+  textarea.value =
+    data?.content || "";
+
+}
+
+
+async function adminSaveAboutUs(){
+
+  const textarea =
+    document.getElementById(
+      "admin-about-text"
+    );
+
+  const message =
+    document.getElementById(
+      "admin-about-message"
+    );
+
+  const {error} =
+    await supabaseClient
+      .from("site_content")
+      .update({
+        content:textarea.value,
+        updated_at:new Date().toISOString()
+      })
+      .eq("key","about_us");
+
+  if(error){
+
+    message.textContent =
+      "Could not save: " +
+      error.message;
+
+    message.className =
+      "error";
+
+    return;
+  }
+
+  message.textContent =
+    "About Us saved.";
+
+  message.className =
+    "success";
+
+  await loadAboutUs();
 
 }
 function toggleAdminQA(){
