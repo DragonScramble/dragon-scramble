@@ -6992,7 +6992,7 @@ async function loadAdminScrambleHistory(){
     await supabaseClient
       .from("scrambles")
       .select(
-"id,name,start_date,end_date,status,closed_at,payment_instructions,color,public_results,visible"
+"id,name,start_date,end_date,status,closed_at,payment_instructions,color,public_results,visible,scramble_type"
       )
       .order(
         "start_date",
@@ -7108,6 +7108,21 @@ async function loadAdminScrambleHistory(){
               </div>
 
             </div>
+            <label>Scramble Type</label>
+
+<select id="scramble-type-${scramble.id}">
+  <option
+    value="standard"
+    ${scramble.scramble_type !== "school" ? "selected" : ""}>
+    Standard
+  </option>
+
+  <option
+    value="school"
+    ${scramble.scramble_type === "school" ? "selected" : ""}>
+    School
+  </option>
+</select>
 <label>Scramble Color</label>
 
 <input
@@ -7217,6 +7232,10 @@ const color =
   document.getElementById(
     `scramble-color-${id}`
   ).value;
+  const scrambleType =
+  document.getElementById(
+    `scramble-type-${id}`
+  ).value;
   const publicResults =
   document.getElementById(
     `scramble-public-results-${id}`
@@ -7236,7 +7255,8 @@ const color =
   p_end_date:end,
   p_color:color,
 p_public_results:publicResults,
-p_visible:visible
+p_visible:visible,
+p_scramble_type:scrambleType
 }
       );
 
