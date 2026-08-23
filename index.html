@@ -5004,6 +5004,10 @@ const isAdminScore =
 
 const scoreContentId =
   `${safePrefix}-match-${match.id}`;
+  const gameCount =
+  currentScramble?.scramble_type === "school"
+    ? 2
+    : 4;
   return `
 
    <div class="card">
@@ -5067,12 +5071,15 @@ const scoreContentId =
     id="${scoreContentId}"
     class="${isAdminScore ? "hidden" : ""}">
 
-    <div class="notice">
-      Enter all four games.
-      Each player is East once.
-    </div>
+   <div class="notice">
+  ${
+    gameCount === 2
+      ? "Enter both games. East is determined by dice before each game."
+      : "Enter all four games. Each player is East once."
+  }
+</div>
       ${
-        players.map(
+      players.slice(0,gameCount).map(
           (east,index) => {
 
             const n =
@@ -5082,14 +5089,33 @@ const scoreContentId =
 
               <div class="game-entry">
 
-                <h3>
+               <h3>
+  Game ${n}
+</h3>
 
-                  Game ${n}
-                  ·
-                  East:
-                  ${escapeHtml(east.nickname)}
+${
+  gameCount === 2
+    ? `
+      <label>East Player</label>
 
-                </h3>
+      <select id="${safePrefix}-east-${match.id}-${n}">
+        <option value="">Select East</option>
+
+        ${players.map(player => `
+          <option value="${player.id}">
+            ${escapeHtml(player.nickname)}
+          </option>
+        `).join("")}
+
+      </select>
+    `
+    : `
+      <p>
+        <b>East:</b>
+        ${escapeHtml(east.nickname)}
+      </p>
+    `
+}
 
                 <label>
                   Winner / Result
@@ -5244,10 +5270,13 @@ async function submitMatchResults(
     );
 
   const games = [];
-
+const gameCount =
+  currentScramble?.scramble_type === "school"
+    ? 2
+    : 4;
   for(
     let n = 1;
-    n <= 4;
+ n <= gameCount;
     n++
   ){
 
@@ -5266,15 +5295,31 @@ async function submitMatchResults(
 
       return;
     }
+const eastPlayerId =
+  gameCount === 2
+    ? document.getElementById(
+        `${prefix}-east-${matchId}-${n}`
+      ).value
+    : players[n-1].id;
 
+if(!eastPlayerId){
+
+  message.textContent =
+    `Select the East player for Game ${n}.`;
+
+  message.className =
+    "error";
+
+  return;
+}
     if(result === "wall"){
 
       games.push({
 
         game_number:n,
 
-        east_player_id:
-          players[n-1].id,
+       east_player_id:
+  eastPlayerId,
 
         winner_player_id:null,
 
@@ -5317,7 +5362,7 @@ async function submitMatchResults(
       game_number:n,
 
       east_player_id:
-        players[n-1].id,
+  eastPlayerId,
 
       winner_player_id:
         result,
@@ -5344,7 +5389,9 @@ async function submitMatchResults(
 
   if(
     !confirm(
-      "Submit all four game results? The match will be marked Completed."
+ gameCount === 2
+  ? "Submit both game results? The match will be marked Completed."
+  : "Submit all four game results? The match will be marked Completed."
     )
   ){
     return;
@@ -5593,7 +5640,13 @@ async function loadCityLeaders(scrambleId){
     document.getElementById("city-leaders");
 
   if(!container) return;
+const scramble =
+  activeScrambles.find(
+    item => item.id === scrambleId
+  ) || currentScramble;
 
+const isSchool =
+  scramble?.scramble_type === "school";
   const [
     citiesResult,
     matchesResult,
@@ -5704,10 +5757,14 @@ async function loadCityLeaders(scrambleId){
     const players =
       cityPlayers.get(match.city_id);
 
-    players.set(
-      match.proposer_id,
-      (players.get(match.proposer_id) || 0) + 5
-    );
+   if(!isSchool){
+
+  players.set(
+    match.proposer_id,
+    (players.get(match.proposer_id) || 0) + 5
+  );
+
+}
 
   }
 
