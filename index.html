@@ -1427,6 +1427,12 @@ Admin may submit results for any confirmed match.
           </div>
 
         </div>
+        <label>Scramble Type</label>
+
+<select id="new-scramble-type">
+  <option value="standard">Standard</option>
+  <option value="school">School</option>
+</select>
 <label>Scramble Color</label>
 
 <input
@@ -7267,6 +7273,10 @@ const color =
   document.getElementById(
     "new-scramble-color"
   ).value;
+  const scrambleType =
+  document.getElementById(
+    "new-scramble-type"
+  ).value;
   const message =
     document.getElementById(
       "new-scramble-message"
@@ -7288,11 +7298,12 @@ const color =
     await supabaseClient
       .rpc(
         "admin_create_scramble",
-       {
+     {
   p_name:name,
   p_start_date:start,
   p_end_date:end,
-  p_color:color
+  p_color:color,
+  p_scramble_type:scrambleType
 }
       );
 
