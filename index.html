@@ -4324,6 +4324,7 @@ function renderCompletedMatchDetails(
       match.proposer_id
     ) ||
     "Player";
+if(currentScramble?.scramble_type !== "school"){
 
   html += `
 
@@ -4342,6 +4343,8 @@ function renderCompletedMatchDetails(
     </div>
 
   `;
+
+}
 
   return html;
 
@@ -4392,7 +4395,10 @@ function renderAdminCompletedEdit(
         ]
       )
     );
-
+const gameCount =
+  currentScramble?.scramble_type === "school"
+    ? 2
+    : 4;
   let html = `
 
     <div class="eyebrow">
@@ -4404,23 +4410,27 @@ function renderAdminCompletedEdit(
     </h3>
 
     <div class="notice">
-      Saving will replace all four original game results
-      and recalculate the leaderboard.
+     Saving will replace ${gameCount === 2 ? "both" : "all four"} original game results
+and recalculate the leaderboard.
     </div>
 
   `;
 
   for(
     let n = 1;
-    n <= 4;
+n <= gameCount;
     n++
   ){
 
     const game =
       gameMap.get(n);
 
-    const east =
-      players[n-1];
+   const east =
+  players.find(
+    player =>
+      player.id === game?.east_player_id
+  ) ||
+  players[n-1];
 
     const result =
       game?.is_wall_game
@@ -4642,10 +4652,14 @@ async function adminSaveCompletedResults(
     );
 
   const games = [];
+  const gameCount =
+  currentScramble?.scramble_type === "school"
+    ? 2
+    : 4;
 
   for(
     let n = 1;
-    n <= 4;
+   n <= gameCount;
     n++
   ){
 
@@ -4671,8 +4685,12 @@ async function adminSaveCompletedResults(
 
         game_number:n,
 
-        east_player_id:
-          players[n-1].id,
+       east_player_id:
+  gameCount === 2
+    ? document.getElementById(
+        `edit-east-${matchId}-${n}`
+      ).value
+    : players[n-1].id,
 
         winner_player_id:null,
 
