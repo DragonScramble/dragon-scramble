@@ -4444,15 +4444,34 @@ n <= gameCount;
 
       <div class="game-entry">
 
-        <h3>
+       <h3>
+  Game ${n}
+</h3>
 
-          Game ${n}
-          ·
-          East:
-          ${escapeHtml(east.nickname)}
+${
+  gameCount === 2
+    ? `
+      <label>East Player</label>
 
-        </h3>
+      <select id="edit-east-${match.id}-${n}">
 
+        ${players.map(player => `
+          <option
+            value="${player.id}"
+            ${game?.east_player_id === player.id ? "selected" : ""}>
+            ${escapeHtml(player.nickname)}
+          </option>
+        `).join("")}
+
+      </select>
+    `
+    : `
+      <p>
+        <b>East:</b>
+        ${escapeHtml(east.nickname)}
+      </p>
+    `
+}
         <label>
           Winner / Result
         </label>
@@ -4732,8 +4751,12 @@ async function adminSaveCompletedResults(
 
       game_number:n,
 
-      east_player_id:
-        players[n-1].id,
+     east_player_id:
+  gameCount === 2
+    ? document.getElementById(
+        `edit-east-${matchId}-${n}`
+      ).value
+    : players[n-1].id,
 
       winner_player_id:
         result,
