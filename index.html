@@ -4186,7 +4186,12 @@ function renderCompletedMatchDetails(
   playerMap
 ){
 
-  if(games.length !== 4){
+ const expectedGameCount =
+  currentScramble?.scramble_type === "school"
+    ? 2
+    : 4;
+
+if(games.length !== expectedGameCount){
 
     return `
       <p class="error">
