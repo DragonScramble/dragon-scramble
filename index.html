@@ -5129,16 +5129,16 @@ const scoreContentId =
     id="${scoreContentId}"
     class="${isAdminScore ? "hidden" : ""}">
 
-   <div class="notice">
+  <div class="notice">
   ${
     gameCount === 2
-      ? "Enter both games. East is determined by dice before each game."
-      : "Enter all four games. Each player is East once."
+      ? "Enter both game results."
+      : "Enter all four game results."
   }
 </div>
       ${
       players.slice(0,gameCount).map(
-          (east,index) => {
+  (player,index) => {
 
             const n =
               index + 1;
@@ -5150,30 +5150,6 @@ const scoreContentId =
                <h3>
   Game ${n}
 </h3>
-
-${
-  gameCount === 2
-    ? `
-      <label>East Player</label>
-
-      <select id="${safePrefix}-east-${match.id}-${n}">
-        <option value="">Select East</option>
-
-        ${players.map(player => `
-          <option value="${player.id}">
-            ${escapeHtml(player.nickname)}
-          </option>
-        `).join("")}
-
-      </select>
-    `
-    : `
-      <p>
-        <b>East:</b>
-        ${escapeHtml(east.nickname)}
-      </p>
-    `
-}
 
                 <label>
                   Winner / Result
@@ -5354,22 +5330,7 @@ const gameCount =
       return;
     }
 const eastPlayerId =
-  gameCount === 2
-    ? document.getElementById(
-        `${prefix}-east-${matchId}-${n}`
-      ).value
-    : players[n-1].id;
-
-if(!eastPlayerId){
-
-  message.textContent =
-    `Select the East player for Game ${n}.`;
-
-  message.className =
-    "error";
-
-  return;
-}
+  players[(n - 1) % players.length].id;
     if(result === "wall"){
 
       games.push({
