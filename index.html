@@ -185,7 +185,56 @@ h3{margin:8px 0}
   font-size:20px;
   font-weight:bold;
 }
+.played-match-summary{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto auto;
+  gap:14px;
+  align-items:center;
+}
 
+.played-match-date{
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.played-match-players{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.played-details-btn{
+  margin:0;
+  white-space:nowrap;
+}
+
+@media(max-width:760px){
+
+  .played-match-summary{
+    grid-template-columns:auto minmax(0,1fr) auto;
+    gap:8px;
+  }
+
+  .played-match-date{
+    font-size:12px;
+  }
+
+  .played-match-players{
+    font-size:12px;
+  }
+
+  .played-details-btn{
+    padding:8px 10px;
+    font-size:11px;
+  }
+
+  .played-match-summary .btn.alt{
+    grid-column:1 / -1;
+    justify-self:end;
+  }
+
+}
 .pill{
   display:inline-block;
   padding:4px 9px;
@@ -1830,7 +1879,42 @@ function timeText(value){
 
 }
 
+function shortPlayedDateTime(value){
 
+  const date =
+    new Date(value);
+
+  const day =
+    date.getDate();
+
+  const month =
+    date.toLocaleDateString(
+      "en-US",
+      {month:"short"}
+    );
+
+  const year =
+    String(
+      date.getFullYear()
+    ).slice(-2);
+
+  const time =
+    date.toLocaleTimeString(
+      "en-US",
+      {
+        hour:"numeric",
+        minute:
+          date.getMinutes() === 0
+            ? undefined
+            : "2-digit"
+      }
+    )
+    .replace(" AM","am")
+    .replace(" PM","pm");
+
+  return `${day} ${month} '${year}, ${time}`;
+
+}
 function show(id){
 
   document
@@ -4065,73 +4149,39 @@ async function loadPlayedMatches(){
 
           <div class="card">
 
-            <span class="pill">
-              Completed
-            </span>
+        <div class="played-match-summary">
 
-            &nbsp;
+  <div class="played-match-date">
+    ${escapeHtml(
+      shortPlayedDateTime(
+        match.scheduled_at
+      )
+    )}
+  </div>
 
-            <span class="pill">
-              ${
-                match.match_type ===
-                "focused"
-                  ? "Focused"
-                  : "Social"
-              }
-            </span>
+  <div class="played-match-players">
+    ${names.join(" · ")}
+  </div>
 
-            <h2>
+  <button
+    class="btn played-details-btn"
+    onclick="togglePlayedDetails('${match.id}')">
+    View Details
+  </button>
 
-              ${escapeHtml(
-                dateText(
-                  match.scheduled_at
-                )
-              )}
+  ${
+    isAdmin
+      ? `
+        <button
+          class="btn alt played-details-btn"
+          onclick="toggleCompletedEdit('${match.id}')">
+          Edit Results
+        </button>
+      `
+      : ""
+  }
 
-              ·
-
-              ${escapeHtml(
-                timeText(
-                  match.scheduled_at
-                )
-              )}
-
-            </h2>
-
-            <p>
-              📍 ${escapeHtml(match.location)}
-            </p>
-
-            <div class="players">
-              ${names.join(" · ")}
-            </div>
-
-            <p class="muted">
-
-              Proposer:
-              <b>${escapeHtml(proposerName)}</b>
-
-            </p>
-
-            <button
-              class="btn"
-              onclick="togglePlayedDetails('${match.id}')">
-              View Details
-            </button>
-
-            ${
-              isAdmin
-                ? `
-
-                  <button
-                    class="btn alt"
-                    onclick="toggleCompletedEdit('${match.id}')">
-                    Edit Results
-                  </button>
-
-                `
-                : ""
-            }
+</div>
 
             <div
               id="played-details-${match.id}"
