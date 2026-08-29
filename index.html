@@ -4358,11 +4358,7 @@ if(games.length !== expectedGameCount){
     games
   ){
 
-    const east =
-      playerMap.get(
-        game.east_player_id
-      ) ||
-      "Player";
+    
 
     if(game.is_wall_game){
 
@@ -4374,12 +4370,7 @@ if(games.length !== expectedGameCount){
             Game ${game.game_number}
           </strong>
 
-          <br>
-
-          East:
-          ${escapeHtml(east)}
-
-          <br><br>
+        <br><br>
 
           <b>Wall Game</b>
 
@@ -4432,12 +4423,7 @@ if(games.length !== expectedGameCount){
           Game ${game.game_number}
         </strong>
 
-        <br>
-
-        East:
-        ${escapeHtml(east)}
-
-        <br>
+     <br>
 
         Winner:
         <b>${escapeHtml(winner)}</b>
