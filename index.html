@@ -251,6 +251,75 @@ h3{margin:8px 0}
   }
 
 }
+  .overall-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+
+.overall-table th,
+.overall-table td{
+  padding:11px 10px;
+  border-bottom:1px solid var(--line);
+}
+
+.overall-table th{
+  text-align:left;
+  color:var(--forest);
+}
+
+.overall-table th.metric,
+.overall-table td.metric{
+  text-align:right;
+}
+
+.overall-sort{
+  border:0;
+  background:none;
+  color:inherit;
+  font:inherit;
+  font-weight:bold;
+  cursor:pointer;
+  padding:0;
+}
+
+.overall-rank{
+  width:42px;
+  color:var(--gold);
+  font-size:18px;
+}
+
+.overall-name{
+  font-weight:bold;
+}
+
+.overall-toggle{
+  display:block;
+  margin:12px auto 0;
+  border:0;
+  background:none;
+  color:var(--forest);
+  font:inherit;
+  cursor:pointer;
+}
+
+@media(max-width:760px){
+
+  .overall-table th,
+  .overall-table td{
+    padding:9px 5px;
+    font-size:12px;
+  }
+
+  .overall-rank{
+    width:28px;
+  }
+
+  .overall-sort{
+    font-size:12px;
+  }
+
+}
 .pill{
   display:inline-block;
   padding:4px 9px;
@@ -5952,6 +6021,232 @@ const isSchool =
     `).join("");
 
 }
+  let overallSort = "points";
+let overallExpanded = false;
+let overallLeaderboardRows = [];
+
+function sortOverallRows(rows, sortBy){
+
+  return [...rows].sort(
+    (a,b) => {
+
+      if(sortBy === "average"){
+
+        if(
+          a.average === null &&
+          b.average !== null
+        ){
+          return 1;
+        }
+
+        if(
+          a.average !== null &&
+          b.average === null
+        ){
+          return -1;
+        }
+
+        if(
+          a.average !== null &&
+          b.average !== null
+        ){
+
+          const averageDiff =
+            b.average -
+            a.average;
+
+          if(averageDiff){
+            return averageDiff;
+          }
+
+        }
+
+        return (
+          b.points -
+          a.points
+          ||
+          b.matches_played -
+          a.matches_played
+          ||
+          a.nickname.localeCompare(
+            b.nickname
+          )
+        );
+
+      }
+
+      if(sortBy === "matches"){
+
+        return (
+          b.matches_played -
+          a.matches_played
+          ||
+          b.points -
+          a.points
+          ||
+          a.nickname.localeCompare(
+            b.nickname
+          )
+        );
+
+      }
+
+      return (
+        b.points -
+        a.points
+        ||
+        b.matches_played -
+        a.matches_played
+        ||
+        a.nickname.localeCompare(
+          b.nickname
+        )
+      );
+
+    }
+  );
+
+}
+
+function setOverallSort(sortBy){
+
+  overallSort =
+    sortBy;
+
+  renderOverallLeaderboard();
+
+}
+
+function toggleOverallLeaderboard(){
+
+  overallExpanded =
+    !overallExpanded;
+
+  renderOverallLeaderboard();
+
+}
+
+function renderOverallLeaderboard(){
+
+  const board =
+    document.getElementById(
+      "board"
+    );
+
+  if(!board){
+    return;
+  }
+
+  const sorted =
+    sortOverallRows(
+      overallLeaderboardRows,
+      overallSort
+    );
+
+  const visible =
+    overallExpanded
+      ? sorted
+      : sorted.slice(0,5);
+
+  board.innerHTML = `
+    <table class="overall-table">
+
+      <thead>
+        <tr>
+
+          <th>#</th>
+
+          <th>Player</th>
+
+          <th class="metric">
+            <button
+              class="overall-sort"
+              type="button"
+              onclick="setOverallSort('points')">
+              Points${overallSort === "points" ? " ↓" : ""}
+            </button>
+          </th>
+
+          <th class="metric">
+            <button
+              class="overall-sort"
+              type="button"
+              onclick="setOverallSort('average')">
+              Average${overallSort === "average" ? " ↓" : ""}
+            </button>
+          </th>
+
+          <th class="metric">
+            <button
+              class="overall-sort"
+              type="button"
+              onclick="setOverallSort('matches')">
+              Matches${overallSort === "matches" ? " ↓" : ""}
+            </button>
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody>
+
+        ${visible.map(
+          (player,index) => `
+
+            <tr>
+
+              <td class="overall-rank">
+                ${index + 1}
+              </td>
+
+              <td class="overall-name">
+                ${escapeHtml(player.nickname)}
+              </td>
+
+              <td class="metric">
+                ${player.points}
+              </td>
+
+              <td class="metric">
+                ${
+                  player.average === null
+                    ? "—"
+                    : player.average.toFixed(1)
+                }
+              </td>
+
+              <td class="metric">
+                ${player.matches_played}
+              </td>
+
+            </tr>
+
+          `
+        ).join("")}
+
+      </tbody>
+
+    </table>
+
+    ${
+      sorted.length > 5
+        ? `
+          <button
+            class="overall-toggle"
+            type="button"
+            onclick="toggleOverallLeaderboard()">
+            ${
+              overallExpanded
+                ? "Show Top 5 ▴"
+                : "Show All ▾"
+            }
+          </button>
+        `
+        : ""
+    }
+  `;
+
+}
 async function loadLeaderboard(){
 
   const board =
@@ -5998,14 +6293,9 @@ if(currentScramble.public_results === false){
 await loadCityLeaders(
   currentScramble.id
 );
-  rows.sort(
-    (a,b) =>
-      b.points -
-      a.points
-      ||
-      b.average -
-      a.average
-  );
+  overallSort = "points";
+overallExpanded = false;
+overallLeaderboardRows = rows;
 
   if(!rows.length){
 
@@ -6020,46 +6310,10 @@ await loadCityLeaders(
     return;
   }
 
-  board.innerHTML =
-    rows.map(
-      (player,index) => `
-
-        <div class="leader">
-
-          <div class="rank">
-            ${index+1}
-          </div>
-
-          <div>
-
-            <div class="nick">
-              ${escapeHtml(player.nickname)}
-            </div>
-
-            <div class="muted">
-
-              ${player.matches_played}
-              match${player.matches_played === 1 ? "" : "es"}
-
-            </div>
-
-          </div>
-
-          <div class="score">
-            ${player.points} pts
-          </div>
-
-          <div class="avg">
-            ${player.average === null ? "N/A" : player.average.toFixed(1) + " avg"}
-          </div>
-
-        </div>
-
-      `
-    ).join("");
-
+renderOverallLeaderboard();
+  
   updateMyStanding(
-    rows,
+sortOverallRows(rows,"points"),
     currentUser
   );
 
