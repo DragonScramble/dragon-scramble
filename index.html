@@ -212,25 +212,41 @@ h3{margin:8px 0}
 @media(max-width:760px){
 
   .played-match-summary{
-    grid-template-columns:auto minmax(0,1fr) auto;
-    gap:8px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:5px 8px;
+    align-items:center;
   }
 
   .played-match-date{
+    grid-column:1;
+    grid-row:1;
     font-size:12px;
-  }
-
-  .played-match-players{
-    font-size:12px;
+    white-space:nowrap;
   }
 
   .played-details-btn{
-    padding:8px 10px;
+    grid-column:2;
+    grid-row:1;
+    margin:0;
+    padding:6px 9px;
     font-size:11px;
+    white-space:nowrap;
+  }
+
+  .played-match-players{
+    grid-column:1 / -1;
+    grid-row:2;
+    font-size:10px;
+    line-height:1.2;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .played-match-summary .btn.alt{
     grid-column:1 / -1;
+    grid-row:auto;
     justify-self:end;
   }
 
