@@ -797,9 +797,10 @@ Only active, payment-confirmed players can propose or join.
 </div>
 
 <div
-id="match-eligibility-message"
-class="notice hidden">
+  id="match-eligibility-message"
+  class="notice welcome-notice hidden">
 </div>
+
 
 
 <div id="proposal" class="card hidden">
@@ -2664,28 +2665,58 @@ async function loadMatchesPage(){
       "match-eligibility-message"
     );
 
-  if(!currentEligibility.eligible){
+if(!currentUser){
 
-    eligibilityMessage.innerHTML = `
+  eligibilityMessage.innerHTML = `
 
-      <b>
-        Not yet active for
-        ${escapeHtml(currentScramble.name)}.
-      </b>
+    <div class="eyebrow">Welcome to Dragon Scramble</div>
 
-      <br>
+    <h2>The Dragons Are Playing. Join Them! 🐉</h2>
 
-      Complete payment and wait for Admin confirmation.
+    <p>
+      Discover our Mahjong community, player rankings
+      and matches. Create an account, join a Scramble,
+      and activate your participation to unlock the full experience.
+    </p>
 
-    `;
+    <p>
+      <b>1.</b> Create your account
+      &nbsp; <b>2.</b> Join a Scramble
+      &nbsp; <b>3.</b> Complete payment and await Admin confirmation
+    </p>
 
-    eligibilityMessage.classList.remove("hidden");
+    <button
+      class="btn"
+      onclick="show('account')">
+      Join the Dragons
+    </button>
 
-  }else{
+  `;
 
-    eligibilityMessage.classList.add("hidden");
+  eligibilityMessage.classList.remove("hidden");
 
-  }
+}else if(!currentEligibility.eligible){
+
+  eligibilityMessage.innerHTML = `
+
+    <b>
+      Not yet active for
+      ${escapeHtml(currentScramble.name)}.
+    </b>
+
+    <br>
+
+    Complete payment and wait for Admin confirmation.
+
+  `;
+
+  eligibilityMessage.classList.remove("hidden");
+
+}else{
+
+  eligibilityMessage.classList.add("hidden");
+
+}
 
   await Promise.all([
     loadUpcomingMatches(),
