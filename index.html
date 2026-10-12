@@ -8370,17 +8370,16 @@ async function adminAdjustPoints(id){
 
 
   const {error} =
-    await supabaseClient
-      .rpc(
-        "admin_add_point_adjustment",
-        {
-
-          p_player_id:id,
-          p_points:points,
-          p_reason:reason
-
-        }
-      );
+  await supabaseClient
+    .rpc(
+      "admin_add_point_adjustment",
+      {
+        p_player_id: id,
+        p_points: points,
+        p_reason: reason,
+        p_scramble_id: currentScramble.id
+      }
+    );
 
 
   if(error){
