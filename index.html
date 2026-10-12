@@ -2217,10 +2217,11 @@ function applyScrambleDateLimits(){
   }
 
 }
+
 async function loadCurrentScrambleDisplay(){
 
-  await getActiveScramble();
-applyScrambleDateLimits();
+  applyScrambleDateLimits();
+
   document
     .getElementById(
       "current-scramble-title"
