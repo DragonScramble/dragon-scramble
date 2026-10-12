@@ -2612,15 +2612,45 @@ async function loadMatchesPage(){
       "played-match-list"
     );
 
-  if(!currentUser){
+ if(!currentUser){
+
+    document
+      .getElementById("match-eligibility-message")
+      .innerHTML = `
+
+        <div class="eyebrow">Welcome to Dragon Scramble</div>
+
+        <h2>The Dragons Are Playing. Join Them! 🐉</h2>
+
+        <p>
+          Discover our Mahjong community, player rankings
+          and matches. Create an account, join a Scramble,
+          and activate your participation to unlock the full experience.
+        </p>
+
+        <p>
+          <b>1.</b> Create your account
+          &nbsp; <b>2.</b> Join a Scramble
+          &nbsp; <b>3.</b> Complete payment and await Admin confirmation
+        </p>
+
+        <button
+          class="btn"
+          onclick="show('account')">
+          Join the Dragons
+        </button>
+
+      `;
+
+    document
+      .getElementById("match-eligibility-message")
+      .classList.remove("hidden");
 
     upcoming.innerHTML = `
 
       <div class="card">
 
-        <h2>
-          Sign in to view matches
-        </h2>
+        <h2>Sign in to view matches</h2>
 
         <button
           class="btn"
@@ -2665,58 +2695,28 @@ async function loadMatchesPage(){
       "match-eligibility-message"
     );
 
-if(!currentUser){
+  if(!currentEligibility.eligible){
 
-  eligibilityMessage.innerHTML = `
+    eligibilityMessage.innerHTML = `
 
-    <div class="eyebrow">Welcome to Dragon Scramble</div>
+      <b>
+        Not yet active for
+        ${escapeHtml(currentScramble.name)}.
+      </b>
 
-    <h2>The Dragons Are Playing. Join Them! 🐉</h2>
+      <br>
 
-    <p>
-      Discover our Mahjong community, player rankings
-      and matches. Create an account, join a Scramble,
-      and activate your participation to unlock the full experience.
-    </p>
+      Complete payment and wait for Admin confirmation.
 
-    <p>
-      <b>1.</b> Create your account
-      &nbsp; <b>2.</b> Join a Scramble
-      &nbsp; <b>3.</b> Complete payment and await Admin confirmation
-    </p>
+    `;
 
-    <button
-      class="btn"
-      onclick="show('account')">
-      Join the Dragons
-    </button>
+    eligibilityMessage.classList.remove("hidden");
 
-  `;
+  }else{
 
-  eligibilityMessage.classList.remove("hidden");
+    eligibilityMessage.classList.add("hidden");
 
-}else if(!currentEligibility.eligible){
-
-  eligibilityMessage.innerHTML = `
-
-    <b>
-      Not yet active for
-      ${escapeHtml(currentScramble.name)}.
-    </b>
-
-    <br>
-
-    Complete payment and wait for Admin confirmation.
-
-  `;
-
-  eligibilityMessage.classList.remove("hidden");
-
-}else{
-
-  eligibilityMessage.classList.add("hidden");
-
-}
+  }
 
   await Promise.all([
     loadUpcomingMatches(),
