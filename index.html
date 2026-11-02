@@ -7436,6 +7436,180 @@ async function adminToggleQA(
   await loadRulesQA();
 
 }
+  async function loadAdminDashboardStats(){
+
+  const playedEl =
+    document.getElementById("admin-stat-played-matches");
+
+  const activeEl =
+    document.getElementById("admin-stat-active-players");
+
+  const proposersEl =
+    document.getElementById("admin-stat-top-proposers");
+
+  const citiesEl =
+    document.getElementById("admin-stat-matches-by-city");
+
+  const zeroEl =
+    document.getElementById("admin-stat-zero-match-players");
+
+  if(!currentScramble){
+    playedEl.textContent = "—";
+    activeEl.textContent = "—";
+    proposersEl.textContent = "—";
+    citiesEl.textContent = "—";
+    zeroEl.textContent = "—";
+    return;
+  }
+
+  const scrambleId = currentScramble.id;
+
+  const [
+    matchesResult,
+    membersResult,
+    seatsResult,
+    playersResult,
+    citiesResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("matches")
+      .select("id,proposer_id,city_id")
+      .eq("scramble_id",scrambleId)
+      .eq("status","completed"),
+
+    supabaseClient
+      .from("scramble_players")
+      .select("player_id,active")
+      .eq("scramble_id",scrambleId)
+      .eq("active",true),
+
+    supabaseClient
+      .from("match_players")
+      .select("match_id,player_id"),
+
+    supabaseClient
+      .from("players")
+      .select("id,nickname"),
+
+    supabaseClient
+      .from("cities")
+      .select("id,name")
+
+  ]);
+
+  const results = [
+    matchesResult,
+    membersResult,
+    seatsResult,
+    playersResult,
+    citiesResult
+  ];
+
+  const failed = results.find(result => result.error);
+
+  if(failed){
+    console.error("Admin dashboard statistics error:",failed.error);
+
+    playedEl.textContent = "Error";
+    activeEl.textContent = "Error";
+    proposersEl.textContent = "Unable to load";
+    citiesEl.textContent = "Unable to load";
+    zeroEl.textContent = "Unable to load";
+    return;
+  }
+
+  const matches = matchesResult.data || [];
+  const members = membersResult.data || [];
+  const seats = seatsResult.data || [];
+  const players = playersResult.data || [];
+  const cities = citiesResult.data || [];
+
+  const playerMap = new Map(
+    players.map(player => [
+      player.id,
+      player.nickname || "Unnamed"
+    ])
+  );
+
+  const completedMatchIds = new Set(
+    matches.map(match => match.id)
+  );
+
+  const participatingPlayerIds = new Set(
+    seats
+      .filter(seat => completedMatchIds.has(seat.match_id))
+      .map(seat => seat.player_id)
+  );
+
+  playedEl.textContent = matches.length;
+  activeEl.textContent = members.length;
+
+  const proposerCounts = new Map();
+
+  matches.forEach(match => {
+    if(!match.proposer_id) return;
+
+    proposerCounts.set(
+      match.proposer_id,
+      (proposerCounts.get(match.proposer_id) || 0) + 1
+    );
+  });
+
+  const topProposers = [...proposerCounts.entries()]
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+
+  proposersEl.innerHTML =
+    topProposers.length
+      ? topProposers.map(([playerId,count]) =>
+          `<span style="margin-right:12px;">${escapeHtml(playerMap.get(playerId) || "Unknown") } ${count}</span>`
+        ).join("")
+      : '<span class="muted">No completed matches yet.</span>';
+
+  const cityMap = new Map(
+    cities.map(city => [city.id,city.name])
+  );
+
+  const cityCounts = new Map();
+
+  matches.forEach(match => {
+    const cityName =
+      cityMap.get(match.city_id) || "Other";
+
+    cityCounts.set(
+      cityName,
+      (cityCounts.get(cityName) || 0) + 1
+    );
+  });
+
+  const cityRows = [...cityCounts.entries()]
+    .sort((a,b) => b[1] - a[1]);
+
+  citiesEl.innerHTML =
+    cityRows.length
+      ? cityRows.map(([name,count]) =>
+          `<div>${escapeHtml(name)}: <b>${count}</b></div>`
+        ).join("")
+      : '<span class="muted">No completed matches yet.</span>';
+
+  const zeroMatchPlayers = members
+    .filter(member =>
+      !participatingPlayerIds.has(member.player_id)
+    )
+    .map(member =>
+      playerMap.get(member.player_id) || "Unknown"
+    )
+    .sort((a,b) => a.localeCompare(b));
+
+  zeroEl.innerHTML =
+    zeroMatchPlayers.length
+      ? zeroMatchPlayers.map(name =>
+          `<div>${escapeHtml(name)}</div>`
+        ).join("")
+      : '<span class="muted">None</span>';
+
+}
 async function loadAdminDashboard(){
 
   if(
@@ -7446,7 +7620,7 @@ async function loadAdminDashboard(){
   }
 
   await getActiveScramble();
-
+  await loadAdminDashboardStats();
   await Promise.all([
     loadAdminScrambleHistory(),
     loadAdminMatchManagement(),
