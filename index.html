@@ -90,7 +90,70 @@ max-width:1400px;
 }
 
 .hidden{display:none!important}
+/* Admin dashboard layout */
 
+.admin-stat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:16px 0;
+}
+
+.admin-stat-card{
+  min-width:0;
+  padding:12px;
+}
+
+.admin-section-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+  margin:16px 0;
+  align-items:start;
+}
+
+.admin-section-card{
+  min-width:0;
+  padding:12px;
+  margin:0;
+}
+
+.admin-section-card h2{
+  font-size:17px;
+  line-height:1.3;
+  margin:0;
+  cursor:pointer;
+}
+
+.admin-section-card .eyebrow{
+  margin-bottom:5px;
+  font-size:10px;
+}
+
+.admin-section-card.expanded{
+  grid-column:1 / -1;
+}
+
+.admin-stat-secondary{
+  margin-top:18px;
+}
+
+@media(max-width:600px){
+  .admin-stat-grid,
+  .admin-section-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+
+  .admin-stat-card,
+  .admin-section-card{
+    padding:10px;
+  }
+
+  .admin-section-card h2{
+    font-size:15px;
+  }
+}
 .hero{
   display:grid;
   grid-template-columns:1.3fr .7fr;
@@ -1604,14 +1667,9 @@ Admin may submit results for any confirmed match.
 <div class="eyebrow">Administration</div>
 <h1>Admin Dashboard</h1>
 
-<!-- DASHBOARD STATISTICS -->
+<!-- TOP STATISTICS -->
 
-<div style="
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:12px;
-  margin-bottom:18px;
-">
+<div class="admin-stats-grid">
 
   <div class="card">
     <div class="eyebrow">Completed Matches</div>
@@ -1627,9 +1685,7 @@ Admin may submit results for any confirmed match.
 
   <div class="card">
     <div class="eyebrow">Current Scramble</div>
-    <p style="font-weight:600;margin-bottom:8px;">
-      Top Proposers
-    </p>
+    <p style="font-weight:600;margin-bottom:8px;">Top Proposers</p>
     <div id="admin-stat-top-proposers">
       <span class="muted">Loading...</span>
     </div>
@@ -1637,7 +1693,242 @@ Admin may submit results for any confirmed match.
 
 </div>
 
-<div class="card" style="margin-bottom:18px;">
+<!-- COLLAPSIBLE ADMIN SECTIONS -->
+
+<div class="admin-section-grid">
+
+  <!-- PLAYERS & PAYMENTS -->
+
+  <div id="admin-player-card" class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-player-content')">
+      Players & Payments <span>+</span>
+    </h2>
+
+    <div id="admin-player-content" class="hidden">
+
+      <button class="btn secondary" type="button"
+        onclick="adminDownloadPlayers()">
+        Download Player List
+      </button>
+
+      <div style="margin:12px 0;">
+        <select id="admin-player-status-filter"
+          onchange="loadAdminPlayers()"
+          style="max-width:220px;">
+          <option value="all">All Players</option>
+          <option value="active">Active Players</option>
+          <option value="hidden">Hidden Players</option>
+        </select>
+      </div>
+
+      <div id="admin-player-list">
+        <p class="muted">Loading players...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MANAGE CITIES -->
+
+  <div id="admin-city-card" class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-city-content')">
+      Manage Cities <span>+</span>
+    </h2>
+
+    <div id="admin-city-content" class="hidden">
+
+      <p class="muted">
+        Cities listed here will be available when players propose matches.
+      </p>
+
+      <div class="edit-box">
+        <label>Add City</label>
+        <input id="admin-new-city" type="text"
+          placeholder="e.g. New York">
+
+        <button class="btn" type="button"
+          onclick="adminAddCity()">
+          Add City
+        </button>
+
+        <p id="admin-city-message" class="muted"></p>
+      </div>
+
+      <div id="admin-city-list">
+        <p class="muted">Loading cities...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRAMBLES -->
+
+  <div class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-scramble-content')">
+      Scrambles <span>+</span>
+    </h2>
+
+    <div id="admin-scramble-content" class="hidden">
+
+      <p class="muted">
+        Names and dates may be edited. Closed Scrambles remain locked for scoring.
+      </p>
+
+      <div id="admin-scramble-history">
+        <p class="muted">Loading Scrambles...</p>
+      </div>
+
+      <div id="admin-create-scramble" class="hidden">
+        <div class="edit-box">
+
+          <h3>Create New Scramble</h3>
+
+          <label>Scramble Name</label>
+          <input id="new-scramble-name"
+            placeholder="e.g. Fall 2026 Dragon Scramble">
+
+          <div class="formgrid">
+            <div>
+              <label>Start Date</label>
+              <input id="new-scramble-start" type="date">
+            </div>
+
+            <div>
+              <label>End Date</label>
+              <input id="new-scramble-end" type="date">
+            </div>
+          </div>
+
+          <label>Scramble Type</label>
+          <select id="new-scramble-type">
+            <option value="standard">Standard</option>
+            <option value="school">School</option>
+          </select>
+
+          <label>Scramble Color</label>
+          <input id="new-scramble-color"
+            type="color"
+            value="#B88A3B"
+            style="width:70px;height:44px;padding:3px;cursor:pointer;">
+
+          <button class="btn" onclick="adminCreateScramble()">
+            Create Active Scramble
+          </button>
+
+          <p id="new-scramble-message" class="muted"></p>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MANAGE Q&A -->
+
+  <div id="admin-rules-qa-card" class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminQA()">
+      Manage Q&A <span>+</span>
+    </h2>
+
+    <div id="admin-qa-content" class="edit-box hidden">
+
+      <label>Question</label>
+      <input id="admin-qa-question" type="text">
+
+      <label>Answer</label>
+      <textarea id="admin-qa-answer"></textarea>
+
+      <button class="btn" type="button"
+        onclick="adminAddQA()">
+        Add Q&A
+      </button>
+
+      <p id="admin-qa-message" class="muted"></p>
+
+      <div id="admin-qa-list">
+        <p class="muted">Loading Q&A...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PAYMENT INSTRUCTIONS -->
+
+  <div id="admin-payment-card" class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-payment-content')">
+      Payment Instructions <span>+</span>
+    </h2>
+
+    <div id="admin-payment-content" class="hidden">
+
+      <label>Payment Message</label>
+      <textarea id="admin-payment-instructions"></textarea>
+
+      <button class="btn"
+        onclick="adminSavePaymentInstructions()">
+        Save Payment Instructions
+      </button>
+
+      <p id="admin-payment-message" class="muted"></p>
+
+    </div>
+  </div>
+
+  <!-- ABOUT US -->
+
+  <div class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-about-content')">
+      About Us <span>+</span>
+    </h2>
+
+    <div id="admin-about-content" class="edit-box hidden">
+
+      <label>About Us Text</label>
+      <textarea id="admin-about-text"
+        style="min-height:180px;"></textarea>
+
+      <button class="btn" type="button"
+        onclick="adminSaveAboutUs()">
+        Save About Us
+      </button>
+
+      <p id="admin-about-message" class="muted"></p>
+
+    </div>
+  </div>
+
+  <!-- ALL MATCHES -->
+
+  <div class="card admin-section-card">
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-match-content')">
+      All Matches <span>+</span>
+    </h2>
+
+    <div id="admin-match-content" class="hidden">
+
+      <p class="muted">
+        Admin may permanently remove test or invalid matches.
+      </p>
+
+      <div id="admin-match-management">
+        <p class="muted">Loading matches...</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ADDITIONAL STATISTICS AT BOTTOM -->
+
+<div class="card admin-additional-stats">
 
   <div class="eyebrow">Additional Statistics</div>
 
@@ -1657,377 +1948,6 @@ Admin may submit results for any confirmed match.
 
   <div id="admin-stat-zero-match-players">
     <span class="muted">Loading...</span>
-  </div>
-
-</div>
-
-
-<!-- PLAYERS & PAYMENTS -->
-
-<div
-  id="admin-player-card"
-  class="card">
-
-  <div class="eyebrow">Player Management</div>
-
-  <h2
-    onclick="toggleAdminSection('admin-player-content')"
-    style="cursor:pointer;">
-    Players & Payments ▾
-  </h2>
-
-  <div
-    id="admin-player-content"
-    class="hidden">
-
-    <button
-      class="btn secondary"
-      type="button"
-      onclick="adminDownloadPlayers()">
-      Download Player List
-    </button>
-
-    <div style="margin:12px 0;">
-
-      <select
-        id="admin-player-status-filter"
-        onchange="loadAdminPlayers()"
-        style="max-width:220px;">
-
-        <option value="all">All Players</option>
-        <option value="active">Active Players</option>
-        <option value="hidden">Hidden Players</option>
-
-      </select>
-
-    </div>
-
-    <div id="admin-player-list">
-      <p class="muted">Loading players...</p>
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- MANAGE CITIES -->
-
-<div
-  id="admin-city-card"
-  class="card">
-
-  <div class="eyebrow">Location Settings</div>
-
-  <h2
-    onclick="toggleAdminSection('admin-city-content')"
-    style="cursor:pointer;">
-    Manage Cities ▾
-  </h2>
-
-  <div
-    id="admin-city-content"
-    class="hidden">
-
-    <p class="muted">
-      Cities listed here will be available when players propose matches.
-    </p>
-
-    <div class="edit-box">
-
-      <label>Add City</label>
-
-      <input
-        id="admin-new-city"
-        type="text"
-        placeholder="e.g. New York">
-
-      <button
-        class="btn"
-        type="button"
-        onclick="adminAddCity()">
-        Add City
-      </button>
-
-      <p
-        id="admin-city-message"
-        class="muted">
-      </p>
-
-    </div>
-
-    <div id="admin-city-list">
-
-      <p class="muted">
-        Loading cities...
-      </p>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- SCRAMBLES -->
-
-<div class="card">
-
-  <div class="eyebrow">
-    Scramble History & Management
-  </div>
-
-  <h2
-    onclick="toggleAdminSection('admin-scramble-content')"
-    style="cursor:pointer;">
-    Scrambles ▾
-  </h2>
-
-  <div
-    id="admin-scramble-content"
-    class="hidden">
-
-    <p class="muted">
-      Names and dates may be edited. Closed Scrambles remain locked for scoring.
-    </p>
-
-    <div id="admin-scramble-history">
-      <p class="muted">Loading Scrambles...</p>
-    </div>
-
-    <div
-      id="admin-create-scramble"
-      class="hidden">
-
-      <div class="edit-box">
-
-        <h3>Create New Scramble</h3>
-
-        <label>Scramble Name</label>
-
-        <input
-          id="new-scramble-name"
-          placeholder="e.g. Fall 2026 Dragon Scramble">
-
-        <div class="formgrid">
-
-          <div>
-            <label>Start Date</label>
-            <input
-              id="new-scramble-start"
-              type="date">
-          </div>
-
-          <div>
-            <label>End Date</label>
-            <input
-              id="new-scramble-end"
-              type="date">
-          </div>
-
-        </div>
-
-        <label>Scramble Type</label>
-
-        <select id="new-scramble-type">
-          <option value="standard">Standard</option>
-          <option value="school">School</option>
-        </select>
-
-        <label>Scramble Color</label>
-
-        <input
-          id="new-scramble-color"
-          type="color"
-          value="#B88A3B"
-          style="
-            width:70px;
-            height:44px;
-            padding:3px;
-            cursor:pointer;
-          ">
-
-        <button
-          class="btn"
-          onclick="adminCreateScramble()">
-          Create Active Scramble
-        </button>
-
-        <p
-          id="new-scramble-message"
-          class="muted">
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- MANAGE Q&A -->
-
-<div
-  id="admin-rules-qa-card"
-  class="card">
-
-  <div class="eyebrow">Rules</div>
-
-  <h2
-    onclick="toggleAdminQA()"
-    style="cursor:pointer;">
-    Manage Q&A ▾
-  </h2>
-
-  <div
-    id="admin-qa-content"
-    class="edit-box hidden">
-
-    <label>Question</label>
-
-    <input
-      id="admin-qa-question"
-      type="text">
-
-    <label>Answer</label>
-
-    <textarea
-      id="admin-qa-answer">
-    </textarea>
-
-    <button
-      class="btn"
-      type="button"
-      onclick="adminAddQA()">
-      Add Q&A
-    </button>
-
-    <p
-      id="admin-qa-message"
-      class="muted">
-    </p>
-
-    <div id="admin-qa-list">
-      <p class="muted">Loading Q&A...</p>
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- PAYMENT INSTRUCTIONS -->
-
-<div
-  id="admin-payment-card"
-  class="card">
-
-  <div class="eyebrow">
-    Current Scramble Settings
-  </div>
-
-  <h2
-    onclick="toggleAdminSection('admin-payment-content')"
-    style="cursor:pointer;">
-    Payment Instructions ▾
-  </h2>
-
-  <div
-    id="admin-payment-content"
-    class="hidden">
-
-    <label>Payment Message</label>
-
-    <textarea
-      id="admin-payment-instructions">
-    </textarea>
-
-    <button
-      class="btn"
-      onclick="adminSavePaymentInstructions()">
-      Save Payment Instructions
-    </button>
-
-    <p
-      id="admin-payment-message"
-      class="muted">
-    </p>
-
-  </div>
-
-</div>
-
-
-<!-- ABOUT US -->
-
-<div class="card">
-
-  <div class="eyebrow">
-    Website Content
-  </div>
-
-  <h2
-    onclick="toggleAdminSection('admin-about-content')"
-    style="cursor:pointer;">
-    About Us ▾
-  </h2>
-
-  <div
-    id="admin-about-content"
-    class="edit-box hidden">
-
-    <label>About Us Text</label>
-
-    <textarea
-      id="admin-about-text"
-      style="min-height:180px;">
-    </textarea>
-
-    <button
-      class="btn"
-      type="button"
-      onclick="adminSaveAboutUs()">
-      Save About Us
-    </button>
-
-    <p
-      id="admin-about-message"
-      class="muted">
-    </p>
-
-  </div>
-
-</div>
-
-
-<!-- ALL MATCHES -->
-
-<div class="card">
-
-  <div class="eyebrow">
-    Match Management
-  </div>
-
-  <h2
-    onclick="toggleAdminSection('admin-match-content')"
-    style="cursor:pointer;">
-    All Matches ▾
-  </h2>
-
-  <div
-    id="admin-match-content"
-    class="hidden">
-
-    <p class="muted">
-      Admin may permanently remove test or invalid matches.
-    </p>
-
-    <div id="admin-match-management">
-      <p class="muted">Loading matches...</p>
-    </div>
-
   </div>
 
 </div>
@@ -9748,14 +9668,20 @@ passwordRecoveryMode = true;
 
   }
 );
-  function toggleAdminSection(id){
+function toggleAdminSection(id){
 
-  const content =
-    document.getElementById(id);
-
+  const content = document.getElementById(id);
   if(!content) return;
 
+  const opening = content.classList.contains("hidden");
+
   content.classList.toggle("hidden");
+
+  const card = content.closest(".admin-section-card");
+
+  if(card){
+    card.classList.toggle("expanded", opening);
+  }
 
 }
   async function loadAboutUs(){
@@ -9864,14 +9790,18 @@ async function adminSaveAboutUs(){
 }
 function toggleAdminQA(){
 
-  const content =
-    document.getElementById(
-      "admin-qa-content"
-    );
-
+  const content = document.getElementById("admin-qa-content");
   if(!content) return;
 
+  const opening = content.classList.contains("hidden");
+
   content.classList.toggle("hidden");
+
+  const card = content.closest(".admin-section-card");
+
+  if(card){
+    card.classList.toggle("expanded", opening);
+  }
 
 }
 function toggleNicknameEditor(show){
