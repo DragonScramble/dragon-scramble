@@ -7972,66 +7972,70 @@ async function adminSavePaymentInstructions(){
 }
 async function loadAdminCities(){
 
-  const list =
-    document.getElementById(
-      "admin-city-list"
-    );
-
+  const list = document.getElementById("admin-city-list");
   if(!list) return;
 
-  const { data:cities, error } =
-    await supabaseClient
-      .from("cities")
-      .select("id,name,active")
-      .order("name");
+  const { data:cities, error } = await supabaseClient
+    .from("cities")
+    .select("id,name,active")
+    .order("name", { ascending:true });
 
   if(error){
-
-    list.innerHTML =
-      '<p class="error">Unable to load cities.</p>';
-
+    list.innerHTML = '<p class="error">Unable to load cities.</p>';
     return;
   }
 
   if(!cities || !cities.length){
-
-    list.innerHTML =
-      '<p class="muted">No cities added yet.</p>';
-
+    list.innerHTML = '<p class="muted">No cities added yet.</p>';
     return;
   }
 
-  list.innerHTML =
-    cities.map(city => `
+  cities.sort((a,b) =>
+    a.name.localeCompare(b.name, undefined, {
+      sensitivity:"base"
+    })
+  );
 
-   <div class="admin-player">
+  list.innerHTML = cities.map(city => {
 
-  <div>
-    <b>${escapeHtml(city.name)}</b>
-    <br>
-    <span class="muted">
-      ${city.active ? "Active" : "Hidden"}
-    </span>
-  </div>
+    const safeName = encodeURIComponent(city.name);
 
-  <div class="admin-actions">
+    return `
+      <div class="admin-player">
 
-    <button
-      class="btn ${city.active ? "secondary" : "alt"}"
-      onclick="adminToggleCity(
-        '${city.id}',
-        ${city.active}
-      )">
+        <div>
+          <b>${escapeHtml(city.name)}</b>
+          <br>
+          <span class="muted">
+            ${city.active ? "Active" : "Hidden"}
+          </span>
+        </div>
 
-      ${city.active ? "Hide" : "Show"}
+        <div class="admin-actions">
 
-    </button>
+          <button
+            class="btn secondary"
+            onclick="adminEditCity('${city.id}', decodeURIComponent('${safeName}'))">
+            Edit
+          </button>
 
-  </div>
+          <button
+            class="btn danger"
+            onclick="adminDeleteCity('${city.id}', decodeURIComponent('${safeName}'))">
+            Delete
+          </button>
 
-</div>
+          <button
+            class="btn ${city.active ? "secondary" : "alt"}"
+            onclick="adminToggleCity('${city.id}', ${city.active})">
+            ${city.active ? "Hide" : "Show"}
+          </button>
 
-    `).join("");
+        </div>
+
+      </div>
+    `;
+  }).join("");
 
 }
 async function adminToggleCity(id, isActive){
