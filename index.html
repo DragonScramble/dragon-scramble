@@ -7440,85 +7440,46 @@ async function loadAdminDashboard(){
 
   if(
     !currentUser ||
-    currentPlayerProfile?.role !==
-    "admin"
+    currentPlayerProfile?.role !== "admin"
   ){
     return;
   }
 
   await getActiveScramble();
 
-await Promise.all([
-
-  loadAdminScrambleHistory(),
-
-  loadAdminMatchManagement(),
-
+  await Promise.all([
+    loadAdminScrambleHistory(),
+    loadAdminMatchManagement(),
     loadAdminCities(),
-
-  loadAdminQA(),
-
-  loadAdminAboutUs()
-
-]);
+    loadAdminQA(),
+    loadAdminAboutUs()
+  ]);
 
   if(currentScramble){
 
     document
-      .getElementById(
-        "admin-payment-card"
-      )
+      .getElementById("admin-payment-card")
       .classList.remove("hidden");
 
     document
-      .getElementById(
-        "admin-player-card"
-      )
+      .getElementById("admin-player-card")
       .classList.remove("hidden");
 
     document
-      .getElementById(
-        "admin-score-card"
-      )
-      .classList.remove("hidden");
-
-    document
-      .getElementById(
-        "admin-payment-instructions"
-      )
+      .getElementById("admin-payment-instructions")
       .value =
-        currentScramble.payment_instructions ||
-        "";
+        currentScramble.payment_instructions || "";
 
-    await Promise.all([
-
-      loadAdminPlayers(),
-
-      loadScoreEntry(
-        "admin-score-list",
-        true
-      )
-
-    ]);
+    await loadAdminPlayers();
 
   }else{
 
     document
-      .getElementById(
-        "admin-payment-card"
-      )
+      .getElementById("admin-payment-card")
       .classList.add("hidden");
 
     document
-      .getElementById(
-        "admin-player-card"
-      )
-      .classList.add("hidden");
-
-    document
-      .getElementById(
-        "admin-score-card"
-      )
+      .getElementById("admin-player-card")
       .classList.add("hidden");
 
   }
