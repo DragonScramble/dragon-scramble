@@ -8060,6 +8060,71 @@ async function adminToggleCity(id, isActive){
   await loadCities();
 
 }
+  async function adminEditCity(id, currentName){
+
+  const newName = prompt(
+    "Edit city name:",
+    currentName
+  );
+
+  if(newName === null) return;
+
+  const name = newName.trim();
+
+  if(!name){
+    alert("City name cannot be empty.");
+    return;
+  }
+
+  if(name === currentName) return;
+
+  const { error } =
+    await supabaseClient
+      .rpc("admin_update_city", {
+        p_city_id: id,
+        p_name: name
+      });
+
+  if(error){
+    alert("Could not update city: " + error.message);
+    return;
+  }
+
+  alert("City name updated.");
+
+  await loadAdminCities();
+  await loadCities();
+
+}
+
+
+async function adminDeleteCity(id, name){
+
+  const confirmed = confirm(
+    'Are you sure you want to delete "' +
+    name +
+    '"? This cannot be undone.'
+  );
+
+  if(!confirmed) return;
+
+  const { error } =
+    await supabaseClient
+      .rpc("admin_delete_city", {
+        p_city_id: id
+      });
+
+  if(error){
+    alert("Could not delete city: " + error.message);
+    return;
+  }
+
+  alert("City deleted.");
+
+  await loadAdminCities();
+  await loadCities();
+
+}
 /* ADMIN PLAYERS */
 
 async function loadAdminPlayers(){
