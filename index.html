@@ -5669,11 +5669,7 @@ const eastPlayerId =
   await loadLeaderboard();
   await loadHomeMatches();
 
-  setTimeout(
-    () =>
-      show("matches"),
-    700
-  );
+  
 
 }
 
@@ -9024,7 +9020,7 @@ async function signInPlayer(){
   await loadAccountPaymentStatus();
   await loadLeaderboard();
   await loadHomeMatches();
-show("matches");
+
 }
 async function resetPassword(){
 
@@ -9420,7 +9416,7 @@ passwordRecoveryMode = true;
           await loadLeaderboard();
 
           await loadHomeMatches();
-show("matches");
+
         },
         0
       );
