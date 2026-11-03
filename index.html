@@ -2058,7 +2058,8 @@ supabase.createClient(
 let currentUser = null;
 let currentPlayerProfile = null;
 let currentScramble = null;
-  let activeScrambles = [];
+let activeScrambles = [];
+let activeCities = [];
 let passwordRecoveryMode =
   window.location.hash.includes("type=recovery") ||
   window.location.search.includes("type=recovery");
@@ -8873,6 +8874,19 @@ async function loadAdminPlayers(){
       placeholder="Example: -20 or 25">
 
     <label>
+        <label>
+      City
+    </label>
+
+    <select
+      id="admin-points-city-${player.id}">
+      <option value="">Select a city</option>
+      ${activeCities.map(city => `
+        <option value="${city.id}">
+          ${escapeHtml(city.name)}
+        </option>
+      `).join("")}
+    </select>
       Reason
     </label>
 
@@ -8962,7 +8976,13 @@ async function adminAdjustPoints(id){
     document.getElementById(
       `admin-points-reason-${id}`
     );
+  const cityInput =
+    document.getElementById(
+      `admin-points-city-${id}`
+    );
 
+  const cityId = cityInput.value;
+  
   const points =
     Number(pointsInput.value);
 
@@ -8992,7 +9012,11 @@ async function adminAdjustPoints(id){
     return;
   }
 
-
+  if(!cityId){
+    alert("Please select a city for this adjustment.");
+    return;
+  }
+  
   if(
     !confirm(
       `Apply ${points > 0 ? "+" : ""}${points} points to this player?\n\nReason: ${reason}`
@@ -9003,7 +9027,7 @@ async function adminAdjustPoints(id){
   }
 
 
-  const {error} =
+   const {error} =
   await supabaseClient
     .rpc(
       "admin_add_point_adjustment",
@@ -9011,10 +9035,10 @@ async function adminAdjustPoints(id){
         p_player_id: id,
         p_points: points,
         p_reason: reason,
-        p_scramble_id: currentScramble.id
+        p_scramble_id: currentScramble.id,
+        p_city_id: cityId
       }
     );
-
 
   if(error){
 
