@@ -7236,21 +7236,89 @@ async function loadRulesVideos(){
     return;
   }
 
-  list.innerHTML = (data || []).map(video => `
-    <div class="card">
-      <h3>${escapeHtml(video.title)}</h3>
-      ${video.description ? `<p>${escapeHtml(video.description)}</p>` : ""}
-      <a class="btn secondary"
-         href="${escapeHtml(video.url)}"
-         target="_blank"
-         rel="noopener noreferrer">
-        Watch Video
-      </a>
-    </div>
-  `).join("");
+  if(!data || data.length === 0){
+    list.innerHTML =
+      '<div class="card"><p class="muted">Videos coming soon.</p></div>';
+    return;
+  }
+
+  list.innerHTML = data.map(video => {
+
+    let embedUrl = "";
+
+    try{
+
+      const parsedUrl = new URL(video.url);
+
+      if(
+        parsedUrl.hostname === "instagram.com" ||
+        parsedUrl.hostname === "www.instagram.com"
+      ){
+
+        const cleanPath = parsedUrl.pathname.replace(/\/+$/,"");
+
+        embedUrl =
+          "https://www.instagram.com" +
+          cleanPath +
+          "/embed";
+
+      }
+
+    }catch(error){
+
+      embedUrl = "";
+
+    }
+
+    return `
+      <div class="card" style="margin-bottom:18px;">
+
+        <h3>${escapeHtml(video.title)}</h3>
+
+        ${video.description
+          ? `<p>${escapeHtml(video.description)}</p>`
+          : ""
+        }
+
+        ${embedUrl ? `
+          <div style="
+            width:100%;
+            max-width:540px;
+            margin:14px auto;
+            overflow:hidden;
+            border-radius:12px;
+          ">
+            <iframe
+              src="${escapeHtml(embedUrl)}"
+              title="${escapeHtml(video.title)}"
+              width="100%"
+              height="540"
+              frameborder="0"
+              scrolling="no"
+              allowtransparency="true"
+              allow="encrypted-media; picture-in-picture"
+              style="
+                display:block;
+                width:100%;
+                border:0;
+              ">
+            </iframe>
+          </div>
+        ` : ""}
+
+        <a class="btn secondary"
+           href="${escapeHtml(video.url)}"
+           target="_blank"
+           rel="noopener noreferrer">
+          Watch on Instagram
+        </a>
+
+      </div>
+    `;
+
+  }).join("");
 
 }
-
 
 async function loadAdminVideos(){
 
