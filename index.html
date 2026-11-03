@@ -92,34 +92,34 @@ max-width:1400px;
 .hidden{display:none!important}
 /* Admin dashboard layout */
 
-.admin-stat-grid{
+.admin-stats-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:8px;
   margin:10px 0 16px;
 }
 
-.admin-stat-card{
+.admin-stats-grid .card{
   min-width:0;
-  padding:7px 10px;
+  padding:8px 10px;
 }
 
-.admin-stat-card .eyebrow{
-  font-size:10px;
+.admin-stats-grid .eyebrow{
+  font-size:9px;
   margin-bottom:2px;
 }
 
-.admin-stat-card h2{
-  font-size:21px;
+.admin-stats-grid h2{
+  font-size:20px;
   margin:2px 0;
 }
 
-.admin-stat-card p{
+.admin-stats-grid p{
   font-size:11px;
   margin:0;
 }
 
-.admin-stat-card #admin-stat-top-proposers{
+.admin-stats-grid #admin-stat-top-proposers{
   font-size:11px;
   line-height:1.3;
 }
