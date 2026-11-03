@@ -5965,12 +5965,38 @@ const scramble =
 
 const isSchool =
   scramble?.scramble_type === "school";
-  const [
+   const [
     citiesResult,
     matchesResult,
     gamesResult,
-    scoresResult
+    scoresResult,
+    adjustmentsResult
   ] = await Promise.all([
+
+    supabaseClient
+      .from("cities")
+      .select("id,name"),
+
+    supabaseClient
+      .from("matches")
+      .select("id,proposer_id,status,completed_at,city_id")
+      .eq("scramble_id",scrambleId),
+
+    supabaseClient
+      .from("games")
+      .select("id,match_id"),
+
+    supabaseClient
+      .from("scores")
+      .select("player_id,game_id,points"),
+
+    supabaseClient
+      .rpc(
+        "public_city_point_adjustments",
+        { p_scramble_id: scrambleId }
+      )
+
+  ]);
 
     supabaseClient
       .from("cities")
@@ -6001,10 +6027,7 @@ const isSchool =
         match.city_id
       );
 
-  if(!completed.length){
-    container.innerHTML = "";
-    return;
-  }
+ 
 
   const cityMap =
     new Map(
@@ -6085,7 +6108,27 @@ const isSchool =
 }
 
   }
+  for(const adjustment of adjustmentsResult.data || []){
 
+    if(!adjustment.city_id) continue;
+
+    if(!cityPlayers.has(adjustment.city_id)){
+      cityPlayers.set(
+        adjustment.city_id,
+        new Map()
+      );
+    }
+
+    const players =
+      cityPlayers.get(adjustment.city_id);
+
+    players.set(
+      adjustment.player_id,
+      (players.get(adjustment.player_id) || 0) +
+      Number(adjustment.points || 0)
+    );
+
+  }
   const playerIds =
     new Set();
 
@@ -10221,12 +10264,10 @@ toggleNicknameEditor(false);
   await loadLeaderboard();
   await loadHomeMatches();
 }
- async function loadCities(){
+async function loadCities(){
 
   const select =
     document.getElementById("match-city");
-
-  if(!select) return;
 
   const { data, error } =
     await supabaseClient
@@ -10240,20 +10281,42 @@ toggleNicknameEditor(false);
     return;
   }
 
-  select.innerHTML =
-    '<option value="">Select a city</option>';
+  activeCities = data || [];
 
-  (data || []).forEach(city => {
+  if(select){
+    select.innerHTML =
+      '<option value="">Select a city</option>';
 
-    const option =
-      document.createElement("option");
+    activeCities.forEach(city => {
 
-    option.value = city.id;
-    option.textContent = city.name;
+      const option =
+        document.createElement("option");
 
-    select.appendChild(option);
+      option.value = city.id;
+      option.textContent = city.name;
 
-  });
+      select.appendChild(option);
+
+    });
+  }
+
+  document
+    .querySelectorAll('[id^="admin-points-city-"]')
+    .forEach(citySelect => {
+
+      const selectedCity = citySelect.value;
+
+      citySelect.innerHTML =
+        '<option value="">Select a city</option>' +
+        activeCities.map(city => `
+          <option value="${city.id}">
+            ${escapeHtml(city.name)}
+          </option>
+        `).join("");
+
+      citySelect.value = selectedCity;
+
+    });
 }
   /* START */
 
