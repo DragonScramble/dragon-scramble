@@ -5998,24 +5998,7 @@ const isSchool =
 
   ]);
 
-    supabaseClient
-      .from("cities")
-      .select("id,name"),
-
-    supabaseClient
-      .from("matches")
-      .select("id,proposer_id,status,completed_at,city_id")
-      .eq("scramble_id",scrambleId),
-
-    supabaseClient
-      .from("games")
-      .select("id,match_id"),
-
-    supabaseClient
-      .from("scores")
-      .select("player_id,game_id,points")
-
-  ]);
+   
 
   const completed =
     (matchesResult.data || [])
