@@ -7281,37 +7281,56 @@ async function loadRulesVideos(){
     .order("display_order",{ascending:true});
 
   if(error){
-    list.innerHTML =
-      '<div class="card"><p class="error">Unable to load videos.</p></div>';
+    list.innerHTML = '<div class="card"><p class="error">Unable to load videos.</p></div>';
     return;
   }
 
   if(!data || data.length === 0){
-    list.innerHTML =
-      '<div class="card"><p class="muted">Videos coming soon.</p></div>';
+    list.innerHTML = '<div class="card"><p class="muted">Videos coming soon.</p></div>';
     return;
   }
 
   list.innerHTML = `
     <div class="rules-video-grid">
-      ${data.map(video => `
-        <a
-          class="card rules-video-card"
-          href="${escapeHtml(video.url)}"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Watch ${escapeHtml(video.title)} on Instagram"
-          style="text-decoration:none;color:inherit;cursor:pointer;"
-        >
-          <h3>${escapeHtml(video.title)}</h3>
+      ${data.map(video => {
 
-          ${video.description
-            ? `<p>${escapeHtml(video.description)}</p>`
-            : ""
+        let embedUrl = "";
+
+        try {
+          const parsed = new URL(video.url);
+          const match = parsed.pathname.match(/\/(reel|p)\/([^/]+)/);
+
+          if(match){
+            embedUrl = `https://www.instagram.com/${match[1]}/${match[2]}/embed`;
           }
+        } catch(e) {}
 
-        </a>
-      `).join("")}
+        return `
+          <a class="card rules-video-card"
+             href="${escapeHtml(video.url)}"
+             target="_blank"
+             rel="noopener noreferrer"
+             style="text-decoration:none;color:inherit;cursor:pointer;">
+
+            ${embedUrl ? `
+              <iframe
+                src="${embedUrl}"
+                title="${escapeHtml(video.title)}"
+                width="100%"
+                height="280"
+                frameborder="0"
+                scrolling="no"
+                allowtransparency="true"
+                allow="encrypted-media; picture-in-picture"
+                style="width:100%;border:0;border-radius:8px;pointer-events:none;">
+              </iframe>
+            ` : ""}
+
+            <h3>${escapeHtml(video.title)}</h3>
+
+          </a>
+        `;
+      }).join("")}
     </div>
   `;
 
