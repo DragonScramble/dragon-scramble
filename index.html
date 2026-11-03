@@ -7295,31 +7295,27 @@ async function loadRulesVideos(){
   list.innerHTML = `
     <div class="rules-video-grid">
       ${data.map(video => `
-        <div class="card rules-video-card">
+        <a
+          class="card rules-video-card"
+          href="${escapeHtml(video.url)}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Watch ${escapeHtml(video.title)} on Instagram"
+          style="text-decoration:none;color:inherit;cursor:pointer;"
+        >
+          <h3>${escapeHtml(video.title)}</h3>
 
-          <div>
-            <h3>${escapeHtml(video.title)}</h3>
+          ${video.description
+            ? `<p>${escapeHtml(video.description)}</p>`
+            : ""
+          }
 
-            ${video.description
-              ? `<p>${escapeHtml(video.description)}</p>`
-              : ""
-            }
-          </div>
-
-          <a class="btn secondary"
-             href="${escapeHtml(video.url)}"
-             target="_blank"
-             rel="noopener noreferrer">
-            Watch Video
-          </a>
-
-        </div>
+        </a>
       `).join("")}
     </div>
   `;
 
 }
-
 async function loadAdminVideos(){
 
   const list = document.getElementById("admin-video-list");
