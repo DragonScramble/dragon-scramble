@@ -7499,13 +7499,13 @@ async function adminToggleQA(
     .sort((a,b) => b[1] - a[1])
     .slice(0,3);
 
-  proposersEl.innerHTML =
+   proposersEl.innerHTML =
     topProposers.length
       ? topProposers.map(([playerId,count]) =>
-          `<span style="margin-right:12px;">${escapeHtml(playerMap.get(playerId) || "Unknown") } ${count}</span>`
-        ).join("")
+          `${escapeHtml(playerMap.get(playerId) || "Unknown")} <b>${count}</b>`
+        ).join(' - ')
       : '<span class="muted">No completed matches yet.</span>';
-
+    
   const cityMap = new Map(
     cities.map(city => [city.id,city.name])
   );
