@@ -852,6 +852,16 @@ src="How%20Dragon%20Scramble%20Works%20Infographic.png"
     "
   >
 
+<div style="text-align:center; margin-top:18px;">
+  <a
+    class="btn"
+    href="https://www.instagram.com/reel/DedRD0et21o/"
+    target="_blank"
+    rel="noopener noreferrer">
+    Watch How Dragon Scramble Works
+  </a>
+</div>
+
 </div>
 
 </section>
@@ -870,7 +880,10 @@ src="How%20Dragon%20Scramble%20Works%20Infographic.png"
 
 <div class="card">
 <div class="eyebrow">Your Standing</div>
-<div id="my-rank" style="font-size:34px">—</div>
+
+<div id="my-rank" style="font-size:24px">Points: —</div>
+<div id="my-average-rank" style="font-size:20px">Average: —</div>
+
 <b id="my-nickname">Sign in to view</b>
 <div id="my-stats" class="muted"></div>
 </div>
@@ -1298,6 +1311,11 @@ Average score is shown only after a player has completed at least 4 matches.
 </div>
 
 <div class="rule">
+<b>City Prize</b><br>
+In any city with more than 20 active players in a Scramble, the player finishing first on that city's points leaderboard wins the city prize.
+</div>
+
+<div class="rule">
 <b>Standard Scramble proposer</b><br>
 In Standard Scrambles, the proposer at the time the match is completed receives +5 points.
 </div>
@@ -1314,8 +1332,7 @@ Leaving less than 24 hours before the match: −20 if no replacement joins and t
 
 <div class="rule">
 <b>Emergency</b><br>
-If an emergency occurs after play begins, every unfinished game becomes a Wall Game, +10 to each player.
-</div>
+A match counts only if at least two games have been completed. Any remaining unfinished games become Wall Games, worth +10 points to each player.</div>
 <div class="notice">
 <b>School Scrambles</b><br>
 School Scramble matches consist of two games. East is determined by dice before each game, with the highest roll becoming East. School Scrambles do not award the +5 proposer bonus. All other Dragon Scramble rules apply.
@@ -1333,8 +1350,20 @@ School Scramble matches consist of two games. East is determined by dice before 
   </div>
 
 </div>
-</section>
 
+<div class="section-divider">
+
+  <div class="eyebrow">Learn & Play</div>
+  <h2>Videos</h2>
+
+  <div id="rules-videos-list">
+    <div class="card">
+      <p class="muted">Loading videos...</p>
+    </div>
+  </div>
+
+</div>
+</section>
 <!-- ABOUT US -->
 
 <section id="about" class="hidden">
@@ -1874,7 +1903,42 @@ Admin may submit results for any confirmed match.
 
     </div>
   </div>
+  <!-- MANAGE VIDEOS -->
 
+  <div id="admin-rules-videos-card" class="card admin-section-card">
+
+    <h2 class="admin-section-title"
+        onclick="toggleAdminSection('admin-video-content')">
+      Manage Videos <span>+</span>
+    </h2>
+
+    <div id="admin-video-content" class="edit-box hidden">
+
+      <label>Video Title</label>
+      <input id="admin-video-title" type="text"
+        placeholder="e.g. How Does Dragon Scramble Work?">
+
+      <label>Instagram URL</label>
+      <input id="admin-video-url" type="url"
+        placeholder="https://www.instagram.com/reel/...">
+
+      <label>Description (optional)</label>
+      <textarea id="admin-video-description"
+        placeholder="A short description"></textarea>
+
+      <button class="btn" type="button"
+        onclick="adminAddVideo()">
+        Add Video
+      </button>
+
+      <p id="admin-video-message" class="muted"></p>
+
+      <div id="admin-video-list">
+        <p class="muted">Loading videos...</p>
+      </div>
+
+    </div>
+  </div>
   <!-- PAYMENT INSTRUCTIONS -->
 
   <div id="admin-payment-card" class="card admin-section-card">
@@ -2132,6 +2196,7 @@ if(activeButton){
   if(id === "rules"){
   loadCurrentScrambleDisplay();
   loadRulesQA();
+      loadRulesVideos();
 }
 if(id === "about"){
   loadAboutUs();
@@ -6424,40 +6489,34 @@ function updateMyStanding(
 ){
 
   const rank =
-    document.getElementById(
-      "my-rank"
-    );
+    document.getElementById("my-rank");
+
+  const averageRank =
+    document.getElementById("my-average-rank");
 
   const nickname =
-    document.getElementById(
-      "my-nickname"
-    );
+    document.getElementById("my-nickname");
 
   const stats =
-    document.getElementById(
-      "my-stats"
-    );
+    document.getElementById("my-stats");
 
   if(!user){
 
-    rank.textContent = "—";
-    nickname.textContent =
-      "Sign in to view";
+    rank.textContent = "Points: —";
+    averageRank.textContent = "Average: —";
+    nickname.textContent = "Sign in to view";
     stats.textContent = "";
 
     return;
   }
 
   const index =
-    rows.findIndex(
-      row =>
-        row.id ===
-        user.id
-    );
+    rows.findIndex(row => row.id === user.id);
 
   if(index < 0){
 
-    rank.textContent = "—";
+    rank.textContent = "Points: —";
+    averageRank.textContent = "Average: —";
 
     nickname.textContent =
       "No completed matches yet";
@@ -6467,11 +6526,22 @@ function updateMyStanding(
     return;
   }
 
-  const player =
-    rows[index];
+  const player = rows[index];
 
   rank.textContent =
-    `#${index+1}`;
+    `Points: #${index + 1}`;
+
+  const averageRows =
+    sortOverallRows(rows, "average")
+      .filter(row => row.average !== null);
+
+  const averageIndex =
+    averageRows.findIndex(row => row.id === user.id);
+
+  averageRank.textContent =
+    averageIndex < 0
+      ? "Average: —"
+      : `Average: #${averageIndex + 1}`;
 
   nickname.textContent =
     player.nickname;
@@ -7124,7 +7194,233 @@ async function loadAdminQA(){
 
 }
 
+/* RULES VIDEOS */
 
+async function loadRulesVideos(){
+
+  const list = document.getElementById("rules-videos-list");
+  if(!list) return;
+
+  const {data,error} = await supabaseClient
+    .from("rules_videos")
+    .select("id,title,url,description,display_order")
+    .eq("active",true)
+    .order("display_order",{ascending:true});
+
+  if(error){
+    list.innerHTML =
+      '<div class="card"><p class="error">Unable to load videos.</p></div>';
+    return;
+  }
+
+  list.innerHTML = (data || []).map(video => `
+    <div class="card">
+      <h3>${escapeHtml(video.title)}</h3>
+      ${video.description ? `<p>${escapeHtml(video.description)}</p>` : ""}
+      <a class="btn secondary"
+         href="${escapeHtml(video.url)}"
+         target="_blank"
+         rel="noopener noreferrer">
+        Watch Video
+      </a>
+    </div>
+  `).join("");
+
+}
+
+
+async function loadAdminVideos(){
+
+  const list = document.getElementById("admin-video-list");
+  if(!list) return;
+
+  const {data,error} = await supabaseClient
+    .from("rules_videos")
+    .select("id,title,url,description,display_order,active")
+    .order("display_order",{ascending:true});
+
+  if(error){
+    list.innerHTML = '<p class="error">Unable to load videos.</p>';
+    return;
+  }
+
+  list.innerHTML = (data || []).map(video => `
+    <div class="edit-box" style="margin-top:14px;">
+
+      <label>Title</label>
+      <input id="video-title-${video.id}"
+        value="${escapeHtml(video.title)}">
+
+      <label>Instagram URL</label>
+      <input id="video-url-${video.id}"
+        type="url"
+        value="${escapeHtml(video.url)}">
+
+      <label>Description</label>
+      <textarea id="video-description-${video.id}">${escapeHtml(video.description || "")}</textarea>
+
+      <p class="muted">${video.active ? "Visible on Rules page" : "Hidden from Rules page"}</p>
+
+      <button class="btn"
+        type="button"
+        onclick="adminSaveVideo('${video.id}')">
+        Save
+      </button>
+
+      <button class="btn secondary"
+        type="button"
+        onclick="adminToggleVideo('${video.id}',${video.active})">
+        ${video.active ? "Hide" : "Show"}
+      </button>
+
+      <button class="btn secondary"
+        type="button"
+        onclick="adminDeleteVideo('${video.id}')">
+        Delete
+      </button>
+
+    </div>
+  `).join("");
+
+}
+
+
+async function adminAddVideo(){
+
+  const title = document.getElementById("admin-video-title").value.trim();
+  const url = document.getElementById("admin-video-url").value.trim();
+  const description = document.getElementById("admin-video-description").value.trim();
+  const message = document.getElementById("admin-video-message");
+
+  if(!title || !url){
+    message.textContent = "Title and Instagram URL are required.";
+    return;
+  }
+
+  let parsedUrl;
+
+  try{
+    parsedUrl = new URL(url);
+  }catch{
+    message.textContent = "Please enter a valid Instagram URL.";
+    return;
+  }
+
+  if(!["instagram.com","www.instagram.com"].includes(parsedUrl.hostname)){
+    message.textContent = "Please enter an Instagram URL.";
+    return;
+  }
+
+  const {data:lastItem} = await supabaseClient
+    .from("rules_videos")
+    .select("display_order")
+    .order("display_order",{ascending:false})
+    .limit(1)
+    .maybeSingle();
+
+  const {error} = await supabaseClient
+    .from("rules_videos")
+    .insert({
+      title,
+      url,
+      description:description || null,
+      display_order:Number(lastItem?.display_order || 0) + 1,
+      active:true
+    });
+
+  if(error){
+    message.textContent = "Could not add video: " + error.message;
+    return;
+  }
+
+  document.getElementById("admin-video-title").value = "";
+  document.getElementById("admin-video-url").value = "";
+  document.getElementById("admin-video-description").value = "";
+
+  message.textContent = "Video added.";
+
+  await loadAdminVideos();
+  await loadRulesVideos();
+
+}
+
+
+async function adminSaveVideo(id){
+
+  const title = document.getElementById(`video-title-${id}`).value.trim();
+  const url = document.getElementById(`video-url-${id}`).value.trim();
+  const description = document.getElementById(`video-description-${id}`).value.trim();
+
+  let parsedUrl;
+
+  try{
+    parsedUrl = new URL(url);
+  }catch{
+    alert("Please enter a valid Instagram URL.");
+    return;
+  }
+
+  if(!title || !["instagram.com","www.instagram.com"].includes(parsedUrl.hostname)){
+    alert("Please enter a title and a valid Instagram URL.");
+    return;
+  }
+
+  const {error} = await supabaseClient
+    .from("rules_videos")
+    .update({
+      title,
+      url,
+      description:description || null
+    })
+    .eq("id",id);
+
+  if(error){
+    alert("Could not save video: " + error.message);
+    return;
+  }
+
+  await loadAdminVideos();
+  await loadRulesVideos();
+
+}
+
+
+async function adminToggleVideo(id,isActive){
+
+  const {error} = await supabaseClient
+    .from("rules_videos")
+    .update({active:!isActive})
+    .eq("id",id);
+
+  if(error){
+    alert("Could not update video: " + error.message);
+    return;
+  }
+
+  await loadAdminVideos();
+  await loadRulesVideos();
+
+}
+
+
+async function adminDeleteVideo(id){
+
+  if(!confirm("Delete this video permanently?")) return;
+
+  const {error} = await supabaseClient
+    .from("rules_videos")
+    .delete()
+    .eq("id",id);
+
+  if(error){
+    alert("Could not delete video: " + error.message);
+    return;
+  }
+
+  await loadAdminVideos();
+  await loadRulesVideos();
+
+}
 async function adminAddQA(){
 
   const question =
@@ -7560,11 +7856,12 @@ async function loadAdminDashboard(){
 
   await getActiveScramble();
   await loadAdminDashboardStats();
-  await Promise.all([
+    await Promise.all([
     loadAdminScrambleHistory(),
     loadAdminMatchManagement(),
     loadAdminCities(),
     loadAdminQA(),
+    loadAdminVideos(),
     loadAdminAboutUs()
   ]);
 
