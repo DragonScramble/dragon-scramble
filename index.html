@@ -1302,6 +1302,7 @@ Closed Scrambles are preserved here with their final standings.
 </section>
 
 
+
 <!-- RULES -->
 
 <section id="rules" class="hidden">
@@ -1309,126 +1310,203 @@ Closed Scrambles are preserved here with their final standings.
 <div class="eyebrow">Play fair · Have fun</div>
 <h1>Dragon Scramble Rules</h1>
 
-<div class="card">
-
-<div class="eyebrow">Participation & Payment</div>
-
-<h2 id="rules-scramble-name">
-Current Scramble
-</h2>
-
-<div
-id="rules-payment-instructions"
-class="payment-box">
-Loading payment instructions...
-</div>
-
-<div style="margin:12px 0;">
-
-  <a
-    class="btn secondary"
-    href="https://jjrxvynomtdsqsuwyfsd.supabase.co/storage/v1/object/public/dragon-scramble-assets/zelle-qr.jpg"
-    target="_blank"
-    rel="noopener noreferrer">
-    View Zelle QR Code
-  </a>
-
-</div>
-
-<p class="muted">
-After payment is made, sign in to your Account and click
-<b>I’ve Paid — Notify Admin</b>.
-</p>
-
-</div>
-
+<!-- PARTICIPATION & PAYMENT -->
 
 <div class="card">
-<div class="eyebrow">Rules</div>
-<div class="rule">
-<b>NMJL</b><br>
-All National Mah Jongg League rules apply.
+
+  <div class="eyebrow">Participation & Payment</div>
+
+  <h2 id="rules-scramble-name">Current Scramble</h2>
+
+  <div
+    id="rules-payment-instructions"
+    class="payment-box">
+    Loading payment instructions...
+  </div>
+
+  <div style="margin:12px 0;">
+    <a
+      class="btn secondary"
+      href="https://jjrxvynomtdsqsuwyfsd.supabase.co/storage/v1/object/public/dragon-scramble-assets/zelle-qr.jpg"
+      target="_blank"
+      rel="noopener noreferrer">
+      View Zelle QR Code
+    </a>
+  </div>
+
+  <p class="muted">
+    After payment is made, sign in to your Account and click
+    <b>I’ve Paid — Notify Admin</b>.
+  </p>
+
 </div>
 
-<div class="rule">
-<b>Standard Scrambles</b><br>
-Every Standard Scramble match has four games, with each player East once.
+<!-- 1. MATCHES -->
+
+<div class="card">
+
+  <div class="eyebrow">01 · Matches</div>
+  <h2>Match Format</h2>
+
+  <div class="rule">
+    <b>NMJL Rules</b><br>
+    All National Mah Jongg League rules apply.
+  </div>
+
+  <div class="rule">
+    <b>Standard Scrambles</b><br>
+    Every Standard Scramble match has four games, with each player East once.
+  </div>
+
+  <div class="rule">
+    <b>Social vs. Focused</b><br>
+    All matches use the same rules. Social matches have a more relaxed pace expectation. Focused matches require a faster pace.
+  </div>
+
+  <div class="rule">
+    <b>School Scrambles</b><br>
+    School Scramble matches consist of two games. East is determined by dice before each game, with the highest roll becoming East. School Scrambles do not award the +5 proposer bonus. All other Dragon Scramble rules apply.
+  </div>
+
+  <div class="rule">
+    <b>Prizes — Overall Leaderboard</b><br>
+    Prizes are awarded to the top three players in each of the two overall rankings: Total Points and Average Score.
+  </div>
+
+  <div class="rule">
+    <b>Prizes — City Leaderboards</b><br>
+    Each city with more than 20 players participating in the Scramble will award one prize to the player with the highest Total Points in that city. The city of the overall Total Points winner is excluded from the city prizes.
+  </div>
+
 </div>
 
-<div class="rule">
-<b>Social vs. Focused</b><br>
-All matches use the same rules. Social has a more relaxed pace expectation. Focused requires a faster pace.
+<!-- 2. HOUSE RULES -->
+
+<div class="card">
+
+  <div class="eyebrow">02 · House Rules</div>
+  <h2>At the Table</h2>
+
+  <div class="rule">
+    <b>Proposer Responsibilities</b><br>
+    The current match proposer provides the Mahjong tiles, mat, racks and dice. If the proposer leaves an open match, proposer responsibility transfers to the next player who joined.
+  </div>
+
+  <div class="rule">
+    <b>Charleston Passing</b><br>
+    All four players must place their tiles on the mat before anyone picks up incoming tiles.
+  </div>
+
+  <div class="rule">
+    <b>Phones</b><br>
+    Phone calls are not permitted during matches, without exception. If necessary, players may briefly send text messages, provided this does not interrupt the flow of the game. Phones must remain below table height during play. AI tools and any other electronic assistance are strictly prohibited.
+  </div>
+
+  <div class="rule">
+    <b>Notifications</b><br>
+    All phone notifications and ringer sounds must be turned off during play, as a courtesy to other players and to encourage everyone to stay present and focused on the game.
+  </div>
+
 </div>
 
-<div class="rule">
-<b>Proposer equipment</b><br>
-The current match proposer provides the Mahjong tiles, mat, racks and dice.
-If the proposer leaves an open match, proposer responsibility transfers to the next player who joined.
+<!-- 3. SCORING -->
+
+<div class="card">
+
+  <div class="eyebrow">03 · Scoring</div>
+  <h2>Points & Bonuses</h2>
+
+  <div class="rule">
+    <b>Mahjong</b><br>
+    The winner receives the NMJL hand value shown on the card.
+  </div>
+
+  <div class="rule">
+    <b>Wall Game</b><br>
+    Each player with a live hand receives +10 points. No other points are awarded for that game.
+  </div>
+
+  <div class="rule">
+    <b>Average Score</b><br>
+    A player's average score is calculated and displayed after completing at least four matches.
+  </div>
+
+  <div class="rule">
+    <b>Bonus Points</b><br>
+    Self-picked Mahjong (last tile drawn from the wall) = hand value ×2.<br>
+    Jokerless Mahjong = hand value ×2 when eligible.<br>
+    Self-picked + Jokerless = hand value ×4.<br>
+    Singles and Pairs hands are not eligible for the Jokerless multiplier.
+  </div>
+
+  <div class="rule">
+    <b>False Mahjong</b><br>
+    If a player calls False Mahjong and more than one other player exposes their tiles before the line is checked and found to be erroneous, the remaining player with a live hand receives +25 points. The player who called False Mahjong receives −25 points. The proposer must inform Admin.
+  </div>
+
+  <div class="rule">
+    <b>Misnamed Tile</b><br>
+    If a player calls Mahjong using a misnamed tile, the player who misnamed the tile receives a penalty of −2 times the value of the Mahjong hand made.
+  </div>
+
+  <div class="rule">
+    <b>Standard Scramble Proposer Bonus</b><br>
+    In Standard Scrambles, the proposer at the time the match is completed receives +5 points.
+  </div>
+
 </div>
 
-<div class="rule">
-<b>Charleston passing</b><br>
-All four players must place their tiles on the mat before anyone picks up incoming tiles.
+<!-- 4. WITHDRAWALS & LATENESS -->
+
+<div class="card">
+
+  <div class="eyebrow">04 · Withdrawals & Lateness</div>
+  <h2>Changes to a Match</h2>
+
+  <div class="rule">
+    <b>Withdrawal</b><br>
+    Leaving less than 24 hours before the match: −20 points if no replacement joins and the match is cancelled.
+  </div>
+
+  <div class="rule">
+    <b>Lateness</b><br>
+    If a player is 20 minutes or more late, the other players may decide to cancel the match. If they do, the late player receives −25 points, and each of the other players receives +25 points.
+  </div>
+
 </div>
 
-<div class="rule">
-<b>Phones</b><br>
-No phone above table height. No photos of tiles, racks, hands or the table. No AI or electronic assistance.
+<!-- 5. LULU & EMERGENCIES -->
+
+<div class="card">
+
+  <div class="eyebrow">05 · Lulu IV & Emergencies</div>
+  <h2>Special Situations</h2>
+
+  <div class="rule">
+    <b>Lulu IV — Dummy Player</b><br>
+    When a match has been proposed more than 24 hours in advance and only three players have joined, the proposer may ask Admin to add Lulu IV as the fourth player.<br>
+    <b>Fourth game:</b> The fourth game is not played. It is recorded as a win for Lulu, worth 25 points.<br>
+    <b>Charleston:</b> If Lulu passes Jokers during the Charleston, players keep those Jokers.<br>
+    <b>Back-to-back matches:</b> Players may choose to play up to two consecutive matches with Lulu.
+  </div>
+
+  <div class="rule">
+    <b>Emergencies</b><br>
+    A match counts only if at least two games have been completed. If an emergency interrupts a match after at least two completed games, any remaining unfinished games become Wall Games, worth +10 points to each player. If fewer than two games have been completed, the match is cancelled and no points are awarded to any player.
+  </div>
+
 </div>
 
-<div class="rule">
-<b>Notifications</b><br>
-All phone notification sounds must be turned off during play, as a courtesy to other players and to encourage everyone to stay present and focused on the game.
-</div>
+<!-- 6. CLARIFICATIONS -->
 
-<div class="rule">
-<b>Scoring</b><br>
-Winner receives the NMJL hand value shown on the card.<br>
-Self-picked Mahjong = hand value ×2.<br>
-Jokerless Mahjong = hand value ×2 when eligible.<br>
-Self-picked + Jokerless = hand value ×4.<br>
-50- and 75-point hands are not eligible for the Jokerless multiplier.<br>
-Wall Game = +10 to each player and no other points for that game.<br>
-Average score is shown only after a player has completed at least 4 matches.
-</div>
-
-<div class="rule">
-<b>City Prize</b><br>
-In any city with more than 20 active players in a Scramble, the player finishing first on that city's points leaderboard wins the city prize.
-</div>
-
-<div class="rule">
-<b>Standard Scramble proposer</b><br>
-In Standard Scrambles, the proposer at the time the match is completed receives +5 points.
-</div>
-<div class="rule">
-<b>Lulu the IV – Dummy Player</b><br>
-When a match has been proposed more than 24 hours in advance and only three players have joined, the proposer may ask the Admin to add Lulu the IV as the fourth player.<br>
-<b>Fourth game:</b> The fourth game is not played. It is recorded as a win for Lulu, worth 25 points.<br>
-<b>Charleston:</b> If Lulu passes Jokers during the Charleston, players keep those Jokers.<br>
-<b>Back-to-back games:</b> Players may choose to play up to two consecutive matches with Lulu.
-</div>
-<div class="rule">
-<b>Withdrawal</b><br>
-Leaving less than 24 hours before the match: −20 if no replacement joins and the match is cancelled.
-</div>
-
-<div class="rule">
-<b>Late</b><br>
-20 minutes or more late AND the delay results in the match being cancelled: late player −20 points; other three players +25 points each.
-</div>
-
-<div class="rule">
-<b>Emergency</b><br>
-A match counts only if at least two games have been completed. Any remaining unfinished games become Wall Games, worth +10 points to each player.</div>
-<div class="notice">
-<b>School Scrambles</b><br>
-School Scramble matches consist of two games. East is determined by dice before each game, with the highest roll becoming East. School Scrambles do not award the +5 proposer bonus. All other Dragon Scramble rules apply.
-</div>
-</div>
 <div class="section-divider">
 
-  <div class="eyebrow">Questions & Clarifications</div>
+  <div class="eyebrow">06 · Questions & Clarifications</div>
+  <h2>Learn, Clarify & Keep Playing</h2>
+
+  <p class="muted">
+    Mahjong has plenty of situations that can raise questions during a game. Check out our videos and Q&A for helpful explanations and best practices on common situations, so everyone can keep the game moving and enjoy the fun.
+  </p>
 
   <h2>Videos</h2>
 
@@ -1447,7 +1525,9 @@ School Scramble matches consist of two games. East is determined by dice before 
   </div>
 
 </div>
+
 </section>
+
 <!-- ABOUT US -->
 
 <section id="about" class="hidden">
