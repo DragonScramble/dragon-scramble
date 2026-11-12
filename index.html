@@ -6102,7 +6102,87 @@ async function calculateScrambleStandings(
   );
 
 }
+async function calculateDistinctOpponents(scrambleId){
 
+  const {data:matches,error:matchesError} =
+    await supabaseClient
+      .from("matches")
+      .select("id")
+      .eq("scramble_id",scrambleId)
+      .eq("status","completed");
+
+  if(matchesError) throw matchesError;
+
+  const matchIds = (matches || []).map(match => match.id);
+
+  if(!matchIds.length) return {};
+
+  const [seatsResult,playersResult] = await Promise.all([
+
+    supabaseClient
+      .from("match_players")
+      .select("match_id,player_id")
+      .in("match_id",matchIds),
+
+    supabaseClient
+      .from("players")
+      .select("id,nickname")
+
+  ]);
+
+  if(seatsResult.error) throw seatsResult.error;
+  if(playersResult.error) throw playersResult.error;
+
+  const nicknameById = new Map(
+    (playersResult.data || []).map(player => [
+      player.id,
+      (player.nickname || "").trim().toLowerCase()
+    ])
+  );
+
+  const opponentsByPlayer = {};
+
+  const seatsByMatch = {};
+
+  (seatsResult.data || []).forEach(seat => {
+    if(!seatsByMatch[seat.match_id]){
+      seatsByMatch[seat.match_id] = [];
+    }
+
+    seatsByMatch[seat.match_id].push(seat.player_id);
+  });
+
+  Object.values(seatsByMatch).forEach(playerIds => {
+
+    playerIds.forEach(playerId => {
+
+      if(!opponentsByPlayer[playerId]){
+        opponentsByPlayer[playerId] = new Set();
+      }
+
+      playerIds.forEach(opponentId => {
+
+        if(
+          opponentId !== playerId &&
+          nicknameById.get(opponentId) !== "lulu iv"
+        ){
+          opponentsByPlayer[playerId].add(opponentId);
+        }
+
+      });
+
+    });
+
+  });
+
+  return Object.fromEntries(
+    Object.entries(opponentsByPlayer).map(([id,opponents]) => [
+      id,
+      opponents.size
+    ])
+  );
+
+}
 async function loadCityLeaders(scrambleId){
 
   const container =
@@ -6525,7 +6605,7 @@ function renderOverallLeaderboard(){
               Matches${overallSort === "matches" ? " ↓" : ""}
             </button>
           </th>
-
+<th class="metric">Prize Eligibility</th>
         </tr>
       </thead>
 
@@ -6559,7 +6639,13 @@ function renderOverallLeaderboard(){
               <td class="metric">
                 ${player.matches_played}
               </td>
-
+<td class="metric">
+  ${
+    player.prize_eligible
+      ? "Eligible"
+      : `${Math.min(player.matches_played,12)}/12 matches · ${Math.min(player.distinct_opponents,10)}/10 opponents`
+  }
+</td>
             </tr>
 
           `
@@ -6634,6 +6720,17 @@ if(currentScramble.public_results === false){
 await loadCityLeaders(
   currentScramble.id
 );
+  const opponentCounts =
+  await calculateDistinctOpponents(currentScramble.id);
+
+rows.forEach(player => {
+  player.distinct_opponents =
+    opponentCounts[player.id] || 0;
+
+  player.prize_eligible =
+    player.matches_played >= 12 &&
+    player.distinct_opponents >= 10;
+});
   overallSort = "points";
 overallExpanded = false;
 overallLeaderboardRows = rows;
