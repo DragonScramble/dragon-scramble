@@ -4955,8 +4955,8 @@ ${
 
         </select>
 <div
-  id="${safePrefix}-wall-options-${match.id}-${n}"
-  class="${result === "wall" ? "" : "hidden"}">
+id="edit-wall-options-${match.id}-${n}"
+class="${result === "wall" ? "" : "hidden"}">
 
   <label>Players with a dead hand</label>
 
@@ -4964,7 +4964,7 @@ ${
     <label>
       <input
         type="checkbox"
-        class="${safePrefix}-dead-hand-${match.id}-${n}"
+        class="edit-dead-hand-${match.id}-${n}"
         value="${player.id}">
       ${escapeHtml(player.nickname)}
     </label>
