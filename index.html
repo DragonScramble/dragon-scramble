@@ -4954,7 +4954,23 @@ ${
           </option>
 
         </select>
+<div
+  id="${safePrefix}-wall-options-${match.id}-${n}"
+  class="${result === "wall" ? "" : "hidden"}">
 
+  <label>Players with a dead hand</label>
+
+  ${players.map(player => `
+    <label>
+      <input
+        type="checkbox"
+        class="${safePrefix}-dead-hand-${match.id}-${n}"
+        value="${player.id}">
+      ${escapeHtml(player.nickname)}
+    </label>
+  `).join("")}
+
+</div>
         <div
           id="edit-winner-options-${match.id}-${n}"
           class="${result === "wall" ? "hidden" : ""}">
@@ -5160,9 +5176,15 @@ async function adminSaveCompletedResults(
 
         base_hand_value:0,
 
-        self_picked:false,
+       self_picked:false,
 
-        jokerless:false
+jokerless:false,
+
+dead_hand_player_ids: Array.from(
+  document.querySelectorAll(
+    `.edit-dead-hand-${matchId}-${n}:checked`
+  )
+).map(input => input.value)
 
       });
 
@@ -5772,9 +5794,15 @@ const eastPlayerId =
 
         base_hand_value:0,
 
-        self_picked:false,
+      self_picked:false,
 
-        jokerless:false
+jokerless:false,
+
+dead_hand_player_ids: Array.from(
+  document.querySelectorAll(
+    `.${prefix}-dead-hand-${matchId}-${n}:checked`
+  )
+).map(input => input.value)
 
       });
 
