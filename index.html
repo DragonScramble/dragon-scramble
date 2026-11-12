@@ -394,18 +394,61 @@ h3{margin:8px 0}
 
 @media(max-width:760px){
 
+  .overall-table{
+    width:100%;
+    table-layout:fixed;
+  }
+
   .overall-table th,
   .overall-table td{
-    padding:9px 5px;
+    padding:9px 2px;
     font-size:12px;
+  }
+
+  .overall-table th:nth-child(1),
+  .overall-table td:nth-child(1){
+    width:5%;
+  }
+
+  .overall-table th:nth-child(2),
+  .overall-table td:nth-child(2){
+    width:27%;
+  }
+
+  .overall-table th:nth-child(3),
+  .overall-table td:nth-child(3){
+    width:14%;
+  }
+
+  .overall-table th:nth-child(4),
+  .overall-table td:nth-child(4){
+    width:14%;
+  }
+
+  .overall-table th:nth-child(5),
+  .overall-table td:nth-child(5){
+    width:12%;
+  }
+
+  .overall-table th:nth-child(6),
+  .overall-table td:nth-child(6){
+    width:28%;
   }
 
   .overall-rank{
-    width:28px;
+    width:auto;
+  }
+
+  .overall-name{
+    overflow-wrap:anywhere;
   }
 
   .overall-sort{
-    font-size:12px;
+    font-size:11px;
+  }
+
+  .overall-table td.metric > div:first-child{
+    gap:10px !important;
   }
 
 }
