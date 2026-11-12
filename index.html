@@ -414,7 +414,10 @@ h3{margin:8px 0}
   font-size:11px;
   text-transform:uppercase;
 }
-
+.match-open-pill{
+  background:#B96F52;
+  color:#ffffff;
+}
 .pending{background:#f0e9d7}
 .inactive{background:#ececec}
 .notice-pending{background:#f5e7bc}
@@ -601,22 +604,22 @@ label{
 
   .match-summary-row{
     display:grid;
-    grid-template-columns:
-      1.35fr
-      .8fr
-      .9fr
-      1.8fr
-      1fr
-      auto;
+   grid-template-columns:
+  auto
+  1.35fr
+  .8fr
+  .9fr
+  1.8fr
+  auto;
     align-items:center;
     gap:18px;
   }
 
-  .match-date,
-  .match-time,
-  .match-type,
-  .match-location,
-  .match-count{
+  .match-status,
+.match-date,
+.match-time,
+.match-type,
+.match-location{
     margin:0;
   }
 
@@ -3735,55 +3738,44 @@ list.innerHTML =
 
   });
 
-        let actions = "";
+       let actions = "";
 
-        if(
-          match.status ===
-          "confirmed"
-        ){
+if(match.status === "confirmed"){
 
-          actions +=
-            '<span class="pill">Confirmed</span>';
+  if(joined || isAdmin){
 
-          if(
-            joined ||
-            isAdmin
-          ){
+    actions += `
 
-            actions += `
+      <button
+        class="btn alt"
+        onclick="show('results')">
+        Enter Results
+      </button>
 
-              <button
-                class="btn alt"
-                onclick="show('results')">
-                Enter Results
-              </button>
+    `;
 
-            `;
+  }
 
-          }
+}
+else if(joined){
 
-        }
-        else if(joined){
+  actions +=
+    '<span class="pill">You’re in</span>';
 
-          actions +=
-            '<span class="pill">You’re in</span>';
+}
+else if(currentEligibility.eligible){
 
-        }
-        else if(
-          currentEligibility.eligible
-        ){
+  actions += `
 
-          actions += `
+    <button
+      class="btn"
+      onclick="joinMatch('${match.id}')">
+      Join Match
+    </button>
 
-            <button
-              class="btn"
-              onclick="joinMatch('${match.id}')">
-              Join Match
-            </button>
+  `;
 
-          `;
-
-        }
+}
 
 
        /* EVERY PLAYER MAY LEAVE AN OPEN OR CONFIRMED MATCH,
@@ -3877,41 +3869,37 @@ if(
 
 <div class="card upcoming-match-card" data-city-id="${match.city_id || ""}">
 
-  <div class="match-summary-row">
+ <div class="match-summary-row">
 
-    <div class="match-date">
-      ${escapeHtml(
-        dateText(match.scheduled_at)
-      )}
-    </div>
-
-    <div class="match-time">
-      ${escapeHtml(
-        timeText(match.scheduled_at)
-      )}
-    </div>
-
-    <div class="match-type">
-      ${
-        match.match_type === "focused"
-          ? "Focused"
-          : "Social"
-      }
-    </div>
-
-    <div class="match-location">
-      📍 ${escapeHtml(match.location)}
-    </div>
-
-    <div class="match-count">
-      ${count} / 4 players
-    </div>
-
-    <div class="match-actions">
-      ${actions}
-    </div>
-
+  <div class="match-status">
+    ${
+      match.status === "confirmed"
+        ? '<span class="pill">Confirmed</span>'
+        : `<span class="pill match-open-pill">${count}/4</span>`
+    }
   </div>
+
+  <div class="match-date">
+    ${escapeHtml(dateText(match.scheduled_at))}
+  </div>
+
+  <div class="match-time">
+    ${escapeHtml(timeText(match.scheduled_at))}
+  </div>
+
+  <div class="match-type">
+    ${match.match_type === "focused" ? "Focused" : "Social"}
+  </div>
+
+  <div class="match-location">
+    📍 ${escapeHtml(match.location)}
+  </div>
+
+  <div class="match-actions">
+    ${actions}
+  </div>
+
+</div>
 
   <div class="match-player-line">
 
