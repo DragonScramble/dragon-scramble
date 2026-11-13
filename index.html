@@ -520,7 +520,13 @@ h3{margin:8px 0}
   .overall-table td.metric > div:first-child{
     gap:10px !important;
   }
-
+  /* Keep all leaderboard column titles the same size on mobile */
+  .overall-table th,
+  .overall-table th:nth-child(5),
+  .overall-table th:nth-child(6),
+  .overall-table th .overall-sort{
+    font-size:6px;
+  }
 }
 .pill{
   display:inline-block;
