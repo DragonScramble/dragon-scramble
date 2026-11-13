@@ -5684,7 +5684,25 @@ const scoreContentId =
 
                 </select>
 
-                <div
+               <div
+  id="${safePrefix}-wall-options-${match.id}-${n}"
+  class="hidden">
+
+  <label>Players with a dead hand</label>
+
+  <div class="checkrow">
+    ${players.map(player => `
+      <label>
+        <input
+          type="checkbox"
+          class="${safePrefix}-dead-hand-${match.id}-${n}"
+          value="${player.id}">
+        ${escapeHtml(player.nickname)}
+      </label>
+    `).join("")}
+  </div>
+
+</div> <div
                   id="${safePrefix}-winner-options-${match.id}-${n}">
 
                   <label>
@@ -5787,7 +5805,14 @@ function newScoreResultChanged(
       "hidden",
       result === "wall"
     );
-
+  document
+    .getElementById(
+      `${prefix}-wall-options-${matchId}-${gameNumber}`
+    )
+    .classList.toggle(
+      "hidden",
+      result !== "wall"
+    );
 }
 
 
