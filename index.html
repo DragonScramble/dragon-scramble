@@ -81,6 +81,22 @@ nav button.active-tab::after{
   border:1px solid #d3b36b!important;
   border-radius:8px;
   padding:7px 10px;
+  .register-nav{
+  background:#c8b6d8 !important;
+  color:#26352e !important;
+  border:1px solid #879b80 !important;
+  border-radius:8px;
+  padding:8px 15px !important;
+  font-size:15px !important;
+  font-weight:bold !important;
+  letter-spacing:1px;
+  margin-left:10px;
+}
+
+.register-nav:hover{
+  background:#879b80 !important;
+  color:#fff !important;
+}
 }
 
 main{
@@ -939,7 +955,20 @@ label{
 <button onclick="show('rules')">Rules</button>
 <button onclick="show('about')">About Us</button>
 <button onclick="show('account')">Account</button>
+<button onclick="show('account')">Account</button>
 
+<button
+  class="register-nav"
+  onclick="show('account')">
+  REGISTER
+</button>
+
+<button
+  id="admin-nav"
+  class="admin-nav hidden"
+  onclick="show('admin')">
+  Admin
+</button>
 <button
 id="admin-nav"
 class="admin-nav hidden"
