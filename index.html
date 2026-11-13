@@ -6681,7 +6681,7 @@ function renderOverallLeaderboard(){
               Matches${overallSort === "matches" ? " ↓" : ""}
             </button>
           </th>
-<th class="metric" style="text-align:center;">Eligibility</th>
+<th class="metric" style="text-align:center;">Podium</th>
         </tr>
       </thead>
 
@@ -6714,29 +6714,33 @@ function renderOverallLeaderboard(){
 
               <td class="metric">
                 ${player.matches_played}
-              </td>
-<td class="metric">
-  <div style="display:flex;justify-content:center;gap:28px;align-items:flex-start;">
-
-    <div style="display:flex;flex-direction:column;align-items:center;width:30px;">
-      <div style="width:19px;height:53px;background:#eee4d8;border-radius:6px;overflow:hidden;display:flex;align-items:flex-end;">
-        <div style="width:100%;height:${Math.min(player.matches_played / 12 * 100,100)}%;background:${player.matches_played >= 12 ? '#879b80' : '#bd5c52'};border-radius:6px;"></div>
-      </div>
-      <span style="font-size:11px;color:#756b60;margin-top:5px;">${Math.min(player.matches_played,12)}/12</span>
-    </div>
-
-    <div style="display:flex;flex-direction:column;align-items:center;width:30px;">
-      <div style="width:19px;height:53px;background:#eee4d8;border-radius:6px;overflow:hidden;display:flex;align-items:flex-end;">
-        <div style="width:100%;height:${Math.min(player.distinct_opponents / 10 * 100,100)}%;background:${player.distinct_opponents >= 10 ? '#879b80' : '#bd5c52'};border-radius:6px;"></div>
-      </div>
-      <span style="font-size:11px;color:#756b60;margin-top:5px;">${Math.min(player.distinct_opponents,10)}/10</span>
-    </div>
-
-  </div>
-
-  <div style="font-size:12px;font-weight:600;margin-top:5px;color:${player.prize_eligible ? '#718a69' : '#bd5148'};text-align:center;white-space:nowrap;">
-    ${player.prize_eligible ? "Eligible" : "Not yet eligible"}
-  </div>
+             <td class="metric">
+  ${
+    player.prize_eligible
+      ? `
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <div style="width:19px;height:53px;background:#879b80;border-radius:6px;"></div>
+          <div style="font-size:12px;font-weight:600;margin-top:5px;color:#718a69;text-align:center;">Eligible</div>
+        </div>
+      `
+      : `
+        <div style="display:flex;justify-content:center;gap:10px;align-items:flex-start;">
+          <div style="display:flex;flex-direction:column;align-items:center;width:30px;">
+            <div style="width:19px;height:53px;background:#eee4d8;border-radius:6px;overflow:hidden;display:flex;align-items:flex-end;">
+              <div style="width:100%;height:${Math.min(player.matches_played / 12 * 100,100)}%;background:#bd5c52;border-radius:6px;"></div>
+            </div>
+            <span style="font-size:11px;color:#756b60;margin-top:5px;">${Math.min(player.matches_played,12)}/12</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;width:30px;">
+            <div style="width:19px;height:53px;background:#eee4d8;border-radius:6px;overflow:hidden;display:flex;align-items:flex-end;">
+              <div style="width:100%;height:${Math.min(player.distinct_opponents / 10 * 100,100)}%;background:#bd5c52;border-radius:6px;"></div>
+            </div>
+            <span style="font-size:11px;color:#756b60;margin-top:5px;">${Math.min(player.distinct_opponents,10)}/10</span>
+          </div>
+        </div>
+        <div style="font-size:12px;font-weight:600;margin-top:5px;color:#bd5148;text-align:center;white-space:nowrap;">Not yet eligible</div>
+      `
+  }
 </td>
 
           `
