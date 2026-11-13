@@ -78,25 +78,34 @@ nav button.active-tab::after{
   border-radius:2px;
 }
 .admin-nav{
-  border:1px solid #d3b36b!important;
+  border:1px solid #d3b36b !important;
   border-radius:8px;
   padding:7px 10px;
-  .register-nav{
-  background:#c8b6d8 !important;
-  color:#26352e !important;
-  border:1px solid #879b80 !important;
-  border-radius:8px;
-  padding:8px 15px !important;
-  font-size:15px !important;
-  font-weight:bold !important;
-  letter-spacing:1px;
-  margin-left:10px;
 }
 
-.register-nav:hover{
-  background:#879b80 !important;
-  color:#fff !important;
+.register-hero-btn{
+  width:104px;
+  height:104px;
+  border-radius:50%;
+  background:#c8b6d8;
+  color:#26352e;
+  border:2px solid #879b80;
+  font-family:Georgia,serif;
+  font-size:15px;
+  font-weight:bold;
+  letter-spacing:1px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  justify-self:center;
+  align-self:center;
+  box-shadow:0 4px 12px #26352e20;
 }
+
+.register-hero-btn:hover{
+  background:#879b80;
+  color:#fff;
 }
 
 main{
@@ -191,7 +200,7 @@ max-width:1400px;
 }
 .hero{
   display:grid;
-  grid-template-columns:1.3fr .7fr;
+  grid-template-columns:1.3fr auto .7fr;
   gap:24px;
   margin-bottom:25px;
 }
@@ -761,6 +770,56 @@ label{
   text-decoration:none;
 }@media(max-width:760px){
   .hero,.grid,.formgrid{grid-template-columns:1fr}
+    .hero > div:first-child{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .hero > .card{
+    grid-column:1;
+    grid-row:2;
+  }
+
+  .register-hero-btn{
+    grid-column:1;
+    grid-row:3;
+    width:190px;
+    max-width:70%;
+    height:38px;
+    border-radius:30px;
+    font-size:12px;
+    background:#ded4e8;
+    border:1px solid #a99abb;
+    color:#405447;
+    justify-self:center;
+    margin:0 auto 8px;
+    box-shadow:none;
+  }
+    .hero > div:first-child{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .hero > .card{
+    grid-column:1;
+    grid-row:2;
+  }
+
+  .register-hero-btn{
+    grid-column:1;
+    grid-row:3;
+    width:190px;
+    max-width:70%;
+    height:38px;
+    border-radius:30px;
+    font-size:12px;
+    background:#ded4e8;
+    border:1px solid #a99abb;
+    color:#405447;
+    justify-self:center;
+    margin:0 auto 8px;
+    box-shadow:none;
+  }
   h1{font-size:38px}
   .leader{grid-template-columns:35px 1fr auto}
   .admin-player{grid-template-columns:1fr}
@@ -958,13 +1017,6 @@ label{
 <button onclick="show('rules')">Rules</button>
 <button onclick="show('about')">About Us</button>
 <button onclick="show('account')">Account</button>
-<button onclick="show('account')">Account</button>
-
-<button
-  class="register-nav"
-  onclick="show('account')">
-  REGISTER
-</button>
 
 <button
   id="admin-nav"
@@ -972,12 +1024,7 @@ label{
   onclick="show('admin')">
   Admin
 </button>
-<button
-id="admin-nav"
-class="admin-nav hidden"
-onclick="show('admin')">
-Admin
-</button>
+
 </nav>
 
 </header>
@@ -1047,7 +1094,12 @@ src="How%20Dragon%20Scramble%20Works%20Infographic.png"
 <h2 id="current-scramble-title">Loading current Scramble...</h2>
 <p class="muted">Play. Climb the board. Keep it social.</p>
 </div>
-
+<button
+  class="register-hero-btn"
+  type="button"
+  onclick="show('account')">
+  REGISTER
+</button>
 <div class="card">
 <div class="eyebrow" style="font-size:16px;">Your Standing</div>
 
