@@ -438,6 +438,7 @@ h3{margin:8px 0}
   cursor:pointer;
 }
 
+
 @media(max-width:760px){
 
   .overall-table{
@@ -450,31 +451,22 @@ h3{margin:8px 0}
     padding:9px 2px;
     font-size:12px;
   }
-.overall-table th{
-  font-size:8px;
-  text-align:center !important;
-}
 
-.overall-table th:nth-child(5),
-.overall-table th:nth-child(6){
-  font-size:5px;
-}
+  .overall-table th,
+  .overall-table th .overall-sort{
+    font-size:6px;
+    text-align:center;
+  }
 
-.overall-table th .overall-sort{
-  display:block;
-  width:100%;
-  text-align:center;
-  font-size:inherit;
-}
+  .overall-table th .overall-sort{
+    display:block;
+    width:100%;
+  }
 
-.overall-table th .overall-sort{
-  display:block;
-  width:100%;
-  text-align:center;
-}
   .overall-table th:nth-child(5){
-  text-align:center !important;
-}
+    text-align:center !important;
+  }
+
   .overall-table th:nth-child(1),
   .overall-table td:nth-child(1){
     width:5%;
@@ -513,21 +505,11 @@ h3{margin:8px 0}
     overflow-wrap:anywhere;
   }
 
-  .overall-sort{
-    font-size:4px;
-  }
-
   .overall-table td.metric > div:first-child{
     gap:10px !important;
   }
-  /* Keep all leaderboard column titles the same size on mobile */
-  .overall-table th,
-  .overall-table th:nth-child(5),
-  .overall-table th:nth-child(6),
-  .overall-table th .overall-sort{
-    font-size:6px;
-  }
 }
+
 .pill{
   display:inline-block;
   padding:4px 9px;
@@ -795,9 +777,14 @@ label{
   display:inline-block;
   margin-top:8px;
   text-decoration:none;
-}@media(max-width:760px){
-  .hero,.grid,.formgrid{grid-template-columns:1fr}
-    .hero > div:first-child{
+
+@media(max-width:760px){
+
+  .hero,.grid,.formgrid{
+    grid-template-columns:1fr;
+  }
+
+  .hero > div:first-child{
     grid-column:1;
     grid-row:1;
   }
@@ -805,6 +792,7 @@ label{
   .hero > .card{
     grid-column:1;
     grid-row:2;
+    margin-bottom:0;
   }
 
   .register-hero-btn{
@@ -819,90 +807,62 @@ label{
     border:1px solid #a99abb;
     color:#405447;
     justify-self:center;
-    margin:0 auto 8px;
+    margin:0 auto;
     box-shadow:none;
   }
-    .hero > div:first-child{
-    grid-column:1;
-    grid-row:1;
-  }
 
-  .hero > .card{
-    grid-column:1;
-    grid-row:2;
-  }
-
-  .register-hero-btn{
-    grid-column:1;
-    grid-row:3;
-    width:190px;
-    max-width:70%;
-    height:38px;
-    border-radius:30px;
-    font-size:12px;
-    background:#ded4e8;
-    border:1px solid #a99abb;
-    color:#405447;
-    justify-self:center;
-    margin:0 auto 8px;
-    box-shadow:none;
-  }
-    /* Tighten mobile leaderboard spacing */
   .hero{
     gap:2px;
     margin-bottom:2px;
   }
 
-  .hero > .card{
-    margin-bottom:0;
-  }
-
-  .register-hero-btn{
-    margin:0 auto;
-  }
   h1{font-size:38px}
   .leader{grid-template-columns:35px 1fr auto}
   .admin-player{grid-template-columns:1fr}
   .admin-actions{justify-content:flex-start}
   .avg{display:none}
+
   header{
     flex-direction:column;
     align-items:flex-start;
   }
-.propose-callout{
-  flex-direction:column;
-  align-items:stretch;
-  padding:22px 18px;
-}
 
-.propose-match-btn{
-  width:100%;
-  margin-right:0;
-  white-space:normal;
-  text-align:center;
-}
+  .propose-callout{
+    flex-direction:column;
+    align-items:stretch;
+    padding:22px 18px;
+  }
 
-.propose-callout h2{
-  font-size:28px;
-}
+  .propose-match-btn{
+    width:100%;
+    margin-right:0;
+    white-space:normal;
+    text-align:center;
+  }
+
+  .propose-callout h2{
+    font-size:28px;
+  }
+
   .match-summary-row{
-  display:block;
+    display:block;
+  }
+
+  .match-summary-row > div{
+    margin-bottom:8px;
+  }
+
+  .match-actions{
+    margin-top:10px;
+  }
+
+  .match-player-line{
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+  }
 }
 
-.match-summary-row > div{
-  margin-bottom:8px;
-}
-
-.match-actions{
-  margin-top:10px;
-}
-
-.match-player-line{
-  margin-top:12px;
-  padding-top:10px;
-  border-top:1px solid var(--line);
-}
-}
   /* Dragon Scramble welcome hero */
 .welcome-notice {
   display: block;
