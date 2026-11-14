@@ -4885,7 +4885,7 @@ if(games.length !== expectedGameCount){
 
     if(game.self_picked){
       extras.push(
-      "Self-picked ×2"
+      "Self-pick bonus: +10 points"
       );
     }
 
@@ -5190,7 +5190,7 @@ class="${result === "wall" ? "" : "hidden"}">
                 type="checkbox"
                 ${game?.self_picked ? "checked" : ""}>
 
-            Self-picked ×2
+           Self-pick +10 points
 
             </label>
 
@@ -5860,7 +5860,7 @@ const scoreContentId =
                         id="${safePrefix}-self-${match.id}-${n}"
                         type="checkbox">
 
-                     Self-picked ×2
+                   Self-pick +10 points
 
                     </label>
 
